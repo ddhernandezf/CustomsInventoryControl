@@ -1,0 +1,187 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <link rel="shortcut icon" type="image/x-icon"  href="@Url.Content("~/Content/Images/favicon.ico")" />
+    <title>Index S.A. - @ViewBag.Title</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    @Styles.Render("~/TelerikMVC/CSS")
+    @Scripts.Render("~/TelerikMVC/JS")
+    @Scripts.Render("~/TelerikMVC/CULTURE")
+    <!-- start: META -->
+    <meta charset="utf-8" />
+    <!--[if IE]><meta http-equiv='X-UA-Compatible' content="IE=edge,IE=9,IE=8,chrome=1" /><![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta content="Index" name="description" />
+    <meta content="R&M" name="author" />
+    <!-- end: META -->
+    <!--Plantillas CSS-->
+    <link href="~/Content/assets/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen" />
+    <link href="~/Content/assets/plugins/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="~/Content/assets/fonts/style.css" rel="stylesheet" />
+    <link href="~/Content/assets/css/main.css" rel="stylesheet" />
+    <link href="~/Content/assets/css/main-responsive.css" rel="stylesheet" />
+    <link href="~/Content/assets/plugins/iCheck/skins/all.css" rel="stylesheet" />
+    <link href="~/Content/assets/plugins/perfect-scrollbar/src/perfect-scrollbar.css" rel="stylesheet" />
+    <link href="~/Content/assets/css/theme_light.css" rel="stylesheet" />
+    <link href="~/Content/Site.css" rel="stylesheet" />
+    <link href="~/Content/toastr.min.css" rel="stylesheet" />
+    <!--[if IE 7]>
+    <link rel="stylesheet" href="assets/plugins/font-awesome/css/font-awesome-ie7.min.css">
+    <![endif]-->
+    <!--Fin de Plantillas CSS-->
+</head>
+<body>
+    @RenderBody()
+    <!--Inicio de Script-->
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Content/assets/plugins/jquery-ui/jquery-ui-1.10.2.custom.min.js"></script>
+    <script src="~/Content/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+    <script src="~/Content/assets/plugins/blockUI/jquery.blockUI.js"></script>
+    <script src="~/Content/assets/plugins/iCheck/jquery.icheck.min.js"></script>
+    <script src="~/Content/assets/plugins/perfect-scrollbar/src/jquery.mousewheel.js"></script>
+    <script src="~/Content/assets/plugins/perfect-scrollbar/src/perfect-scrollbar.js"></script>
+    <script src="~/Content/assets/js/main.js"></script>
+    <!-- start: JAVASCRIPTS REQUIRED FOR THIS PAGE ONLY -->
+    <script src="~/Content/assets/plugins/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/Content/assets/js/login.js"></script>
+    <!-- end: JAVASCRIPTS REQUIRED FOR THIS PAGE ONLY -->
+    <script type="text/javascript">
+        $(function () {
+            Main.init();
+            Login.init();
+        });
+    </script>
+    <script src="~/Scripts/ladda.min.js"></script>
+    <script src="~/Scripts/spin.min.js"></script>
+    <script src="~/Scripts/toastr.min.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $("#formaprincipal").submit(function (e) {
+                var form = $("#formaprincipal");
+                form.validate();
+                if (form.valid()) {
+                    $("#loading").fadeIn();
+                    var opts = {
+                        lines: 12, // The number of lines to draw
+                        length: 7, // The length of each line
+                        width: 4, // The line thickness
+                        radius: 10, // The radius of the inner circle
+                        color: '#000', // #rgb or #rrggbb
+                        speed: 1, // Rounds per second
+                        trail: 60, // Afterglow percentage
+                        shadow: false, // Whether to render a shadow
+                        hwaccel: false // Whether to use hardware acceleration
+                    };
+                    var target = document.getElementById('loading');
+                    var spinner = new Spinner(opts).spin(target);
+                }
+                else {
+                    e.preventDefault();
+                }
+            });
+        }
+        );
+    </script>
+
+    <!--Fin del Inicio de Script-->
+
+    <div id="loading">
+        <div id="loadingcontent">
+            <p id="loadingspinner">
+                Autenticando...
+            </p>
+        </div>
+    </div>
+    <div class="logo-display">
+
+    </div>
+</body>
+</html>
+<script>
+    $(document).ready(function () {
+        kendo.culture("es-GT");
+        register_tab_GUID();
+    });
+
+    function register_tab_GUID() {
+        if (typeof (Storage) !== "undefined") {
+            if (sessionStorage["tabGUID"] == null) {
+                var getResult = wsExecute('GET', 'json', '@Url.Action("GetGUID", "Seguridad")', null, false);
+
+                if (getResult === '') {
+                    sessionStorage["tabGUID"] = tab_GUID();
+                    var guid = sessionStorage["tabGUID"];
+                    window.addEventListener("storage", storage_Handler, false);
+                    localStorage["tabGUID"] = guid;
+                    var setResult = wsExecute('GET', 'json', '@Url.Action("SetGUID", "Seguridad")', { 'guid': guid }, false);
+                }
+                else {
+                    if (getResult != sessionStorage["tabGUID"]) {
+                        $("#loading").fadeIn();
+                        window.location.href = "@Url.Action("MultiplesTabs", "Error")";
+                    }
+                }
+            }
+            else {
+                var getResult = wsExecute('GET', 'json', '@Url.Action("GetGUID", "Seguridad")', null, false);
+                if (getResult != sessionStorage["tabGUID"]) {
+                    $("#loading").fadeIn();
+                    window.location.href = "@Url.Action("MultiplesTabs", "Error")";
+                }
+            }
+        }
+    }
+
+    function storage_Handler(e) {
+        // if tabGUID does not match then more than one tab and GUID
+        if (e.key == 'tabGUID') {
+            if (e.oldValue != e.newValue) {
+                tab_Warning();
+            }
+        }
+    }
+
+    function tab_GUID() {
+        function s4() {
+            return Math.floor((1 + Math.random()) * 0x10000)
+              .toString(16)
+              .substring(1);
+        }
+        return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+          s4() + '-' + s4() + s4() + s4();
+    }
+
+    function tab_Warning() {
+        alert("Another tab is open!");
+    }
+</script>
+<style>
+    body {
+        display: inline-block;
+        width: 100%;
+    }
+
+    #login-box {
+        margin-top:10%;
+        border: solid;
+        padding: 10px;
+        border-radius: 10px;
+        border-color: #005CA8;
+        border-width: 2px;
+        display: inline-block;
+    }
+
+    .logo-display {
+        background-image: url("@Url.Content("~/Content/Images/LogoIndex00001.jpg")");
+        width: 200px;
+        height: 200px;
+        background-size: 100% 100%;
+        position: fixed;
+        bottom: 11px;
+        right: 10px;
+        opacity: 0.3;
+    }
+</style>

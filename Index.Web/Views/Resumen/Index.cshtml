@@ -1,0 +1,77 @@
+﻿@using Index.Commons;
+@using Kendo.Mvc.UI;
+
+@Styles.Render("~/Content/css")
+@Scripts.Render("~/bundles/modernizr")
+@Styles.Render("~/TelerikMVC/CSS")
+@Scripts.Render("~/TelerikMVC/JS")
+@Scripts.Render("~/TelerikMVC/CULTURE")
+
+@{
+    ViewBag.Title = "Index";
+    Layout = null;
+}
+
+@(Html.Kendo().Grid<DischargeResume>()
+                    .Name("grdRawMaterial")
+                    .AutoBind(false)
+                    .HtmlAttributes(new { @style = "height: 99%; font-size: 10px;" })
+                    .Columns(columns =>
+                    {
+                        columns.Bound(o => o.Id).Hidden(true);
+                        columns.Bound(o => o.IdFileHeader).Hidden(true);
+                        columns.Bound(o => o.IdFileDetailStock).Hidden(true);
+                        columns.Bound(o => o.IdFileDetailSubstract).Hidden(true);
+                        columns.Bound(o => o.IdState).Hidden(true);
+                        columns.Bound(o => o.IdItem).Hidden(true);
+                        columns.Bound(o => o.TransactionDate).Width(80).Format("{0: dd/MM/yyyy}").Filterable(false).ClientFooterTemplate("#=count#"); ;
+                        columns.Bound(o => o.TransactionLine).Width(50).Filterable(false);
+                        columns.Bound(o => o.DocumentName).Width(150).Filterable(f => f.Cell(r => r.Operator("contains")));
+                        columns.Bound(o => o.InventoryQuantity).Width(115).ClientTemplate("#=kendo.toString(InventoryQuantity,'n6')#").Filterable(false);
+                        columns.Bound(o => o.Stock).Width(115).ClientTemplate("#=kendo.toString(Stock,'n6')#").Filterable(false);
+                        columns.Bound(o => o.Quantity).Width(115).ClientTemplate("#=kendo.toString(Quantity,'n6')#").Filterable(false).ClientFooterTemplate("#=kendo.toString(sum,'n6')#");
+                        columns.Bound(o => o.Decrease).Width(115).ClientTemplate("#=kendo.toString(Decrease,'n6')#").Filterable(false);
+                        columns.Bound(o => o.StateName).Width(90).Filterable(false);
+                        columns.Bound(o => o.Cif).Width(115).ClientTemplate("#=kendo.toString(Cif,'c6')#").Filterable(false).ClientFooterTemplate("#=kendo.toString(sum,'c6')#");
+                        columns.Bound(o => o.Dai).Width(115).ClientTemplate("#=kendo.toString(Dai,'c6')#").Filterable(false).ClientFooterTemplate("#=kendo.toString(sum,'c6')#");
+                        columns.Bound(o => o.Iva).Width(115).ClientTemplate("#=kendo.toString(Iva,'c6')#").Filterable(false).ClientFooterTemplate("#=kendo.toString(sum,'c6')#");
+                    })
+                    .Pageable(p =>
+                    {
+                        p.Refresh(true);
+                    })
+                    .Scrollable()
+                    .AutoBind(true)
+                    .DataSource(dataSource => dataSource
+                        .Ajax()
+                        .Aggregates(a=>
+                        {
+                            a.Add(p => p.TransactionDate).Count();
+                            a.Add(p => p.Quantity).Sum();
+                            a.Add(p => p.Cif).Sum();
+                            a.Add(p => p.Dai).Sum();
+                            a.Add(p => p.Iva).Sum();
+                        })
+                        .Group(g =>
+                        {
+                            g.Add(f => f.ItemName);
+                        })
+                        .PageSize(20)
+                        .Model(m =>
+                        {
+                            m.Id(o => o.IdItem);
+                        })
+                        .Read(r => r.Action("Read", "Resumen", new { IdFileDetail = ViewBag.IdFileDetail }))
+                     )
+)
+
+<style>
+    table {
+        font-size: 10px;
+    }
+</style>
+<script>
+    $(document).ready(function () {
+        kendo.culture("es-GT");
+    });
+</script>

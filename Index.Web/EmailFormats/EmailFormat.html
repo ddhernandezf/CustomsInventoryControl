@@ -1,0 +1,39 @@
+<html>
+    <head>
+		<title>Home</title>
+    </head>
+    <body style="display: inline-block;position: relative;width: 700px;margin: 0px;padding: 0px;background-color: #005CA8;font-family: arial;">
+        <div style="background-color: #FFFFFF;width: 90%;float: left;margin-left: 5%;margin-top: 15px; margin-bottom: 15px; box-shadow: 0 0 15px #ddd;border-radius: 15px;">
+            <div style="font-size: 20px;font-weight: bolder;text-align: center;padding: 10px 0px;margin-top: 20px;">Resultados de transmisión a OPA</div>
+            <div style="font-size: 13px;text-align: justify;width: 90%;display: inline-block;margin-left: 4%;padding: 10px 5px;">
+                Su batch de transmisión con prioridad <span style="font-weight: bolder;">@Priority</span>, en el periodo de tiempo del
+                <span style="font-weight: bolder;">@StartDate</span> al <span style="font-weight: bolder;">@EndDate</span> para el cliente
+                <span style="font-weight: bolder;">@Customer</span> bajo la cuenta <span style="font-weight: bolder;">@Account</span>. Ha terminado
+                de transmitir con los siguientes resultados:
+            </div>
+            <div style="width: 100%;margin-top: 20px;">
+                <table style="border-spacing: 0;border-collapse: collapse;min-width: 90%;display: block;min-height: auto;overflow-x: auto;overflow-y: auto;max-width: 90%;margin-left: 5%;max-height: 300px;">
+                    <thead>
+                        <tr>
+                            <td style="min-width: 100px;border: solid;white-space: nowrap;text-align: center;padding: 5px 20px;border-width: 0.5px;font-weight: bolder;font-size: 17px;">Estado</td>
+                            <td style="min-width: 250px;border: solid;white-space: nowrap;text-align: center;padding: 5px 20px;border-width: 0.5px;font-weight: bolder;font-size: 17px;">Mensaje</td>
+                            <td style="border: solid;white-space: nowrap;text-align: center;padding: 5px 20px;border-width: 0.5px;font-weight: bolder;font-size: 17px;">Información de exportación</td>
+                            <td style="border: solid;white-space: nowrap;text-align: center;padding: 5px 20px;border-width: 0.5px;font-weight: bolder;font-size: 17px;">Información de importación</td>
+                            <td style="min-width: 150px;border: solid;white-space: nowrap;text-align: center;padding: 5px 20px;border-width: 0.5px;font-weight: bolder;font-size: 17px;">Cantidad</td>
+                            <td style="min-width: 150px;border: solid;white-space: nowrap;text-align: center;padding: 5px 20px;border-width: 0.5px;font-weight: bolder;font-size: 17px;">CIF</td>
+                            <td style="min-width: 150px;border: solid;white-space: nowrap;text-align: center;padding: 5px 20px;border-width: 0.5px;font-weight: bolder;font-size: 17px;">FOB</td>
+                            <td style="min-width: 150px;border: solid;white-space: nowrap;text-align: center;padding: 5px 20px;border-width: 0.5px;font-weight: bolder;font-size: 17px;">DAI</td>
+                            <td style="min-width: 150px;border: solid;white-space: nowrap;text-align: center;padding: 5px 20px;border-width: 0.5px;font-weight: bolder;font-size: 17px;">IVA</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @data
+                    </tbody>
+                </table>
+            </div>
+            <div style="display: inline-block;padding: 30px 0px;text-align: center;width: 100%;">
+                <a href="@SystemUrl">Click aquí para ir al sistema</a>
+            </div>
+        </div>
+    </body>
+</html>

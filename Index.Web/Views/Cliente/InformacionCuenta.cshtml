@@ -1,0 +1,151 @@
+﻿@using Kendo.Mvc.UI
+
+@Styles.Render("~/Content/css")
+@Scripts.Render("~/bundles/modernizr")
+@Styles.Render("~/TelerikMVC/CSS")
+@Scripts.Render("~/TelerikMVC/JS")
+@Scripts.Render("~/TelerikMVC/CULTURE")
+@model Index.Commons.CustomerAccountData
+
+@{
+
+    Layout = null;
+}
+
+@using (Html.BeginForm("InformacionCuenta", "Cliente", FormMethod.Post, new { @id = "frmCustomerInfo" }))
+{
+    <div class="k-edit-form-container">
+        <div style="display: inline-block;width: 100%;overflow: hidden;">
+            @Html.HiddenFor(m => m.IdCustomer)
+            @Html.HiddenFor(m => m.IdAccount)
+            <div class="error">
+                @Html.ValidationMessage("errorGeneral")
+            </div>
+            <div class="col-12" style="padding:0px;">
+                <div class="col-12 title">Periodo de resolución</div>
+                <div class="col-4">
+                    <div class="col-12 title">@Html.DisplayNameFor(x => x.ResolutionStartDate)</div>
+                    <div class="col-12 item">
+                        @(Html.Kendo().DatePicker()
+                            .Name("ResolutionStartDate")
+                            .HtmlAttributes(new { Style = "width:100%;" })
+                            .Format("dd/MM/yyyy")
+                            .Value(Model.ResolutionStartDate)
+                        )
+                        <div class="error">@Html.ValidationMessageFor(m => m.ResolutionStartDate)</div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="col-12 title">@Html.DisplayNameFor(x => x.ResolutionEndDate)</div>
+                    <div class="col-12 item">
+                        @(Html.Kendo().DatePicker()
+                            .Name("ResolutionEndDate")
+                            .HtmlAttributes(new { Style = "width:100%;" })
+                            .Format("dd/MM/yyyy")
+                            .Value(Model.ResolutionEndDate)
+                        )
+                        <div class="error">@Html.ValidationMessageFor(m => m.ResolutionEndDate)</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12" style="padding:0px;">
+                <div class="col-12 title">Periodo fiscal</div>
+                <div class="col-4">
+                    <div class="col-12 title">@Html.DisplayNameFor(x => x.FiscalPeriodStartDate)</div>
+                    <div class="col-12 item">
+                        @(Html.Kendo().DatePicker()
+                            .Name("FiscalPeriodStartDate")
+                            .HtmlAttributes(new { Style = "width:100%;" })
+                            .Format("dd/MM/yyyy")
+                            .Value(Model.FiscalPeriodStartDate)
+                        )
+                        <div class="error">@Html.ValidationMessageFor(m => m.FiscalPeriodStartDate)</div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="col-12 title">@Html.DisplayNameFor(x => x.FiscalPeriodEndDate)</div>
+                    <div class="col-12 item">
+                        @(Html.Kendo().DatePicker()
+                            .Name("FiscalPeriodEndDate")
+                            .HtmlAttributes(new { Style = "width:100%;" })
+                            .Format("dd/MM/yyyy")
+                            .Value(Model.FiscalPeriodEndDate)
+                        )
+                        <div class="error">@Html.ValidationMessageFor(m => m.FiscalPeriodEndDate)</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12" style="padding:0px;">
+                <div class="col-4">
+                    <div class="col-12 title">@Html.DisplayNameFor(x => x.RegimeRate)</div>
+                    <div class="col-12 item">
+                        @(Html.Kendo().TextBox()
+                            .Name("RegimeRate")
+                            .HtmlAttributes(new { Style = "width:100%;" })
+                            .Value(Model.RegimeRate)
+                        )
+                        <div class="error">@Html.ValidationMessageFor(m => m.RegimeRate)</div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="col-12 title">@Html.DisplayNameFor(x => x.ResolutionRate)</div>
+                    <div class="col-12 item">
+                        @(Html.Kendo().TextBox()
+                            .Name("ResolutionRate")
+                            .HtmlAttributes(new { Style = "width:100%;" })
+                            .Value(Model.ResolutionRate)
+                        )
+                        <div class="error">@Html.ValidationMessageFor(m => m.ResolutionRate)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="k-edit-buttons k-state-default" style="float: left;width: 100%;border-top: solid;padding-top: 10px;border-width: 1px;color: gray;text-align: right;">
+        <button id="btnSave" type="submit" class="k-button k-button-icontext k-primary k-grid-update">
+            <span class="k-icon k-update"></span> Actualizar
+        </button>
+        &nbsp;
+        <button id="btnCancel" type="button" class="k-button k-button-icontext k-grid-cancel">
+            <span class="k-icon k-cancel"></span> Cancelar
+        </button>
+    </div>
+}
+
+<style>
+    .error {
+        color: red;
+        font-size: 11px;
+    }
+</style>
+
+<script>
+    $(document).ready(function () {
+        kendo.culture("es-GT");
+        $("#frmCustomerInfo").submit(function () {
+            $("#loading").fadeIn();
+        });
+
+        $("#btnCancel").click(function () {
+            window.parent.$("#customerAccountDataWindow").data("kendoWindow").close();
+        });
+
+        if ("@ViewBag.Success" == "True") {
+            window.parent.$("#customerAccountDataWindow").data("kendoWindow").close();
+
+            var wnd = window.parent.$("#modalWindowAlert").kendoWindow({
+                title: "Confirmaci&oacute;n",
+                modal: true,
+                visible: false,
+                resizable: false,
+                width: 300
+            }).data("kendoWindow");
+
+            $("#yes").hide();
+            $("#no").hide();
+
+            window.parent.$("#confirmMessage").html("Información registrada exitosamente");
+            wnd.center().open();
+        }
+    });
+</script>

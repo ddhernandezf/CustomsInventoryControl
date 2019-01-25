@@ -1,0 +1,64 @@
+﻿@using Index.Commons;
+@using Kendo.Mvc.UI;
+
+@{
+    Layout = null;
+}
+
+<div style="width:450px;padding-left: 10px;padding-bottom: 30px;font-size: 12px;">
+    Marque o desmarque los roles que necesita o no utilizara para este usuario.
+</div>
+<div style="width:100%;">
+    @(Html.Kendo().Grid((List<CustomerToAssign>)ViewBag.data)
+     .Name("grdSecundary")
+     .Columns(c =>
+     {
+         c.Bound(p => p.Id).Hidden(true);
+         c.Bound(p => p.EnterpriseName).Width(100).Filterable(f => f.Cell(r => r.Operator("contains")));
+         c.Bound(p => p.IsAssigned).Width(25).Filterable(false).ClientTemplate("<input data-idperson='#=Id#' type='checkbox' #= IsAssigned ? checked='checked' :'' # enabled/>").Title("Asignados");
+     })
+     .Scrollable()
+     .Filterable(f =>
+        {
+            f.Mode(GridFilterMode.Row);
+        })
+     .DataSource(dataSource => dataSource
+        .Ajax()
+        .ServerOperation(false)
+     )
+    )
+</div>
+<script>
+    $(document).ready(function () {
+        $(':checkbox').change(function () {
+            customerAssignment($(this).is(':checked'), parseInt($(this).data("idperson")));
+        });
+    });
+
+    function customerAssignment(addorremove, idcustomer) {
+        var result;
+        if (addorremove) {
+            result = wsExecute('POST', 'json', '@Url.Action("AddCustomerAsignment", "Usuario")', { 'model': { IdCustomer: idcustomer, UserName: '@ViewBag.UserName' } }, false);
+        }
+        else {
+            result = wsExecute('POST', 'json', '@Url.Action("RemoveCustomerAssignment", "Usuario")', { 'model': { IdCustomer: idcustomer, UserName: '@ViewBag.UserName' } }, false)
+        }
+
+        if (result.Errors) {
+            if (args.errors.errorGeneral) {
+                wnd = $("#modalWindowAlert").kendoWindow({
+                    title: "Error",
+                    modal: true,
+                    visible: false,
+                    resizable: false,
+                    width: 300
+                }).data("kendoWindow");
+
+                $("#yes").hide();
+                $("#no").hide();
+                $("#confirmMessage").html(args.errors.errorGeneral.errors[0]);
+                wnd.center().open();
+            }
+        }
+    }
+</script>

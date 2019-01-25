@@ -1,0 +1,39 @@
+﻿@using Index.Commons;
+@using Kendo.Mvc.UI;
+
+@{
+    Layout = null;
+}
+
+@(Html.Kendo().Grid<Customer>()
+                    .Name("grdAjaxCrud")
+                    .Columns(c =>
+                    {
+                        c.Bound(p => p.Id).Hidden(true);
+                        c.Bound(p => p.EnterpriseName).ClientTemplate("<a rel='' style='width:100%;' class='k-button k-primary' href='javascript:changeCustomer(#=Id#);'>#=EnterpriseName#</a>")
+                            .Filterable(f => f.Cell(r => r.Operator("contains")));
+                        //c.Bound(p => p.EnterpriseName).Width(125).Title("").Filterable(false).ClientTemplate("<a rel='' class='k-button k-primary' href='javascript:changeCustomer(#=Id#);'>Seleccionar</a>");
+                    })
+                    .Pageable(p =>
+                    {
+                        p.Refresh(true);
+                    })
+                    .Scrollable()
+                    .Filterable(f =>
+                    {
+                        f.Mode(GridFilterMode.Row);
+                    })
+                    .DataSource(dataSource => dataSource
+                        .Ajax()
+                        .PageSize(20)
+                        .Model(m =>
+                        {
+                            m.Id(o => o.Id);
+                        })
+                        .Read(r => r.Action("ReadByAssignment", "Usuario"))
+                        .Events(e =>
+                        {
+                            e.Error("errorHandler");
+                        })
+                     )
+)

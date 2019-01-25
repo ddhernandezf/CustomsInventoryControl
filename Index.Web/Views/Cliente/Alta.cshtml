@@ -1,0 +1,85 @@
+﻿@using Kendo.Mvc.UI;
+@using Index.Commons;
+@model CustomerDischarged
+
+@{
+    ViewBag.Title = "Alta";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("Alta", "Cliente", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    <div class="col-12">
+        <div class="col-6">
+            <div class="col-12 title">@Html.DisplayNameFor(x => x.DcoumentName)</div>
+            <div class="col-12 item">
+                @(Html.Kendo().TextBox()
+                    .Name("DcoumentName")
+                    .HtmlAttributes(new { Style = "width:100%;" })
+                    .Value(Model.DcoumentName)
+                )
+                <div class="error">@Html.ValidationMessageFor(m => m.DcoumentName)</div>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="col-12 title">@Html.DisplayNameFor(x => x.DcoumentDescription)</div>
+            <div class="col-12 item">
+                @Html.TextAreaFor(m => m.DcoumentDescription, new { @style = "width:100%;height:95px;", @class = "k-textbox" })
+                <div class="error">@Html.ValidationMessageFor(m => m.DcoumentDescription)</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12">
+        <div class="col-6">
+            <div class="col-12 title">@Html.DisplayNameFor(x => x.FilePath)</div>
+            <div class="col-12 item">
+                @(Html.Kendo().Upload()
+                    .Name("FilePath")
+                    .HtmlAttributes(new { @accept = ".pdf, .doc, .docx" })
+                    .Events(e=> {
+                        e.Select("FilePathSelect");
+                    })
+                )
+                <div class="error">@Html.ValidationMessageFor(m => m.DcoumentDescription)</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 text-center">
+        @(Html.Kendo().Button()
+                            .Name("btnGuardar")
+                            .Content("Guardar")
+                            .ImageUrl(Url.Content("~/Content/Images/SaveButton.png"))
+                            .HtmlAttributes(new { @class = "k-primary", @type = "submit" })
+        )
+
+        @(Html.Kendo().Button()
+                            .Name("btnCancelar")
+                            .Content("Cancelar")
+                            .ImageUrl(Url.Content("~/Content/Images/CancelButton.png"))
+                            .HtmlAttributes(new { @type = "button", @style = "margin-left:20px;" })
+                            .Events(e =>
+                            {
+                                e.Click("cancelar");
+                            })
+        )
+    </div>
+}
+
+<script>
+    function cancelar() {
+        alert("cancelar");
+    }
+
+    function FilePathSelect(e) {
+        if (e.files.length > 20) {
+            alert("Please select max 20 files.");
+            e.preventDefault();
+        }
+    }
+</script>
+
+<style>
+    .error {
+        color: red;
+    }
+</style>

@@ -1,0 +1,75 @@
+﻿@using System
+@using Kendo.Mvc.UI
+@using Kendo.Mvc.UI.Fluent
+
+<div class="menu">
+    @{
+        Index.Web.Controllers.MenuController menu = new Index.Web.Controllers.MenuController();
+        List<Index.Commons.Menu> data = (List<Index.Commons.Menu>)Session["MENUINFO"];
+    }
+    @functions{
+        public void addChildren(MenuItemBuilder builder, Index.Commons.Menu item, IEnumerable<Index.Commons.Menu> items)
+        {
+            var children = items.Where(m => m.IdParent == item.Id);
+            if (children != null)
+            {
+                builder.Items(menuItems =>
+                {
+                    foreach (var child in children)
+                    {
+                        if (child.ShowMenu == true)
+                        {
+                            var menuItem = menuItems.Add().Text(child.Name);
+                            if (!String.IsNullOrEmpty(child.Action) || !String.IsNullOrWhiteSpace(child.Action))
+                            {
+                                menuItem.Action(child.Action, child.Controller);
+                            }
+                            if (!String.IsNullOrEmpty(child.Image) || !String.IsNullOrWhiteSpace(child.Image))
+                            {
+                                menuItem.ImageUrl(Url.Content("~/Content/Images/Menu/" + child.Image));
+                            }
+
+                            addChildren(menuItem, child, items);
+                        }
+                    }
+                });
+
+            }
+        }
+    }
+
+    @if (Session["MENUINFO"] != null)
+    {
+        @(Html.Kendo().Menu()
+                  .Name("Menu")
+                  .Items(i =>
+                  {
+                      foreach (Index.Commons.Menu item in data.Where(l => l.IdParent == 0))
+                      {
+                          if (item.ShowMenu == true)
+                          {
+                              var builder = i.Add().Text(item.Name);
+                              if (!String.IsNullOrEmpty(item.Action) || !String.IsNullOrWhiteSpace(item.Action))
+                              {
+                                  builder.Action(item.Action, item.Controller);
+                              }
+                              if (!String.IsNullOrEmpty(item.Image) || !String.IsNullOrWhiteSpace(item.Image))
+                              {
+                                  builder.ImageUrl(Url.Content("~/Content/Images/Menu/" + item.Image));
+                              }
+
+                              addChildren(builder, item, data);
+                          }
+                      }
+                  })
+                  .HtmlAttributes(new { @style = "width:100%;" })
+                  .Events(e =>
+                  {
+                      e.Select("SelectMenu");
+                  })
+                  .Orientation(MenuOrientation.Vertical)
+                  .Direction(MenuDirection.Bottom)
+        )
+    }
+</div>
+

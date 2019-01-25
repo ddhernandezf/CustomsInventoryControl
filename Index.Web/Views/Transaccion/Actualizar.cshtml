@@ -1,0 +1,510 @@
+﻿@using System
+@using Kendo.Mvc.UI
+@using Index.Commons;
+
+@{
+    Layout = null;
+}
+
+@Styles.Render("~/Content/css")
+@Scripts.Render("~/bundles/modernizr")
+@Styles.Render("~/TelerikMVC/CSS")
+@Scripts.Render("~/TelerikMVC/JS")
+@Scripts.Render("~/TelerikMVC/CULTURE")
+
+@using (Html.BeginForm("Update", "Transaccion", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @id = "frmImportsUpdate" }))
+{
+    <div id="html-continer-update"></div>
+    <div class="error general">
+        <div id="error-general"></div>
+    </div>
+    <div class="col-12 no-padding">
+        <div class="col-4">
+            <div class="col-12 title">Tipo de documento</div>
+            <div class="col-12 item">
+                @(Html.Kendo().DropDownList()
+              .Name("IdFileInfoUpd")
+              .DataTextField("Name")
+              .DataValueField("Id")
+              .OptionLabel("Seleccionar...")
+              .SelectedIndex(0)
+              .Filter("contains")
+              .DataSource(source =>
+              {
+                  source.Read(read =>
+                  {
+                      read.Action("getComboConfig", "Documento");
+                  });
+              })
+              .HtmlAttributes(new { style = "width: 100%" })
+              .Events(e =>
+              {
+                  e.Select("SelectIdFileInfoUpdate");
+              })
+                )
+                <div class="error">@Html.ValidationMessage("IdFileInfo")</div>
+            </div>
+        </div>
+        <div class="col-4" style="float:right; text-align">
+            @(Html.Kendo().Button()
+            .Name("btnGuardarUpdate")
+            .Content("Guardar")
+            .HtmlAttributes(new { @type = "button", @class = "k-primary", @style = "margin-top: 15px;" })
+            .Enable(false)
+            .Events(e =>
+            {
+                e.Click("btnGuardarUpdate_Click");
+            })
+            )
+            &nbsp;&nbsp;
+            @(Html.Kendo().Button()
+            .Name("btnCancelarUpdate")
+            .Content("Cancelar")
+            .HtmlAttributes(new { @type = "button", @style = "margin-top: 15px;" })
+            .Enable(false)
+            .Events(e =>
+            {
+                e.Click("btnCancelarUpdate_Click");
+            })
+            )
+        </div>
+    </div>
+    <div id="loading">
+        <div id="loadingcontent">
+            <p id="loadingspinner">
+                <img style="width:50px;height:50px;" src="@Url.Content("~/Content/Images/loading.gif")" />
+            </p>
+        </div>
+    </div>
+}
+
+<style>
+    .error {
+        color: red;
+    }
+
+        .error.general {
+            float: left;
+            width: 100%;
+            display: inline-block;
+        }
+
+    #error-general {
+        width: 100%;
+        text-align: center;
+    }
+</style>
+
+<script>
+    var dtResolucion, dtMoneda, dtGarantia, dtAduana, dtPais, dtBodega;
+    var dataForm, dataContent, data;
+    var glbFileInfoConfig = null;
+
+    $(document).ready(function () {
+        $("#loading").fadeIn();
+        dataContent = @Html.Raw(ViewBag.data);
+        fillData(dataContent);
+    });
+
+    $(document).keydown(function (e) {
+        var keycode;
+
+        if (window.event)
+            keycode = window.event.keyCode;
+        else if (e)
+            keycode = e.which;
+
+        if (keycode == 113) {
+            $('#btnGuardar').trigger('click');
+        }
+
+        if (keycode == 27) {
+            $('#btnCancelar').trigger('click');
+        }
+    });
+
+    function btnGuardarUpdate_Click(e){
+        var data = dataForm;
+        var response = true;
+
+        for (var i = 0; i < data.length; i++) {
+            switch (data[i].ObjectHtml) {
+                case "TextBox":
+                    $("span[data-valmsg-for=" + data[i].DataBaseName + "]").html('');
+                    if (data[i].IsUsed) {
+                        if (data[i].IsRequeried) {
+                            var obj = $("#" + data[i].DataBaseName);
+                            if (obj.val() == '' || obj.val() == null) {
+                                $("span[data-valmsg-for=" + data[i].DataBaseName + "]").html('*');
+                                response = false;
+                            }
+                        }
+                    }
+                    break;
+                case "DropDownList":
+                    $("span[data-valmsg-for=" + data[i].DataBaseName + "]").html('');
+                    if (data[i].IsUsed) {
+                        if (data[i].IsRequeried) {
+                            var obj = $("#" + data[i].DataBaseName).data("kendoDropDownList");
+                            if (obj.value() == '' || obj.value() == null) {
+                                $("span[data-valmsg-for=" + data[i].DataBaseName + "]").html('*');
+                                response = false;
+                            }
+                        }
+                    }
+                    break;
+                case "DatePicker":
+                    $("span[data-valmsg-for=" + data[i].DataBaseName + "]").html('');
+                    if (data[i].IsUsed) {
+                        if (data[i].IsRequeried) {
+                            var obj = $("#" + data[i].DataBaseName).data("kendoDatePicker");
+                            if (obj.value() == '' || obj.value() == null) {
+                                $("span[data-valmsg-for=" + data[i].DataBaseName + "]").html('*');
+                                response = false;
+                            }
+                        }
+                    }
+                    break;
+                case "NumericTextBox":
+                    $("span[data-valmsg-for=" + data[i].DataBaseName + "]").html('');
+                    if (data[i].IsUsed) {
+                        if (data[i].IsRequeried) {
+                            var obj = $("#" + data[i].DataBaseName).data("kendoNumericTextBox");
+                            if (obj.value() == '' || obj.value() == null) {
+                                $("span[data-valmsg-for=" + data[i].DataBaseName + "]").html('*');
+                                response = false;
+                            }
+                        }
+                    }
+                    break;
+            }
+        }
+
+        if (response) {
+            $("#loading").fadeIn();
+            setTimeout(function () {
+                var formdata = $("#frmImportsUpdate").serialize();
+                var otro = JSON.stringify(formdata);
+                var result = wsExecute("POST", "json", "@Url.Action("Update", "Transaccion")", formdata, false);
+
+                if (result === true) {
+                    var win = window.parent.$("#wndUpdate").data("kendoWindow");
+                    win.close();
+                    window.parent.$("#grdCrud").data("kendoGrid").dataSource.read();
+                    window.parent.location.reload();
+                }
+                else {
+                    $("#error-general").html(result);
+                    $("#loading").fadeOut();
+                }
+            }, 500);
+        }
+    }
+
+    function loadData(idfileinfoconfig) {
+        data = wsExecute("GET", "json", "@Url.Action("getMaster", "Transaccion")" + "?IdFileInfoConfig=" + idfileinfoconfig, null, false);
+        dtResolucion = wsExecute("GET", "json", "@Url.Action("getCombo", "Resolucion")", null, false);
+        dtMoneda = wsExecute("GET", "json", "@Url.Action("getCombo", "Moneda")", null, false);
+        dtGarantia = wsExecute("GET", "json", "@Url.Action("getCombo", "Garantia")", null, false);
+        dtAduana = wsExecute("GET", "json", "@Url.Action("getCombo", "Aduana")", null, false);
+        dtPais = wsExecute("GET", "json", "@Url.Action("getCombo", "Pais")", null, false);
+        dtBodega = wsExecute("GET", "json", "@Url.Action("getCombo", "Bodega")", null, false);
+        dataForm = data;
+    }
+
+    function writeWeb(data, isNew) {
+        var htmlcontainer, htmlconstructor = '';
+
+        if (isNew) {
+            htmlcontainer = $('#html-continer');
+            htmlcontainer.html('');
+        }
+        else {
+            htmlcontainer = $('#html-continer-update');
+            htmlcontainer.html('');
+            htmlconstructor = '<input type="hidden" id="Id" name="Id" value="' + dataContent.Id + '" />'
+                                    + '<input type="hidden" id="IdFileInfoUpdate" name="IdFileInfoUpdate" value="' + $("#IdFileInfoUpd").data("kendoDropDownList").value() + '" />'
+                                    + '<input type="hidden" id="IdState" name="IdState" value="' + dataContent.IdState + '" />';
+        }
+
+        //html constructor
+        for (var i = 0; i < data.length; i++) {
+            var readonlyText = (isNew == false) ? ((setReadOnly(data[i].DataBaseName, dataContent.Id) == true) ? 'readonly' : '') : '';
+            switch (data[i].ObjectHtml) {
+                case "TextBox":
+                    if (data[i].IsUsed) {
+                        var req = (data[i].IsUsed == true) ? 'requeried' : '';
+                        var itemvalue = (isNew == true) ? '' : 'value="' + getItemValue(data[i].DataBaseName) + '"';
+
+                        htmlconstructor = htmlconstructor + '<div class="col-2">'
+                                        + '<div class="col-12 title">' + data[i].Label + '</div>'
+                                        + '<div class="col-12 item">'
+                                            + '<input id="' + data[i].DataBaseName + '" name="' + data[i].DataBaseName + '" type="text" class="k-textbox" style="width: 100%" ' + itemvalue + ' maxlength="100" ' + req + ' ' + readonlyText  + '/>'
+                                            + '<div class="error">'
+                                                + '<span class="field-validation-valid" data-valmsg-for="' + data[i].DataBaseName + '" data-valmsg-replace="true"></span>'
+                                             + '</div>'
+                                        + '</div>'
+                                    + '</div>';
+                    }
+                    break;
+                case "DropDownList":
+                    if (data[i].IsUsed) {
+                        var req = (data[i].IsUsed == true) ? 'requeried' : '';
+
+                        htmlconstructor = htmlconstructor + '<div class="col-3">'
+                                        + '<div class="col-12 title">' + data[i].Label + '</div>'
+                                        + '<div class="col-12 item">'
+                                            + '<input name="' + data[i].DataBaseName + '" id="' + data[i].DataBaseName + '" style="width: 100%" ' + req + ' ' + readonlyText + ' />'
+                                            + '<div class="error">'
+                                                + '<span class="field-validation-valid" data-valmsg-for="' + data[i].DataBaseName + '" data-valmsg-replace="true"></span>'
+                                             + '</div>'
+                                        + '</div>'
+                                    + '</div>';
+                    }
+                    break;
+                case "DatePicker":
+                    if (data[i].IsUsed) {
+                        var req = (data[i].IsUsed == true) ? 'requeried' : '';
+
+                        htmlconstructor = htmlconstructor + '<div class="col-3">'
+                                        + '<div class="col-12 title">' + data[i].Label + '</div>'
+                                        + '<div class="col-12 item">'
+                                            + '<input name="' + data[i].DataBaseName + '" id="' + data[i].DataBaseName + '" style="width: 100%" ' + req + ' ' + readonlyText + ' />'
+                                            + '<div class="error">'
+                                                + '<span class="field-validation-valid" data-valmsg-for="' + data[i].DataBaseName + '" data-valmsg-replace="true"></span>'
+                                             + '</div>'
+                                        + '</div>'
+                                    + '</div>';
+                    }
+                    break;
+                case "NumericTextBox":
+                    if (data[i].IsUsed) {
+                        var req = (data[i].IsUsed == true) ? 'requeried' : '';
+
+                        htmlconstructor = htmlconstructor + '<div class="col-3">'
+                                        + '<div class="col-12 title">' + data[i].Label + '</div>'
+                                        + '<div class="col-8 item">'
+                                            + '<input name="' + data[i].DataBaseName + '" id="' + data[i].DataBaseName + '" type="number" min="0" step="1" style="width: 100%;" ' + req + ' ' + readonlyText + ' />'
+                                            + '<div class="error">'
+                                                + '<span class="field-validation-valid" data-valmsg-for="' + data[i].DataBaseName + '" data-valmsg-replace="true"></span>'
+                                             + '</div>'
+                                        + '</div>'
+                                    + '</div>';
+                    }
+                    break;
+            }
+            htmlcontainer.html(htmlconstructor);
+        }
+
+        //kendo constructor
+        for (var i = 0; i < data.length; i++) {
+            switch (data[i].ObjectHtml) {
+                case "TextBox":
+                    $("#" + data[i].DataBaseName).bind('change', function () {
+                        EmulateTab(data, $(this).prop('id'));
+                    })
+                    break;
+                case "DropDownList":
+                    if (data[i].IsUsed) {
+                        $("#" + data[i].DataBaseName).kendoDropDownList({
+                            filter: "contains",
+                            dataTextField: "Name",
+                            dataValueField: "Id",
+                            optionLabel: {
+                                Name: "Seleccionar...",
+                                Id: ""
+                            },
+                            dataSource: getDatasetValue(data[i].DataBaseName),
+                            value: (isNew == true) ? null : getItemValue(data[i].DataBaseName),
+                            change: function () {
+                                EmulateTab(data, this.element.attr('id'));
+                            }
+                        });
+                    }
+                    break;
+                case "DatePicker":
+                    if (data[i].IsUsed) {
+                        $("#" + data[i].DataBaseName).kendoDatePicker({
+                            format: "dd/MM/yyyy",
+                            value: (isNew == true) ? null : getItemValue(data[i].DataBaseName),
+                            change: function () {
+                                EmulateTab(data, this.element.attr('id'));
+                            }
+                        });
+                    }
+                    break;
+                case "NumericTextBox":
+                    if (data[i].IsUsed) {
+                        $("#" + data[i].DataBaseName).kendoNumericTextBox({
+                            spinners: false,
+                            value: (isNew == true) ? null : getItemValue(data[i].DataBaseName),
+                            format: "n6",
+                            decimals: 6,
+                            change: function () {
+                                EmulateTab(data, this.element.attr('id'));
+                            }
+                        });
+                    }
+                    break;
+            }
+        }
+        $("#loading").fadeOut();
+        focusFirstElement(data, data[0].DataBaseName);
+    }
+
+    function setReadOnly(fieldname, idfileheader) {
+        var params = wsExecute("GET", "json", "@Url.Action("getHeaderValidationDataJson", "Transaccion")" + "?IdFileHeader=" + idfileheader, null, false);
+        var result = false;
+
+        switch (fieldname) {
+            case "ExchangeRate":
+                result = (params.HasDetail == true) ? true : false;
+                break;
+            case "Insurance":
+                result = (params.HasDetail == true) ? true : false;
+                break;
+            case "Cargo":
+                result = (params.HasDetail == true) ? true : false;
+                break;
+            //case "CIFTotal":
+            //    result = (params.HasDetail == true) ? true : false;
+            //    break;
+        }
+
+        return result;
+    }
+
+    function getItemValue(fieldname) {
+        var value;
+        switch (fieldname) {
+            case "IdDocument":
+                value = dataContent.IdDocument;
+                break;
+            case "AuthorizationDate":
+                value = dataContent.AuthorizationDate;
+                break;
+            case "ExpantionDate":
+                value = dataContent.ExpantionDate;
+                break;
+            case "ExpirationDate":
+                value = dataContent.ExpirationDate;
+                break;
+            case "DocumentDate":
+                value = dataContent.DocumentDate;
+                break;
+            case "ExchangeRate":
+                value = dataContent.ExchangeRate;
+                break;
+            case "Insurance":
+                value = dataContent.Insurance;
+                break;
+            case "Cargo":
+                value = dataContent.Cargo;
+                break;
+            case "IdCountry":
+                value = dataContent.IdCountry;
+                break;
+            case "IdCustom":
+                value = dataContent.IdCustom;
+                break;
+            case "IdWarranty":
+                value = dataContent.IdWarranty;
+                break;
+            case "IdCurrency":
+                value = dataContent.IdCurrency;
+                break;
+            case "IdResolution":
+                value = dataContent.IdResolution;
+                break;
+            case "IdCellar":
+                value = dataContent.IdCellar;
+                break;
+            case "ArrivalDAte":
+                value = dataContent.ArrivalDate;
+                break;
+            case "CIFTotal":
+                value = dataContent.CifTotal;
+                break;
+            case "LinesTotal":
+                value = dataContent.LinesTotal;
+                break;
+            case "Factura":
+                value = dataContent.Facturas;
+                break;
+        }
+
+        return value;
+    }
+
+    function SelectIdFileInfoUpdate(e) {
+        $("#loading").fadeIn();
+        var item = this.dataItem(e.item);
+        var submitButton = $("#btnGuardarUpdate").data("kendoButton");
+        var cancelButton = $("#btnCancelarUpdate").data("kendoButton");
+
+        setTimeout(function () {
+            if (item.Id != "") {
+                submitButton.enable(true);
+                cancelButton.enable(true);
+
+                loadData(item.Id);
+                writeWeb(data, false);
+            }
+            else {
+                submitButton.enable(false);
+                cancelButton.enable(false);
+
+                $('#html-continer-update').html('');
+                $("#loading").fadeOut();
+            }
+        }, 500);
+    }
+
+    function btnCancelarUpdate_Click(e) {
+        var htmlcontainer = $('#html-continer-update');
+        htmlcontainer.html('');
+
+        var win = window.parent.$("#wndUpdate").data("kendoWindow");
+        var frame = window.parent.$("#header-update");
+        frame.attr('src', "");
+        win.close();
+        window.parent.$('#FileConfig').data('kendoDropDownList').wrapper.trigger('click');
+    }
+
+    function fillData(datacontent){
+        if((datacontent != null) || (datacontent != '')){
+            setTimeout(function(){
+                var dropFileInfo = $("#IdFileInfoUpd").data("kendoDropDownList");
+                dropFileInfo.value(datacontent.IdFileInfoConfig);
+                dropFileInfo.trigger("select");
+                dropFileInfo.enable(false);
+            },700);
+        }
+    }
+
+    function getDatasetValue(fieldname) {
+        var ds;
+        switch (fieldname) {
+            case "IdCountry":
+                ds = dtPais;
+                break;
+            case "IdCustom":
+                ds = dtAduana;
+                break;
+            case "IdWarranty":
+                ds = dtGarantia;
+                break;
+            case "IdCurrency":
+                ds = dtMoneda;
+                break;
+            case "IdResolution":
+                ds = dtResolucion;
+                break;
+            case "IdCellar":
+                ds = dtBodega;
+                break;
+        }
+
+        return ds;
+    }
+</script>

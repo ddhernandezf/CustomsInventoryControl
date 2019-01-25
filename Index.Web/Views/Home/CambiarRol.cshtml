@@ -1,0 +1,39 @@
+﻿@using Index.Commons;
+@using Kendo.Mvc.UI;
+
+@{
+    Layout = null;
+}
+
+@(Html.Kendo().Grid<Role>()
+                    .Name("grdAjaxCrud")
+                    .Columns(c =>
+                    {
+                        c.Bound(p => p.Id);
+                        c.Bound(p => p.Name).ClientTemplate("<a rel='' style='width:100%;' class='k-button' href='javascript:changeRole(#=Id#);'>#=Name#</a>")
+                            .Filterable(f => f.Cell(r => r.Operator("contains")));
+                        //c.Bound(p => p.Name).Width(50).Title("").Filterable(false).ClientTemplate("<a rel='' class='k-button' href='javascript:changeRole(#=Id#);'>Seleccionar</a>");
+                    })
+                    .Pageable(p =>
+                    {
+                        p.Refresh(true);
+                    })
+                    .Scrollable()
+                    .Filterable(f =>
+                    {
+                        f.Mode(GridFilterMode.Row);
+                    })
+                    .DataSource(dataSource => dataSource
+                        .Ajax()
+                        .PageSize(20)
+                        .Model(m =>
+                        {
+                            m.Id(o => o.Id);
+                        })
+                        .Read(r => r.Action("ReadByUser", "Rol"))
+                        .Events(e =>
+                        {
+                            e.Error("errorHandler");
+                        })
+                     )
+)

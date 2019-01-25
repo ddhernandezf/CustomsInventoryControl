@@ -1,0 +1,107 @@
+﻿@using Index.Commons;
+@using Kendo.Mvc.UI;
+
+@{
+    Layout = null;
+}
+
+<div id="dischargeHeader"></div>
+<div style="padding:10px;">
+    @(Html.Kendo().CheckBox()
+        .Name("chkFormula")
+        .Label("Formula")
+    )
+</div>
+
+@(Html.Kendo().Grid<DischargeRawMaterial>()
+                    .Name("grdRawMaterial")
+                    .AutoBind(false)
+                    .HtmlAttributes(new { @style = "height: 83%; font-size: 12px;" })
+                    .Events(e=> {
+                        e.DataBound("grdRawMaterialDataBound");
+                        e.DetailExpand("grdRawMaterialChange");
+                    })
+                    .Columns(c =>
+                    {
+                        c.Bound(p => p.IdItem).Hidden(true);
+                        c.Bound(p => p.IdFileDetail).Hidden(true);
+                        c.Bound(p => p.IdFormula).Hidden(true);
+                        c.Bound(p => p.IdParentItem).Hidden(true);
+                        c.Bound(p => p.DisplayItemName).Width(400).Filterable(f => f.Cell(r => r.Operator("contains")));
+                        c.Bound(p => p.QuantityLabel).Width(200).Filterable(false);
+                        c.Bound(p => p.DecreaseLabel).Width(200).Filterable(false);
+                        c.Bound(p => p.DisplayAccountingItem).Width(700).Filterable(f => f.Cell(r => r.Operator("contains")));
+                    })
+                    .Pageable(p =>
+                    {
+                        p.Refresh(true);
+                    })
+                    .Scrollable()
+                    .Navigatable()
+                    .ClientDetailTemplateId("DischargeTemplate")
+                    .Filterable(f =>
+                    {
+                        f.Mode(GridFilterMode.Row);
+                    })
+                    .DataSource(dataSource => dataSource
+                        .Ajax()
+                        .PageSize(20)
+                        .Model(m =>
+                        {
+                            m.Id(o => o.IdItem);
+                        })
+                        .Read(r => r.Action("RawMaterialRead", "Descargo").Data("grdRawMaterialParams"))
+                     )
+)
+<div style="text-align:center;">
+    <a id="resumeViewer" href="javascript:showWindowResume(@ViewBag.IdFileDetail);">0 Registros</a>
+</div>
+
+<script>
+    var IdFileDetail = parseInt("@ViewBag.IdFileDetail");
+    var chkFormula;
+
+    $(document).ready(function () {
+        $("#loading").fadeIn();
+        setTimeout(function () {
+            glbIdFileDetail = parseInt("@ViewBag.IdFileDetail");
+            rawGrid = $("#grdRawMaterial").data("kendoGrid");
+            DischargeParameters = wsExecute("GET", "json", "@Url.Action("GetParameters", "Descargo")", { IdFileDetail: IdFileDetail }, false);
+            chkFormula = $("#chkFormula");
+            useFormula = DischargeParameters.UseFormula;
+            chkFormula.prop('checked', useFormula);
+            chkFormula.trigger('change');
+
+            if (DischargeParameters.UseFormula) {
+                chkFormula.removeAttr("disabled");
+            }
+            else {
+                chkFormula.attr("disabled", true)
+            }
+
+            rawGrid.dataSource.read();
+            $("#dischargeHeader").html('Descargo de materia prima para el producto <strong>' + DischargeParameters.AccountingItem
+                + ' ' + DischargeParameters.ItemName + '</strong> a través del documento <strong>' + DischargeParameters.IdDocument
+                + ' ' + DischargeParameters.DocumentName + '</strong>, para el cliente <strong>'
+                + DischargeParameters.CustomerName + '</strong> en la cuenta <strong>' + DischargeParameters.AccountName + '</strong>');
+        }, 500);
+
+        $("#chkFormula").change(function () {
+            if ($("#chkFormula").is(':checked')) {
+                useFormula = true;
+                rawGrid.dataSource.read();
+            }
+            else {
+                useFormula = false;
+                rawGrid.dataSource.read();
+            }
+        });
+    });
+</script>
+
+<style>
+    #dischargeHeader {
+        padding: 0px 5px 15px 5px;
+        text-align: justify;
+    }
+</style>

@@ -1,0 +1,502 @@
+﻿@using Kendo.Mvc.UI;
+@using Index.Commons;
+
+@{
+    ViewBag.Title = "Proveedores";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <!-- start: FORM VALIDATION 1 PANEL -->
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="view-title">
+                    <div class="view-logo"><img src="@Url.Content("~/Content/Images/Headers/DestinyCustomer.png")" /></div>
+                    <div class="view-text">Catálogo de clientes destino</div>
+                </div>
+            </div>
+
+            <div class="panel-body">
+                @(Html.Kendo().Grid<Supplier>()
+                    .Name("grdCrud")
+                    .Columns(c =>
+                    {
+                        c.Bound(p => p.IdPerson).Hidden(true);
+                        c.Bound(p => p.CompleteName).Width(500).Filterable(f => f.Cell(r => r.Operator("contains"))).ClientTemplate("#=CompleteName#").Title("Nombres");
+                        c.Bound(p => p.Nit).Width(150).Filterable(false);
+                        c.Bound(p => p.CompleteName).Width(25).Filterable(false).Locked(true).Lockable(false)
+                            .Title(" ").ClientTemplate("<a style='cursor:pointer;' onclick='showWindowPhone(\"#=CompleteName#\",#=IdPerson#);'><img style='width: 25px;' title='Asignar Teléfonos' src='" + @Url.Content("~/Content/Images/Menu/Telefono.png") + "' /></a>");
+                        c.Bound(p => p.CompleteName).Width(25).Filterable(false).Locked(true).Lockable(false)
+                            .Title(" ").ClientTemplate("<a style='cursor:pointer;' onclick='showWindowEmail(\"#=CompleteName#\",#=IdPerson#);'><img style='width: 25px;' title='Asignar Correos' src='" + @Url.Content("~/Content/Images/Menu/Email.png") + "' /></a>");
+                        c.Bound(p => p.CompleteName).Width(25).Filterable(false).Locked(true).Lockable(false)
+                            .Title(" ").ClientTemplate("<a style='cursor:pointer;' onclick='showWindowAddress(\"#=CompleteName#\",#=IdPerson#);'><img style='width: 25px;' title='Asignar direcciones' src='" + @Url.Content("~/Content/Images/Menu/Address.png") + "' /></a>");
+                        c.Command(cmd =>
+                        {
+                            cmd.Edit().Text(" ");
+                            cmd.Destroy().Text(" ");
+                        }).Width(100).Locked(true).Lockable(false);
+                    })
+                    .Editable(e =>
+                    {
+                        e.Mode(GridEditMode.PopUp)
+                         .DisplayDeleteConfirmation("¿Se encuentra realmente seguro de eliminar el registro?")
+                         .TemplateName("Template")
+                         .Window(w =>
+                            w.Title("Formulario de información de clientes destino")
+                            .Width(700)
+                         );
+                    })
+                    .ToolBar(t =>
+                    {
+                        t.Create().Text("Nuevo").HtmlAttributes(new { @class = "k-primary" });
+                    })
+                    .Pageable(p =>
+                    {
+                        p.Refresh(true);
+                    })
+                    .Scrollable()
+                    .Filterable(f =>
+                    {
+                        f.Mode(GridFilterMode.Row);
+                    })
+                    .DataSource(dataSource => dataSource
+                        .Ajax()
+                        .PageSize(20)
+                        .Model(m =>
+                        {
+                            m.Id(o => o.IdPerson);
+                        })
+                        .Read(r => r.Action("Read", "ClienteDestino"))
+                        .Create(c => c.Action("Create", "ClienteDestino"))
+                        .Update(u => u.Action("Update", "ClienteDestino"))
+                        .Destroy(d => d.Action("Delete", "ClienteDestino"))
+                        .Events(e =>
+                        {
+                            e.Error("errorHandler");
+                            e.RequestEnd("onRequestEndSupplier");
+                        })
+                     )
+                )
+            </div>
+        </div>
+    </div>
+</div>
+
+@(Html.Kendo().Window()
+    .Name("asignarTelefonos")
+    .Title("Asignar teléfonos a clientes")
+    .Width(800)
+    .Modal(true)
+    .Visible(false)
+    .Actions(a =>
+    {
+        a.Maximize();
+        a.Close();
+    })
+    .Events(e =>
+    {
+        e.Close("asignarTelefonosClose");
+    })
+)
+
+@(Html.Kendo().Window()
+    .Name("asignarEmail")
+    .Title("Asignar email a clientes")
+    .Width(800)
+    .Modal(true)
+    .Visible(false)
+    .Actions(a =>
+    {
+        a.Maximize();
+        a.Close();
+    })
+    .Events(e =>
+    {
+        e.Close("asignarEmailClose");
+    })
+)
+
+@(Html.Kendo().Window()
+    .Name("asignarDireccion")
+    .Title("Asignar direcciones a clientes")
+    .Width(800)
+    .Modal(true)
+    .Visible(false)
+    .Actions(a =>
+    {
+        a.Maximize();
+        a.Close();
+    })
+    .Events(e =>
+    {
+        e.Close("asignarDireccionClose");
+    })
+)
+
+<script type="text/kendo-template" id="message">
+    <div class="k-widget k-tooltip k-tooltip-validation k-invalid-msg field-validation-error"
+         style="margin: 0.5em; display: block; " data-for="#=field#" data-valmsg-for="#=field#" id="#=field#_validationMessage">
+        <span class="k-icon k-warning"> </span>#=message#<div class="k-callout k-callout-n"></div>
+    </div>
+</script>
+<script>
+    var validationMessageTmpl = kendo.template($("#message").html());
+    var OpenWizzard = false, wizName = null, wizId = null;
+
+    function errorHandler(args) {
+        if (typeof args.errors === "string") {
+            onErrorGeneral(args.errors);
+        }
+        if (args.errors) {
+            var grid = $("#grdCrud").data("kendoGrid");
+            grid.one("dataBinding", function (e) {
+                e.preventDefault();
+
+                for (var error in args.errors) {
+                    showMessage(grid.editable.element, error, args.errors[error].errors);
+                }
+            });
+        }
+        if (args.errors.errorGeneral) {
+            wnd = $("#modalWindowAlert").kendoWindow({
+                title: "Error",
+                modal: true,
+                visible: false,
+                resizable: false,
+                width: 300
+            }).data("kendoWindow");
+
+            $("#yes").hide();
+            $("#no").hide();
+            $("#confirmMessage").html(args.errors.errorGeneral.errors[0]);
+            wnd.center().open();
+        }
+    }
+
+    function onRequestEndSupplier(e) {
+        wnd = $("#modalWindowAlert").kendoWindow({
+            title: "Confirmaci&oacute;n",
+            modal: true,
+            visible: false,
+            resizable: false,
+            width: 300
+        }).data("kendoWindow");
+
+        $("#yes").hide();
+        $("#no").hide();
+
+        if (e.type == "destroy" && !e.response.Errors) {
+            $("#confirmMessage").html("Registro eliminado exitosamente");
+            wnd.center().open();
+            this.read();
+        }
+
+        if (e.type == "update" && !e.response.Errors) {
+            $("#confirmMessage").html("Registro actualizado exitosamente");
+            wnd.center().open();
+            this.read();
+        }
+
+        if (e.type == "create" && !e.response.Errors) {
+            wizName = e.response.Data[0].FirstName;
+            this.read();
+            $("#loading").fadeIn();
+
+            setTimeout(function () {
+                $("#grdCrud").data("kendoGrid").dataSource.filter({
+                    field: "FirstName",
+                    operator: "eq",
+                    value: wizName
+                });
+
+                setTimeout(function () {
+                    var DataSource = $("#grdCrud").data("kendoGrid").dataSource.data();
+                    wizId = dataSourceBrowser(DataSource, 'FirstName', wizName, 'IdPerson');
+
+                    if (wizId != null) {
+                        OpenWizzard = true;
+                        showWindowPhone(wizName, wizId);
+                    }
+                    else {
+                        $("#confirmMessage").html("Registro agregado exitosamente");
+                        wnd.center().open();
+                        $("#loading").fadeOut();
+                    }
+                }, 700);
+            }, 700);
+        }
+    }
+
+    function showMessage(container, name, errors) {
+        container.find("[data-valmsg-for=" + name + "],[data-val-msg-for=" + name + "]")
+                 .replaceWith(validationMessageTmpl({ field: name, message: errors[0] }))
+    }
+
+    function showWindowPhone(fullname, idperson) {
+        $("#loading").fadeIn();
+        var win = $("#asignarTelefonos").data("kendoWindow");
+        win.refresh({ url: "@Url.Action("AsignarTelefono", "Cliente")", data: { IdPerson: idperson } });
+        win.title('Asignar números telefónicos a ' + fullname);
+
+        setTimeout(function () {
+            win.open();
+            win.center();
+            setTimeout(function () {
+                win.center();
+                setTimeout(function () {
+                    $("#grdPhone").data("kendoGrid").dataSource.read();
+                    $("#loading").fadeOut();
+                }, 1000);
+            }, 1500);
+        }, 3000);
+    }
+
+    function showWindowEmail(fullname, idperson) {
+        $("#loading").fadeIn();
+        var win = $("#asignarEmail").data("kendoWindow");
+        win.refresh({ url: "@Url.Action("AsignarEmail", "Cliente")", data: { IdPerson: idperson } });
+        win.title('Asignar email a ' + fullname);
+
+        setTimeout(function () {
+            win.open();
+            win.center();
+            setTimeout(function () {
+                win.center();
+                setTimeout(function () {
+                    $("#grdEmail").data("kendoGrid").dataSource.read();
+                    $("#loading").fadeOut();
+                }, 1000);
+            }, 1500);
+        }, 3000);
+    }
+
+    function showWindowAddress(fullname, idperson) {
+        $("#loading").fadeIn();
+        var win = $("#asignarDireccion").data("kendoWindow");
+        win.refresh({ url: "@Url.Action("AsignarDireccion", "Cliente")", data: { IdPerson: idperson } });
+        win.title('Asignar dirección a ' + fullname);
+
+        setTimeout(function () {
+            win.open();
+            win.center();
+            setTimeout(function () {
+                win.center();
+                setTimeout(function () {
+                    $("#grdAddress").data("kendoGrid").dataSource.read();
+                    $("#loading").fadeOut();
+                }, 1000);
+            }, 1500);
+        }, 3000);
+    }
+
+    function onRequestEndPhone(e) {
+        wnd = $("#modalWindowAlert").kendoWindow({
+            title: "Confirmaci&oacute;n",
+            modal: true,
+            visible: false,
+            resizable: false,
+            width: 300
+        }).data("kendoWindow");
+
+        $("#yes").hide();
+        $("#no").hide();
+
+        if (e.type == "destroy" && !e.response.Errors) {
+            $("#confirmMessage").html("Registro eliminado exitosamente");
+            $("#grdPhone").data("kendoGrid").dataSource.read();
+        }
+
+        if (e.type == "update" && !e.response.Errors) {
+            $("#confirmMessage").html("Registro actualizado exitosamente");
+            $("#grdPhone").data("kendoGrid").dataSource.read();
+        }
+
+        if (e.type == "create" && !e.response.Errors) {
+            $("#confirmMessage").html("Registro agregado exitosamente");
+            $("#grdPhone").data("kendoGrid").dataSource.read();
+        }
+    }
+
+    function errorHandlerPhone(args) {
+        if (typeof args.errors === "string") {
+            onErrorGeneral(args.errors);
+        }
+        if (args.errors) {
+            var grid = $("#grdPhone").data("kendoGrid");
+            grid.one("dataBinding", function (e) {
+                e.preventDefault();
+
+                for (var error in args.errors) {
+                    showMessage(grid.editable.element, error, args.errors[error].errors);
+                }
+            });
+        }
+        if (args.errors.errorGeneral) {
+            wnd = $("#modalWindowAlert").kendoWindow({
+                title: "Error",
+                modal: true,
+                visible: false,
+                resizable: false,
+                width: 300
+            }).data("kendoWindow");
+
+            $("#yes").hide();
+            $("#no").hide();
+            $("#confirmMessage").html(args.errors.errorGeneral.errors[0]);
+            wnd.center().open();
+        }
+    }
+
+    function onRequestEndEmail(e) {
+        wnd = $("#modalWindowAlert").kendoWindow({
+            title: "Confirmaci&oacute;n",
+            modal: true,
+            visible: false,
+            resizable: false,
+            width: 300
+        }).data("kendoWindow");
+
+        $("#yes").hide();
+        $("#no").hide();
+
+        if (e.type == "destroy" && !e.response.Errors) {
+            $("#confirmMessage").html("Registro eliminado exitosamente");
+            $("#grdEmail").data("kendoGrid").dataSource.read();
+        }
+
+        if (e.type == "update" && !e.response.Errors) {
+            $("#confirmMessage").html("Registro actualizado exitosamente");
+            $("#grdEmail").data("kendoGrid").dataSource.read();
+        }
+
+        if (e.type == "create" && !e.response.Errors) {
+            $("#confirmMessage").html("Registro agregado exitosamente");
+            $("#grdEmail").data("kendoGrid").dataSource.read();
+        }
+    }
+
+    function errorHandlerEmail(args) {
+        if (typeof args.errors === "string") {
+            onErrorGeneral(args.errors);
+        }
+        if (args.errors) {
+            var grid = $("#grdEmail").data("kendoGrid");
+            grid.one("dataBinding", function (e) {
+                e.preventDefault();
+
+                for (var error in args.errors) {
+                    showMessage(grid.editable.element, error, args.errors[error].errors);
+                }
+            });
+        }
+        if (args.errors.errorGeneral) {
+            wnd = $("#modalWindowAlert").kendoWindow({
+                title: "Error",
+                modal: true,
+                visible: false,
+                resizable: false,
+                width: 300
+            }).data("kendoWindow");
+
+            $("#yes").hide();
+            $("#no").hide();
+            $("#confirmMessage").html(args.errors.errorGeneral.errors[0]);
+            wnd.center().open();
+        }
+    }
+
+    function onRequestEndDireccion(e) {
+        wnd = $("#modalWindowAlert").kendoWindow({
+            title: "Confirmaci&oacute;n",
+            modal: true,
+            visible: false,
+            resizable: false,
+            width: 300
+        }).data("kendoWindow");
+
+        $("#yes").hide();
+        $("#no").hide();
+
+        if (e.type == "destroy" && !e.response.Errors) {
+            $("#confirmMessage").html("Registro eliminado exitosamente");
+            $("#grdAddress").data("kendoGrid").dataSource.read();
+        }
+
+        if (e.type == "update" && !e.response.Errors) {
+            $("#confirmMessage").html("Registro actualizado exitosamente");
+            $("#grdAddress").data("kendoGrid").dataSource.read();
+        }
+
+        if (e.type == "create" && !e.response.Errors) {
+            $("#confirmMessage").html("Registro agregado exitosamente");
+            $("#grdAddress").data("kendoGrid").dataSource.read();
+        }
+    }
+
+    function errorHandlerDireccion(args) {
+        if (typeof args.errors === "string") {
+            onErrorGeneral(args.errors);
+        }
+        if (args.errors) {
+            var grid = $("#grdAddress").data("kendoGrid");
+            grid.one("dataBinding", function (e) {
+                e.preventDefault();
+
+                for (var error in args.errors) {
+                    showMessage(grid.editable.element, error, args.errors[error].errors);
+                }
+            });
+        }
+        if (args.errors.errorGeneral) {
+            wnd = $("#modalWindowAlert").kendoWindow({
+                title: "Error",
+                modal: true,
+                visible: false,
+                resizable: false,
+                width: 300
+            }).data("kendoWindow");
+
+            $("#yes").hide();
+            $("#no").hide();
+            $("#confirmMessage").html(args.errors.errorGeneral.errors[0]);
+            wnd.center().open();
+        }
+    }
+
+    function asignarTelefonosClose(e) {
+        if (OpenWizzard === true) {
+            showWindowEmail(wizName, wizId);
+        }
+    }
+
+    function asignarEmailClose(e) {
+        if (OpenWizzard === true) {
+            showWindowAddress(wizName, wizId);
+        }
+    }
+
+    function asignarDireccionClose(e) {
+        if (OpenWizzard === true) {
+            OpenWizzard = false;
+            wizName = null;
+            wizId = null;
+        }
+    }
+
+    function IdPhoneTypeSelect(e) {
+        $("#Number").siblings('input:visible').focus();
+    }
+
+    function NumberChange(e) {
+        $(".k-button.k-button-icontext.k-primary.k-grid-update").focus();
+    }
+
+    function IdEmailTypeSelect(e) {
+        $("#EmailAddress").focus();
+    }
+
+    function IdAddressTypeSelect(e) {
+        $("#AddressValue").focus();
+    }
+</script>

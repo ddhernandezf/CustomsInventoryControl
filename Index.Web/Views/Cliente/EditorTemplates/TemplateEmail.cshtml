@@ -1,0 +1,59 @@
+﻿@using Kendo.Mvc.UI;
+@model Index.Commons.Email
+
+<div class="generali-popup-form">
+    @Html.HiddenFor(m => m.Id)
+    @Html.HiddenFor(m => m.IdPerson)
+    <div class="col-3">
+        <div class="col-12 title">@Html.DisplayNameFor(x => x.IdEmailType)</div>
+        <div class="col-12 item">
+            @(Html.Kendo().DropDownList()
+              .Name("IdEmailType")
+              .DataTextField("Name")
+              .DataValueField("Id")
+              .OptionLabel("Seleccionar...")
+              .SelectedIndex(0)
+              .Filter("contains")
+              .DataSource(source =>
+              {
+                  source.Read(read =>
+                  {
+                      read.Action("getComboEmailType", "Email");
+                  });
+              })
+              .HtmlAttributes(new { style = "width: 100%" })
+              .Events(e =>
+              {
+                  e.Select("IdEmailTypeSelect");
+              })
+            )
+            <div class="error">@Html.ValidationMessageFor(m => m.IdEmailType)</div>
+        </div>
+    </div>
+    <div class="col-8">
+        <div class="col-12 title">@Html.DisplayNameFor(x => x.EmailAddress)</div>
+        <div class="col-12 item">
+            @(Html.Kendo().TextBox()
+                    .Name("EmailAddress")
+                    .HtmlAttributes(new { Style = "width:100%;" })
+                    .Value(Model.EmailAddress)
+            )
+            <div class="error">@Html.ValidationMessageFor(m => m.EmailAddress)</div>
+        </div>
+    </div>
+    <div class="error">
+        @Html.ValidationMessage("errorGeneral")
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        setTimeout(function () {
+            $("#IdEmailType").data("kendoDropDownList").open();
+
+            $("#EmailAddress").change(function () {
+                $(".k-button.k-button-icontext.k-primary.k-grid-update").focus();
+            });
+        }, 500);
+    });
+</script>

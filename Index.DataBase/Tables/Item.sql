@@ -1,0 +1,26 @@
+﻿CREATE TABLE [dbo].[Item]
+(
+	[Id] INT NOT NULL IDENTITY,
+	[IdAccount] INT NULL DEFAULT NULL,
+	[IdCustomer] INT NOT NULL,
+	[IdResolution] INT NULL,
+	[IdAccountingItem] INT NULL,
+	[IdUnitMeasurement] INT NOT NULL,
+	[Code] NVARCHAR(50) NOT NULL,
+	[Name] VARCHAR(200) NOT NULL,
+	[Description] VARCHAR(1000) NULL,
+	[Barcode] NVARCHAR(100) NULL,
+	[IsProduct] BIT NOT NULL,
+	[RegisterDate] DATETIME NOT NULL,
+	[RegisterUser] VARCHAR(60) NOT NULL,
+	[Active] BIT NOT NULL DEFAULT 1,
+	PRIMARY KEY([Id]),
+	UNIQUE([Code], [IdAccountingItem], [IdAccount], [IdCustomer],[Name],[IsProduct], [IdUnitMeasurement]),
+	FOREIGN KEY([IdCustomer]) REFERENCES [Customer]([IdPerson]),
+	FOREIGN KEY([IdResolution]) REFERENCES [Resolution]([Id]),
+	FOREIGN KEY([IdAccountingItem]) REFERENCES [AccountingItem]([Id]),
+	--FOREIGN KEY([IdResolution]) REFERENCES [ResolutionAccountingItem]([IdResolution]),
+	--FOREIGN KEY([IdAccountingItem]) REFERENCES [ResolutionAccountingItem]([IdAccountingItem]),
+	FOREIGN KEY([IdUnitMeasurement]) REFERENCES [UnitMeasurement]([Id]),
+	FOREIGN KEY([IdAccount]) REFERENCES [Account]([Id])
+)

@@ -1,0 +1,443 @@
+﻿@using Index.Commons;
+@using Kendo.Mvc.UI;
+
+@model FileDetail
+
+@{
+    FileHeader HeaderParams = (FileHeader)ViewBag.HeaderParams;
+
+    List<Field> fields = (List<Field>)ViewBag.Fields;
+    String jsonFields = new System.Web.Script.Serialization.JavaScriptSerializer().Serialize(fields);
+
+    Field line = fields.Where(x => x.DataBaseName == "TransactionLine").FirstOrDefault();
+    Field quantity = fields.Where(x => x.DataBaseName == "ItemQuantity").FirstOrDefault();
+    Field itemRaw = fields.Where(x => x.DataBaseName == "IdItem").FirstOrDefault();
+    Field cifq = fields.Where(x => x.DataBaseName == "CIFcostQuetzal").FirstOrDefault();
+    Field fobq = fields.Where(x => x.DataBaseName == "FOcostQuetzal").FirstOrDefault();
+    Field cifd = fields.Where(x => x.DataBaseName == "CIFcostDollar").FirstOrDefault();
+    Field fobd = fields.Where(x => x.DataBaseName == "FOcostDollar").FirstOrDefault();
+    Field duties = fields.Where(x => x.DataBaseName == "CustomDuties").FirstOrDefault();
+    Field iva = fields.Where(x => x.DataBaseName == "Iva").FirstOrDefault();
+    Field tbase = fields.Where(x => x.DataBaseName == "TaxableBase").FirstOrDefault();
+    Field trate = fields.Where(x => x.DataBaseName == "TaxRate").FirstOrDefault();
+    Field net = fields.Where(x => x.DataBaseName == "NetWeight").FirstOrDefault();
+    Field gross = fields.Where(x => x.DataBaseName == "GrossWeight").FirstOrDefault();
+
+    String lineText = (line == null) ? null : ((line.Label == null) ? line.FieldName : line.Label);
+    String quantText = (quantity == null) ? null : ((quantity.Label == null) ? quantity.FieldName : quantity.Label);
+    String itemText = (itemRaw == null) ? null : ((itemRaw.Label == null) ? itemRaw.FieldName : itemRaw.Label);
+    String cifqText = (cifq == null) ? null : ((cifq.Label == null) ? cifq.FieldName : cifq.Label);
+    String fobqText = (fobq == null) ? null : ((fobq.Label == null) ? fobq.FieldName : fobq.Label);
+    String cifdText = (cifd == null) ? null : ((cifd.Label == null) ? cifd.FieldName : cifd.Label);
+    String fobdText = (fobd == null) ? null : ((fobd.Label == null) ? fobd.FieldName : fobd.Label);
+    String dutiesText = (duties == null) ? null : ((duties.Label == null) ? duties.FieldName : duties.Label);
+    String ivaText = (iva == null) ? null : ((iva.Label == null) ? iva.FieldName : iva.Label);
+    String tbaseText = (tbase == null) ? null : ((tbase.Label == null) ? tbase.FieldName : tbase.Label);
+    String trateText = (trate == null) ? null : ((trate.Label == null) ? trate.FieldName : trate.Label);
+    String netText = (net == null) ? null : ((net.Label == null) ? net.FieldName : net.Label);
+    String grossText = (gross == null) ? null : ((gross.Label == null) ? gross.FieldName : gross.Label);
+}
+
+<div>
+    @Html.HiddenFor(m => m.Id)
+    @Html.HiddenFor(m => m.IdState)
+    @Html.Hidden("IdFileHeader", HeaderParams.Id)
+    <div class="error">
+        @Html.ValidationMessage("errorGeneral")
+    </div>
+    <div class="col-11">
+        <div class="col-2">
+            <div class="col-12 title">Buscar &nbsp;<img id="img-tooltip" style="width:15px;" src="@Url.Content("~/Content/Images/Help.png")" /></div>
+            <div class="col-12 item">
+                @(Html.Kendo().TextBox()
+                    .Name("Filtro")
+                    .HtmlAttributes(new { @style="width:100%;" })
+                )
+            </div>
+        </div>
+        <div class="col-9">
+            <div class="col-12 title">@itemText</div>
+            <div class="col-12 item">
+                @(Html.Kendo().DropDownList()
+              .Name("IdItem")
+              .DataTextField("Name")
+              .DataValueField("Id")
+              .OptionLabel("Seleccionar...")
+              .SelectedIndex(0)
+              .Filter("contains")
+              .AutoBind(false)
+              .DataSource(source =>
+              {
+                  source.Custom().Group(g =>
+                  {
+                      g.Add("Parent", typeof(String));
+                  });
+                  source.Read(read =>
+                  {
+                      if (HeaderParams.IsSubstract)
+                      {
+                          if (HeaderParams.LoadRawMaterial)
+                          {
+                              read.Action("getCombo", "Producto").Data("IdItemParams");
+                          }
+                          else
+                          {
+                              read.Action("getCombo", "MateriaPrima").Data("IdItemParams");
+                          }
+                      }
+                      else
+                      {
+                          if (HeaderParams.LoadRawMaterial)
+                          {
+                              read.Action("getCombo", "MateriaPrima").Data("IdItemParams");
+                          }
+                          else
+                          {
+                              read.Action("getCombo", "Producto").Data("IdItemParams");
+                          }
+                      }
+                  });
+              })
+              .HtmlAttributes(new { style = "width: 100%" })
+              .Events(e=> {
+                  e.Change("IdItemChange");
+              })
+                )
+                <div class="error">@Html.ValidationMessageFor(m => m.IdItem)</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12" style="padding:0px;">
+        @if (line != null)
+        {
+            if (line.IsUsed)
+            {
+                <div class="col-2">
+                    <div class="col-12 title">@lineText</div>
+                    <div class="col-12 item">
+                        @(Html.Kendo().NumericTextBox()
+                            .Name("TransactionLine")
+                            .HtmlAttributes(new { Style = "width:100%;" })
+                            .Value(Model.TransactionLine)
+                            .Format("0")
+                            .Spinners(false)
+                            .Events(e=> {
+                                e.Change("TranLineChange");
+                            })
+                        )
+                        <div class="error">@Html.ValidationMessageFor(m => m.TransactionLine)</div>
+                    </div>
+                </div>
+            }
+        }
+
+        @if (quantity != null)
+        {
+            if (quantity.IsUsed)
+            {
+                <div class="col-2">
+                    <div class="col-12 title">@quantText</div>
+                    <div class="col-12 item">
+                        @(Html.Kendo().NumericTextBox()
+                            .Name("Quantity")
+                            .HtmlAttributes(new { Style = "width:100%;" })
+                            .Value((Double?)Model.Quantity)
+                            .Format("n6")
+                            .Decimals(6)
+                            .Spinners(false)
+                            .Events(e=> {
+                                e.Change("QuantityChange");
+                            })
+                        )
+                        <div class="error">@Html.ValidationMessageFor(m => m.Quantity)</div>
+                    </div>
+                </div>
+            }
+        }
+
+        @if (cifq != null)
+        {
+            if (cifq.IsUsed)
+            {
+                <div class="col-2">
+                    <div class="col-12 title">@cifqText</div>
+                    <div class="col-12 item">
+                        @(Html.Kendo().NumericTextBox()
+                    .Name("CIFQ")
+                    .HtmlAttributes(new { Style = "width:100%;" })
+                    .Value((Double?)Model.CIFQ)
+                    .Spinners(false)
+                    .Format("Q #.000000")
+                    .Events(e =>
+                    {
+                        e.Change("CIFQChange");
+                    })
+                        )
+                        <div class="error">@Html.ValidationMessageFor(m => m.CIFQ)</div>
+                    </div>
+                </div>
+            }
+        }
+
+        @if (duties != null)
+        {
+            if (duties.IsUsed)
+            {
+                <div class="col-2">
+                    <div class="col-12 title">@dutiesText</div>
+                    <div class="col-12 item">
+                        @(Html.Kendo().NumericTextBox()
+                    .Name("CustomDuties")
+                    .HtmlAttributes(new { Style = "width:100%;" })
+                    .Value((Double?)Model.CustomDuties)
+                    .Spinners(false)
+                    .Format("Q #.000000")
+                    .Events(e =>
+                    {
+                        e.Change("CustomDutiesChange");
+                    })
+                        )
+                        <div class="error">@Html.ValidationMessageFor(m => m.CustomDuties)</div>
+                    </div>
+                </div>
+            }
+        }
+
+        @if (iva != null)
+        {
+            if (iva.IsUsed)
+            {
+                <div class="col-2">
+                    <div class="col-12 title">@ivaText</div>
+                    <div class="col-12 item">
+                        @(Html.Kendo().NumericTextBox()
+                    .Name("IVA")
+                    .HtmlAttributes(new { Style = "width:100%;" })
+                    .Value((Double?)Model.IVA)
+                    .Spinners(false)
+                    .Format("Q #.000000")
+                    .Events(e=> {
+                        e.Change("IvaChange");
+                    })
+                        )
+                        <div class="error">@Html.ValidationMessageFor(m => m.IVA)</div>
+                    </div>
+                </div>
+            }
+        }
+
+        @if (cifd != null)
+        {
+            if (cifd.IsUsed)
+            {
+                <div class="col-2">
+                    <div class="col-12 title">@cifdText</div>
+                    <div class="col-12 item">
+                        @(Html.Kendo().NumericTextBox()
+                    .Name("CIFD")
+                    .HtmlAttributes(new { Style = "width:100%;" })
+                    .Value((Double?)Model.CIFD)
+                    .Spinners(false)
+                    .Format("$ #.000000")
+                    .Culture("en-US")
+                        )
+                        <div class="error">@Html.ValidationMessageFor(m => m.CIFD)</div>
+                    </div>
+                </div>
+            }
+        }
+
+        @if (fobq != null)
+        {
+            if (fobq.IsUsed)
+            {
+                <div class="col-2">
+                    <div class="col-12 title">@fobqText</div>
+                    <div class="col-12 item">
+                        @(Html.Kendo().NumericTextBox()
+                    .Name("FOQ")
+                    .HtmlAttributes(new { Style = "width:100%;" })
+                    .Value((Double?)Model.FOQ)
+                    .Spinners(false)
+                    .Format("Q #.000000")
+                    .Events(e =>
+                    {
+                        e.Change("FOQChange");
+                    })
+                        )
+                        <div class="error">@Html.ValidationMessageFor(m => m.FOQ)</div>
+                    </div>
+                </div>
+            }
+        }
+
+        @if (fobd != null)
+        {
+            if (fobd.IsUsed)
+            {
+                <div class="col-2">
+                    <div class="col-12 title">@fobdText</div>
+                    <div class="col-12 item">
+                        @(Html.Kendo().NumericTextBox()
+                    .Name("FOD")
+                    .HtmlAttributes(new { Style = "width:100%;" })
+                    .Value((Double?)Model.FOD)
+                    .Spinners(false)
+                    .Format("$ #.000000")
+                    .Culture("en-US")
+                        )
+                        <div class="error">@Html.ValidationMessageFor(m => m.FOD)</div>
+                    </div>
+                </div>
+            }
+        }
+
+        @if (tbase != null)
+        {
+            if (tbase.IsUsed)
+            {
+                <div class="col-2">
+                    <div class="col-12 title">@tbaseText</div>
+                    <div class="col-12 item">
+                        @(Html.Kendo().NumericTextBox()
+                            .Name("TaxableBase")
+                            .HtmlAttributes(new { Style = "width:100%;" })
+                            .Value((Double?)Model.TaxableBase)
+                            .Spinners(false)
+                            .Format("Q #.000000")
+                            .Events(e=> {
+                                e.Change("TaxableBaseChange");
+                            })
+                        )
+                        <div class="error">@Html.ValidationMessageFor(m => m.TaxableBase)</div>
+                    </div>
+                </div>
+            }
+        }
+
+        @if (trate != null)
+        {
+            if (trate.IsUsed)
+            {
+                <div class="col-2">
+                    <div class="col-12 title">@trateText</div>
+                    <div class="col-12 item">
+                        @(Html.Kendo().NumericTextBox()
+                            .Name("TaxRate")
+                            .HtmlAttributes(new { Style = "width:100%;" })
+                            .Value((Double?)Model.TaxRate)
+                            .Spinners(false)
+                            .Format("Q #.000000")
+                            .Events(e =>
+                            {
+                                e.Change("TaxRateChange");
+                            })
+                        )
+                        <div class="error">@Html.ValidationMessageFor(m => m.TaxRate)</div>
+                    </div>
+                </div>
+            }
+        }
+
+        @if (net != null)
+        {
+            if (net.IsUsed)
+            {
+                <div class="col-2">
+                    <div class="col-12 title">@netText</div>
+                    <div class="col-12 item">
+                        @(Html.Kendo().NumericTextBox()
+                            .Name("NetWeight")
+                            .HtmlAttributes(new { Style = "width:100%;" })
+                            .Value((Double?)Model.NetWeight)
+                            .Format("#.000000")
+                            .Spinners(false)
+                            .Format("#.000000")
+                            .Events(e =>
+                            {
+                                e.Change("NetWeightChange");
+                            })
+                        )
+                        <div class="error">@Html.ValidationMessageFor(m => m.NetWeight)</div>
+                    </div>
+                </div>
+            }
+        }
+
+        @if (gross != null)
+        {
+            if (gross.IsUsed)
+            {
+                <div class="col-2">
+                    <div class="col-12 title">@grossText</div>
+                    <div class="col-12 item">
+                        @(Html.Kendo().NumericTextBox()
+                            .Name("GrossWeight")
+                            .HtmlAttributes(new { Style = "width:100%;" })
+                            .Value((Double?)Model.GrossWeight)
+                            .Format("#.000000")
+                            .Spinners(false)
+                            .Format("#.000000")
+                            .Events(e =>
+                            {
+                                e.Change("GrossWeightChange");
+                            })
+                        )
+                        <div class="error">@Html.ValidationMessageFor(m => m.GrossWeight)</div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        dataFields = JSON.parse('@Html.Raw(jsonFields)');
+
+        var tooltip = $("#img-tooltip").kendoTooltip({
+            content: "Búsqueda por código, nombre o inciso arancelario",
+            width: 120,
+            position: "top"
+        }).data("kendoTooltip");
+
+        setTimeout(function () {
+            var drop = $("#IdItem").data('kendoDropDownList');
+            drop.dataSource.read();
+            if(DetailIsNew == null){
+                setTimeout(function () {
+                    drop.enable(false);
+                }, 100);
+            }
+        }, 500);
+
+        $("#Filtro").change(function () {
+            $("#loading").fadeIn();
+            filterParamas = $("#Filtro").val();
+            var dropdown = $("#IdItem").data("kendoDropDownList");
+            dropdown.dataSource.read();
+            if (filterParamas == "" || filterParamas == null) {
+                setTimeout(function () {
+                    dropdown.select(0);
+                    dropdown.open();
+                    $("#loading").fadeOut();
+                }, 1000);
+            }
+            else {
+                setTimeout(function () {
+                    if (dropdown.dataSource.data().length == 1) {
+                        dropdown.open();
+                        dropdown.value(dropdown.dataSource.data()[0].Id);
+                        dropdown.trigger("change");
+                        dropdown.close();
+                        $("#loading").fadeOut();
+                    }
+                    else {
+                        dropdown.wrapper.trigger('click');
+                        $("#loading").fadeOut();
+                    }
+                }, 500);
+            }
+        });
+    });
+</script>

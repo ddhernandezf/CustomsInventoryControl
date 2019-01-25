@@ -1,0 +1,244 @@
+﻿@using System
+@using Kendo.Mvc.UI
+
+@Styles.Render("~/Content/css")
+@Scripts.Render("~/bundles/modernizr")
+@Styles.Render("~/TelerikMVC/CSS")
+@Scripts.Render("~/TelerikMVC/JS")
+@Scripts.Render("~/TelerikMVC/CULTURE")
+@model Index.Commons.Item
+
+@{
+
+    Layout = null;
+}
+
+@using (Html.BeginForm("Template", "Producto", FormMethod.Post, new { @id = "frmMateriaPrima" }))
+{
+    <div class="generali-popup-form">
+        @Html.HiddenFor(m => m.Id)
+        @Html.HiddenFor(m => m.IdCustomer)
+        <div class="error">
+            @Html.ValidationMessage("errorGeneral")
+        </div>
+        <div class="col-1">
+            <div class="col-12 title">@Html.DisplayNameFor(x => x.Active)</div>
+            <div class="col-12 item">
+                @(Html.Kendo().CheckBox()
+                .Name("Active")
+                .Checked(Model.Active)
+                )
+                <div class="error">@Html.ValidationMessageFor(m => m.Active)</div>
+            </div>
+        </div>
+        <div class="col-10">
+            <div class="col-12 title">@Html.DisplayNameFor(x => x.Name)</div>
+            <div class="col-12 item">
+                @(Html.Kendo().TextBox()
+                    .Name("Name")
+                    .HtmlAttributes(new { Style = "width:100%;" })
+                    .Value(Model.Name)
+                )
+                <div class="error">@Html.ValidationMessageFor(m => m.Name)</div>
+            </div>
+        </div>
+        <div class="col-11">
+            <div class="col-12 title">@Html.DisplayNameFor(x => x.Description)</div>
+            <div class="col-12 item">
+                @Html.TextAreaFor(m => m.Description, new { @style = "width:100%;height:95px;", @class = "k-textbox" })
+                <div class="error">@Html.ValidationMessageFor(m => m.Description)</div>
+            </div>
+        </div>
+        <div class="col-2">
+            <div class="col-12 title">@Html.DisplayNameFor(x => x.Code)</div>
+            <div class="col-12 item">
+                @(Html.Kendo().TextBox()
+                    .Name("Code")
+                    .HtmlAttributes(new { Style = "width:100%;" })
+                    .Value(Model.Code)
+                )
+                <div class="error">@Html.ValidationMessageFor(m => m.Code)</div>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="col-12 title">@Html.DisplayNameFor(x => x.IdUnitMeasurement)</div>
+            <div class="col-12 item">
+                @(Html.Kendo().DropDownList()
+              .Name("IdUnitMeasurement")
+              .DataTextField("Name")
+              .DataValueField("Id")
+              .OptionLabel("Seleccionar...")
+              .SelectedIndex(0)
+              .Filter("contains")
+              .DataSource(source =>
+              {
+                  source.Read(read =>
+                  {
+                      read.Action("getCombo", "UnidadMedida");
+                  });
+              })
+              .HtmlAttributes(new { style = "width: 100%" })
+              .Events(e =>
+              {
+                  e.Select("IdUnitMeasurementSelect");
+              })
+                )
+                <div class="error">@Html.ValidationMessageFor(m => m.IdUnitMeasurement)</div>
+            </div>
+        </div>
+        <div class="col-5">
+            <div class="col-12 title">@Html.DisplayNameFor(x => x.IdResolucion)</div>
+            <div class="col-12 item">
+                @(Html.Kendo().DropDownList()
+              .Name("IdResolucion")
+              .DataTextField("Name")
+              .DataValueField("Id")
+              .OptionLabel("Seleccionar...")
+              .SelectedIndex(0)
+              .Filter("contains")
+              .DataSource(source =>
+              {
+                  source.Read(read =>
+                  {
+                      read.Action("getCombo", "Resolucion");
+                  });
+              })
+              .HtmlAttributes(new { style = "width: 100%" })
+              .Events(e =>
+              {
+                  e.Select("IdResolucionSelect");
+              })
+                )
+                <div class="error">@Html.ValidationMessageFor(m => m.IdResolucion)</div>
+            </div>
+        </div>
+        <div class="col-11">
+            <div class="col-12 title">@Html.DisplayNameFor(x => x.IdAccountingItem)</div>
+            <div class="col-12 item">
+                @(Html.Kendo().DropDownList()
+                      .Name("IdAccountingItem")
+                      .DataTextField("Name")
+                      .DataValueField("Id")
+                      .OptionLabel("Seleccionar...")
+                      .SelectedIndex(0)
+                      .Filter("contains")
+                      .DataSource(source =>
+                      {
+                          //source.Custom().Group(g =>
+                          //{
+                          //    g.Add("Parent", typeof(String));
+                          //});
+                          source.Read(read =>
+                          {
+                              read.Action("getCombo", "Partida").Data("cmbAccountingItemData");
+                          })
+                          .ServerFiltering(true);
+                      })
+                      .Enable(false)
+                      .AutoBind(false)
+                      .CascadeFrom("IdResolucion")
+                      .HtmlAttributes(new { style = "width: 100%" })
+                      .Events(e =>
+                      {
+                          e.Select("IdAccountingItemSelect");
+                          e.DataBound("IdAccountingItemDataBound");
+                      })
+                )
+                <div class="error">@Html.ValidationMessageFor(m => m.IdAccountingItem)</div>
+            </div>
+        </div>
+    </div>
+    <div class="k-edit-buttons k-state-default" style="float: left;width: 100%;border-top: solid;padding-top: 10px;border-width: 1px;color: gray;text-align: right;">
+        <button id="btnSave" type="submit" class="k-button k-button-icontext k-primary k-grid-update">
+            <span class="k-icon k-update"></span> Actualizar
+        </button>
+        &nbsp;
+        <button id="btnCancel" type="button" class="k-button k-button-icontext k-grid-cancel">
+            <span class="k-icon k-cancel"></span> Cancelar
+        </button>
+    </div>
+}
+
+<style>
+    .error {
+        color: red;
+        font-size: 11px;
+    }
+</style>
+
+<script>
+    $(document).ready(function () {
+        $("#btnCancel").click(function () {
+            window.parent.$("#templateWindow").data("kendoWindow").close();
+        });
+
+        setTimeout(function () {
+            $("#Name").focus();
+
+            $("#Name").change(function () {
+                $("#Description").focus();
+            });
+
+            $("#Description").change(function () {
+                $("#Description").focus();
+            });
+
+            $("#Code").change(function () {
+                $("#IdUnitMeasurement").data("kendoDropDownList").open();
+            });
+        }, 500);
+
+        if ("@ViewBag.Success" == "True" || "@ViewBag.Success" == "true") {
+            
+
+            if ("@ViewBag.IsNew" == "True" || "@ViewBag.IsNew" == "true") {
+                window.parent.$("#loading").fadeIn();
+                window.parent.callWizard($("#Name").val());
+            }
+            else {
+                window.parent.$("#grdCrud").data("kendoGrid").dataSource.read();
+                window.parent.$("#templateWindow").data("kendoWindow").close();
+
+                wnd = window.parent.$("#modalWindowAlert").kendoWindow({
+                    title: "Confirmaci&oacute;n",
+                    modal: true,
+                    visible: false,
+                    resizable: false,
+                    width: 300
+                }).data("kendoWindow");
+
+                window.parent.$("#yes").hide();
+                window.parent.$("#no").hide();
+
+                window.parent.$("#confirmMessage").html("Registro modificado exitosamente");
+                wnd.center().open();
+            }
+        }
+    });
+
+    function IdUnitMeasurementSelect(e) {
+        $("#IdResolucion").data("kendoDropDownList").open();
+    }
+
+    function IdResolucionSelect(e) {
+        window.parent.$("#loading").fadeIn();
+    }
+
+    function IdAccountingItemSelect(e) {
+        $(".k-button.k-button-icontext.k-primary.k-grid-update").focus();
+    }
+
+    function IdAccountingItemDataBound(e) {
+        window.parent.$("#loading").fadeOut();
+        setTimeout(function () {
+            $("#IdAccountingItem").data("kendoDropDownList").open();
+        });
+    }
+
+    function cmbAccountingItemData() {
+        return {
+            IdResolution: $("#IdResolucion").data("kendoDropDownList").value()
+        };
+    }
+</script>
+

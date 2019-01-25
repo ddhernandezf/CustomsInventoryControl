@@ -1,0 +1,45 @@
+﻿@using Kendo.Mvc.UI;
+@model Index.Commons.FileInfo
+
+<div class="generali-popup-form">
+    @Html.HiddenFor(m => m.Id)
+<div class="error">
+        @Html.ValidationMessage("errorGeneral")
+    </div>
+    <div class="col-5">
+        <div class="col-12 no-padding">
+            <div class="col-12 title">@Html.DisplayNameFor(x => x.Name)</div>
+            <div class="col-12 item">
+                @(Html.Kendo().TextBox()
+                    .Name("Name")
+                    .HtmlAttributes(new { Style = "width:100%;" })
+                    .Value(Model.Name)
+                )
+                <div class="error">@Html.ValidationMessageFor(m => m.Name)</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-5">
+        <div class="col-12 title">@Html.DisplayNameFor(x => x.Description)</div>
+        <div class="col-12 item">
+            @Html.TextAreaFor(m => m.Description, new { @style = "width:100%;height:95px;", @class = "k-textbox" })
+            <div class="error">@Html.ValidationMessageFor(m => m.Description)</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        setTimeout(function () {
+            $("#Name").focus();
+
+            $("#Name").change(function () {
+                $("#Description").focus();
+            });
+
+            $("#Description").change(function () {
+                $(".k-button.k-button-icontext.k-primary.k-grid-update").focus();
+            });
+        }, 500);
+    });
+</script>

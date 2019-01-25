@@ -1,0 +1,99 @@
+﻿@using Kendo.Mvc.UI;
+@model Index.Commons.Currency
+
+<div class="generali-popup-form">
+    @Html.HiddenFor(m => m.Id)
+<div class="error">
+        @Html.ValidationMessage("errorGeneral")
+    </div>
+    <div class="col-4">
+        <div class="col-12 title">@Html.DisplayNameFor(x => x.IdCountry)</div>
+        <div class="col-12 item">
+            @(Html.Kendo().DropDownList()
+              .Name("IdCountry")
+              .DataTextField("Name")
+              .DataValueField("Id")
+              .OptionLabel("Seleccionar...")
+              .SelectedIndex(0)
+              .Filter("contains")
+              .DataSource(source =>
+              {
+                  source.Read(read =>
+                  {
+                      read.Action("getCombo", "Pais");
+                  });
+              })
+              .HtmlAttributes(new { style = "width: 100%" })
+              .Events(e=> {
+                  e.Select("IdCountrySelect");
+              })
+            )
+            <div class="error">@Html.ValidationMessageFor(m => m.IdCountry)</div>
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="col-12 title">@Html.DisplayNameFor(x => x.Name)</div>
+        <div class="col-12 item">
+            @(Html.Kendo().TextBox()
+                    .Name("Name")
+                    .HtmlAttributes(new { Style = "width:100%;" })
+                    .Value(Model.Name)
+            )
+            <div class="error">@Html.ValidationMessageFor(m => m.Name)</div>
+        </div>
+    </div>
+    <div class="col-7">
+        <div class="col-12 title">@Html.DisplayNameFor(x => x.Description)</div>
+        <div class="col-12 item">
+            @Html.TextAreaFor(m=>m.Description,new { @style="width:100%;height:95px;", @class= "k-textbox" })
+            <div class="error">@Html.ValidationMessageFor(m => m.Description)</div>
+        </div>
+    </div>
+    <div class="col-3">
+        <div class="col-12 title">@Html.DisplayNameFor(x => x.Symbol)</div>
+        <div class="col-12 item">
+            @(Html.Kendo().TextBox()
+                    .Name("Symbol")
+                    .HtmlAttributes(new { Style = "width:100%;" })
+                    .Value(Model.Symbol)
+            )
+            <div class="error">@Html.ValidationMessageFor(m => m.Symbol)</div>
+        </div>
+    </div>
+    <div class="col-2">
+        <div class="col-12 title">@Html.DisplayNameFor(x => x.ExchangeRate)</div>
+        <div class="col-12 item">
+            @(Html.Kendo().NumericTextBox()
+                    .Name("ExchangeRate")
+                    .HtmlAttributes(new { Style = "width:100%;" })
+                    .Value((Double)Model.ExchangeRate)
+                    .Spinners(false)
+                    .Format("c")
+                    .Events(e=> {
+                        e.Change("ExchangeRateChange");
+                    })
+            )
+            <div class="error">@Html.ValidationMessageFor(m => m.ExchangeRate)</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        setTimeout(function () {
+            $("#IdCountry").data("kendoDropDownList").open();
+
+            $("#Name").change(function () {
+                $("#Description").focus();
+            });
+
+            $("#Description").change(function () {
+                $("#Symbol").focus();
+            });
+
+            $("#Symbol").change(function () {
+                $("#ExchangeRate").siblings('input:visible').focus();
+            });
+        }, 500);
+    });
+</script>

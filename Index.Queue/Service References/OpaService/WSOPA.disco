@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<discovery xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://schemas.xmlsoap.org/disco/">
+  <contractRef ref="https://sws.export.com.gt/WS_OPA_2015/WSOPA.asmx?wsdl" docRef="https://sws.export.com.gt/WS_OPA_2015/WSOPA.asmx" xmlns="http://schemas.xmlsoap.org/disco/scl/" />
+  <soap address="https://sws.export.com.gt/WS_OPA_2015/WSOPA.asmx" xmlns:q1="http://tempuri.org/" binding="q1:WSOPASoap" xmlns="http://schemas.xmlsoap.org/disco/soap/" />
+  <soap address="https://sws.export.com.gt/WS_OPA_2015/WSOPA.asmx" xmlns:q2="http://tempuri.org/" binding="q2:WSOPASoap12" xmlns="http://schemas.xmlsoap.org/disco/soap/" />
+</discovery>

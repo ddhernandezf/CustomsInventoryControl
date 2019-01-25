@@ -1,0 +1,96 @@
+﻿@using Index.Commons;
+@using Kendo.Mvc.UI;
+
+@model FileAttached
+
+@{
+    Int32 IdFileHeader = (Int32)Session["IDFILEHEADER"];
+    Boolean IsSubstract = (Boolean)ViewBag.IsSubstract;
+
+    List<Field> fields = (List<Field>)ViewBag.Fields;
+    Field idsupplier = fields.Where(x => x.DataBaseName == "IdSupplier").FirstOrDefault();
+    Field description = fields.Where(x => x.DataBaseName == "Description").FirstOrDefault();
+    Field number = fields.Where(x => x.DataBaseName == "AttachedNumber").FirstOrDefault();
+    Field date = fields.Where(x => x.DataBaseName == "AttachedDate").FirstOrDefault();
+
+    String descSupplier = (idsupplier.Label == null) ? idsupplier.FieldName : idsupplier.Label;
+    String descTitle = (description.Label == null) ? description.FieldName : description.Label;
+    String numberTitle = (number.Label == null) ? number.FieldName : number.Label;
+    String dateTitle = (date.Label == null) ? date.FieldName : date.Label;
+}
+
+<div class="generali-popup-form">
+    @Html.HiddenFor(m => m.Id)
+    @Html.Hidden("IdFileHeader", IdFileHeader)
+<div class="error">
+        @Html.ValidationMessage("errorGeneral")
+    </div>
+    @if (idsupplier.IsUsed)
+    {
+        <div class="col-5">
+            <div class="col-12 title">@descSupplier</div>
+            <div class="col-12 item">
+                @(Html.Kendo().DropDownList()
+              .Name("IdSupplierOrDestiny")
+              .DataTextField("Name")
+              .DataValueField("Id")
+              .OptionLabel("Seleccionar...")
+              .SelectedIndex(0)
+              .Filter("contains")
+              .DataSource(source =>
+              {
+                  source.Read(read =>
+                  {
+                      read.Action("getSupplierCombo", "Transaccion", new { IsDestinyCustomer = IsSubstract });
+                  });
+              })
+              .HtmlAttributes(new { style = "width: 100%" })
+                )
+                <div class="error">@Html.ValidationMessageFor(m => m.IdSupplier)</div>
+            </div>
+        </div>
+    }
+    @if (description.IsUsed)
+    {
+        <div class="col-5">
+            <div class="col-12 title">@descTitle</div>
+            <div class="col-12 item">
+                @(Html.Kendo().TextBox()
+                    .Name("Description")
+                    .HtmlAttributes(new { Style = "width:100%;" })
+                    .Value(Model.Description)
+                )
+                <div class="error">@Html.ValidationMessageFor(m => m.Description)</div>
+            </div>
+        </div>
+    }
+    @if (number.IsUsed)
+    {
+        <div class="col-4">
+            <div class="col-12 title">@numberTitle</div>
+            <div class="col-12 item">
+                @(Html.Kendo().TextBox()
+                    .Name("AttachedNumber")
+                    .HtmlAttributes(new { Style = "width:100%;" })
+                    .Value(Model.AttachedNumber)
+                )
+                <div class="error">@Html.ValidationMessageFor(m => m.AttachedNumber)</div>
+            </div>
+        </div>
+    }
+    @if (date.IsUsed)
+    {
+        <div class="col-4">
+            <div class="col-12 title">@dateTitle</div>
+            <div class="col-12 item">
+                @(Html.Kendo().DatePicker()
+                    .Name("AttachedDate")
+                    .HtmlAttributes(new { Style = "width:100%;" })
+                    .Value(Model.AttachedDate)
+                    .Format("dd/MM/yyyy")
+                )
+                <div class="error">@Html.ValidationMessageFor(m => m.AttachedDate)</div>
+            </div>
+        </div>
+    }
+</div>

@@ -1,0 +1,105 @@
+﻿@using Index.Commons;
+@using Kendo.Mvc.UI;
+
+@{
+    Layout = null;
+}
+
+<div class="col-11">
+    @(Html.Kendo().Button()
+        .Name("btnFreezeDoc")
+        .Content("Congelar")
+        .ImageUrl(Url.Content("~/Content/Images/Congelar.png"))
+        .HtmlAttributes(new { @class = "k-primary" })
+    )
+    &nbsp;
+    @(Html.Kendo().Button()
+        .Name("btnUnFreezeDoc")
+        .Content("Descongelar")
+        .ImageUrl(Url.Content("~/Content/Images/Descongelar.png"))
+        .HtmlAttributes(new { @class = "k-primary" })
+    )
+    &nbsp;
+    @(Html.Kendo().Button()
+        .Name("btnCancelar")
+        .Content("Cancelar")
+    )
+</div>
+<div class="col-11">
+    @(Html.Kendo().Grid<Freeze>()
+                    .Name("grdFreeze")
+                    .HtmlAttributes(new { @style = "font-size: 10px;" })
+                    .Columns(c =>
+                    {
+                        c.Bound(p => p.Id);
+                        c.Bound(p => p.IsFrozen).Title("CONGELADO").Width(80).ClientTemplate("<input type='checkbox' #=(IsFrozen == true) ? 'checked' : ''# disabled />");
+                        c.Bound(p => p.ItemName).Width(130);
+                        c.Bound(p => p.TransactionLine).Width(50).ClientTemplate("#=kendo.toString(TransactionLine, 'n0')#");
+                        c.Bound(p => p.Quantity).Width(120).ClientTemplate("#=kendo.toString(Quantity, 'n6')#");
+                        c.Bound(p => p.Stock).Width(120).ClientTemplate("#=kendo.toString(Stock, 'n6')#");
+                        c.Bound(p => p.Discharge).Width(120).ClientTemplate("#=kendo.toString(Discharge, 'n6')#");
+                        c.Bound(p => p.Balance).Width(120).ClientTemplate("#=kendo.toString(Balance, 'n6')#");
+                    })
+                    .Scrollable()
+                    .DataSource(dataSource => dataSource
+                        .Ajax()
+                        .Model(m =>
+                        {
+                            m.Id(o => o.Id);
+                        })
+                        .Read(r => r.Action("ReadDocument", "Congelar", new { IdFileHeader = ViewBag.IdFileHeader }))
+                        .Events(e =>
+                        {
+                            e.Error("errorHandler");
+                            e.RequestEnd("onRequestEnd");
+                        })
+                     )
+    )
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('#btnCancelar').click(function () {
+            $("#wndAdjunto").data("kendoWindow").close();
+        });
+
+        $('#btnFreezeDoc').click(function () {
+            var r = confirm('Se dispone a congelar todos los saldos del documento "@ViewBag.Document". ¿Se encuentra realmente seguro de realizar esta acción?');
+            if (r == true) {
+                $("#loading").fadeIn();
+                setTimeout(function () {
+                    var result = wsExecute("GET", "json", "@Url.Action("CongelarDocumento", "Congelar")", { IdFileHeader: Number("@ViewBag.IdFileHeader") }, false);
+                    if (result === true) {
+                        $("#wndAdjunto").data("kendoWindow").close();
+                        $("#grdCrud").data("kendoGrid").dataSource.read();
+                        alert('Se congelaron los saldos del documento exitosamente.');
+                    }
+                    else {
+                        alert('Ocurrio un error desconocido. El documento no pudo congelarse.');
+                    }
+                    $("#loading").fadeOut();
+                }, 500);
+            }
+        });
+
+        $('#btnUnFreezeDoc').click(function () {
+            var r = confirm('Se dispone a descongelar todos los saldos del documento "@ViewBag.Document". ¿Se encuentra realmente seguro de realizar esta acción?');
+            if (r == true) {
+                $("#loading").fadeIn();
+                setTimeout(function () {
+                    var result = wsExecute("GET", "json", "@Url.Action("DescongelarDocumento", "Congelar")", { IdFileHeader: Number("@ViewBag.IdFileHeader") }, false);
+                    console.log(result);
+                    if (result === true) {
+                        $("#wndAdjunto").data("kendoWindow").close();
+                        $("#grdCrud").data("kendoGrid").dataSource.read();
+                        alert('Se descongelaron los saldos del documento exitosamente.');
+                    }
+                    else {
+                        alert('Ocurrio un error desconocido. El documento no pudo descongelarse.');
+                    }
+                    $("#loading").fadeOut();
+                }, 500);
+            }
+        });
+    });
+</script>

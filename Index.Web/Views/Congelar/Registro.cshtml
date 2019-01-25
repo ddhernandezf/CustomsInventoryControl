@@ -1,0 +1,180 @@
+﻿@using Index.Commons;
+@using Kendo.Mvc.UI;
+@model Freeze
+
+@{
+    Layout = null;
+}
+
+<div class="col-11">
+    @(Html.Kendo().Button()
+        .Name("btnFreezeReg")
+        .Content("Congelar")
+        .ImageUrl(Url.Content("~/Content/Images/Congelar.png"))
+        .HtmlAttributes(new { @class = "k-primary" })
+    )
+    &nbsp;
+    @if (Model.IsFrozen == true)
+    {
+        @(Html.Kendo().Button()
+            .Name("btnUnFreezeReg")
+            .Content("Descongelar")
+            .ImageUrl(Url.Content("~/Content/Images/Descongelar.png"))
+            .HtmlAttributes(new { @class = "k-primary" })
+        )
+    }
+    &nbsp;
+    @(Html.Kendo().Button()
+        .Name("btnCancelar")
+        .Content("Cancelar")
+    )
+</div>
+<div class="col-11">
+    <span>
+        Se congelará el saldo definido para este registro, en su número de línea @ViewBag.TransactionLine para la materia prima @Model.ItemName.
+    </span>
+</div>
+<div class="col-11">
+    <div class="col-2">
+        <div class="col-12 title">&nbsp;</div>
+        <div class="col-12 item">
+            @(Html.Kendo().TextBox()
+                    .Name("IsFrozen")
+                    .HtmlAttributes(new { Style = "width:100%;" })
+                    .Value((Model.IsFrozen == true) ? "CONGELADO" : " NO CONGELADO")
+                    .Enable(false)
+            )
+            <div class="error">@Html.ValidationMessageFor(m => m.ItemName)</div>
+        </div>
+    </div>
+    <div class="col-8">
+        <div class="col-12 title">@Html.DisplayNameFor(x => x.ItemName)</div>
+        <div class="col-12 item">
+            @(Html.Kendo().TextBox()
+                    .Name("ItemName")
+                    .HtmlAttributes(new { Style = "width:100%;" })
+                    .Value(Model.ItemName)
+                    .Enable(false)
+            )
+            <div class="error">@Html.ValidationMessageFor(m => m.ItemName)</div>
+        </div>
+    </div>
+</div>
+<div class="col-11">
+    <div class="col-2">
+        <div class="col-12 title">@Html.DisplayNameFor(x => x.Quantity)</div>
+        <div class="col-12 item">
+            @(Html.Kendo().NumericTextBox()
+                    .Name("Quantity")
+                    .HtmlAttributes(new { Style = "width:100%;" })
+                    .Value((Double)Model.Quantity)
+                    .Format("n6")
+                    .Decimals(6)
+                    .Enable(false)
+                    .Spinners(false)
+            )
+            <div class="error">@Html.ValidationMessageFor(m => m.Quantity)</div>
+        </div>
+    </div>
+    <div class="col-2">
+        <div class="col-12 title">@Html.DisplayNameFor(x => x.Stock)</div>
+        <div class="col-12 item">
+            @(Html.Kendo().NumericTextBox()
+                    .Name("Stock")
+                    .HtmlAttributes(new { Style = "width:100%;" })
+                    .Value((Double)Model.Stock)
+                    .Format("n6")
+                    .Decimals(6)
+                    .Enable(false)
+                    .Spinners(false)
+            )
+            <div class="error">@Html.ValidationMessageFor(m => m.Stock)</div>
+        </div>
+    </div>
+    <div class="col-3">
+        <div class="col-12 title">@Html.DisplayNameFor(x => x.Discharge)</div>
+        <div class="col-12 item">
+            @(Html.Kendo().NumericTextBox()
+                    .Name("Discharge")
+                    .HtmlAttributes(new { Style = "width:100%;" })
+                    .Value((Double)Model.Discharge)
+                    .Format("n6")
+                    .Decimals(6)
+                    .Spinners(false)
+                    .Min(0)
+                    .Max((Double)Model.Stock)
+            )
+            <div class="error">@Html.ValidationMessageFor(m => m.Discharge)</div>
+        </div>
+    </div>
+    <div class="col-2">
+        <div class="col-12 title">@Html.DisplayNameFor(x => x.Balance)</div>
+        <div class="col-12 item">
+            @(Html.Kendo().NumericTextBox()
+                    .Name("Balance")
+                    .HtmlAttributes(new { Style = "width:100%;" })
+                    .Value((Double)Model.Balance)
+                    .Format("n6")
+                    .Decimals(6)
+                    .Enable(false)
+                    .Spinners(false)
+            )
+            <div class="error">@Html.ValidationMessageFor(m => m.Balance)</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('#btnCancelar').click(function () {
+            $("#wndAdjunto").data("kendoWindow").close();
+        });
+
+        $('#Discharge').change(function () {
+            var discharge = $('#Discharge').data("kendoNumericTextBox");
+            var stock = $('#Stock').data("kendoNumericTextBox");
+            var balance = $('#Balance').data("kendoNumericTextBox");
+
+            balance.value(stock.value() - discharge.value());
+        });
+
+        $('#btnFreezeReg').click(function () {
+            var r = confirm('Se dispone a congelar el saldo de este registro. ¿Se encuentra realmente seguro de realizar esta acción?');
+            if (r == true) {
+                $("#loading").fadeIn();
+                setTimeout(function () {
+                    var discharge = $('#Discharge').data("kendoNumericTextBox");
+                    var result = wsExecute("GET", "json", "@Url.Action("CongelarRegistro", "Congelar")", { IdFileDetail: Number("@ViewBag.IdFileDetail"), Discharge: discharge.value() }, false);
+                    if (result === true) {
+                        $("#wndAdjunto").data("kendoWindow").close();
+                        $("#grdCrud").data("kendoGrid").dataSource.read();
+                        alert('Se congelo el saldo del registro existosamente.');
+                    }
+                    else {
+                        alert('Ocurrio un error desconocido. El registro no pudo congelarse.');
+                    }
+                    $("#loading").fadeOut();
+                }, 500);
+            }
+        });
+
+        $('#btnUnFreezeReg').click(function () {
+            var r = confirm('Se dispone a descongelar el saldo de este registro. ¿Se encuentra realmente seguro de realizar esta acción?');
+            if (r == true) {
+                $("#loading").fadeIn();
+                setTimeout(function () {
+                    var result = wsExecute("GET", "json", "@Url.Action("DescongelarRegistro", "Congelar")", { IdFileDetail: Number("@ViewBag.IdFileDetail") }, false);
+                    if (result === true) {
+                        $("#wndAdjunto").data("kendoWindow").close();
+                        $("#grdCrud").data("kendoGrid").dataSource.read();
+                        alert('Se descongelo el saldo del registro existosamente.');
+                    }
+                    else {
+                        alert('Ocurrio un error desconocido. El registro no pudo descongelarse.');
+                    }
+                    $("#loading").fadeOut();
+                }, 500);
+            }
+        });
+    });
+</script>

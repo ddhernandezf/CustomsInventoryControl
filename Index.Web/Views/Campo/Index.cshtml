@@ -1,0 +1,94 @@
+﻿@using System
+@using Kendo.Mvc.UI
+
+@{
+    Index.Commons.FileInfoConfig config = (Index.Commons.FileInfoConfig)ViewBag.FileInfoConfig;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <!-- start: FORM VALIDATION 1 PANEL -->
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="view-title">
+                    <div class="view-logo"><img src="@Url.Content("~/Content/Images/Headers/ResolutionWhite.png")" /></div>
+                    @if (config != null)
+                    {
+                        <div class="view-text">Catálogo de campos de @config.DropDownName</div>
+                    }
+                </div>
+            </div>
+
+            <div class="panel-body">
+
+                <div class="col-12" style="padding:0px;">
+                    <div style="float:left;padding-right:10px;"><strong>Documento:</strong> </div>
+                    <div class="col-5" style="padding:0px;">
+                        @(Html.Kendo().DropDownList()
+                              .Name("FileInfoConfig")
+                              .DataTextField("Name")
+                              .DataValueField("Id")
+                              .OptionLabel("Seleccionar...")
+                              .Value((config == null) ? null : config.Id.ToString())
+                              .Filter("contains")
+                              .DataSource(source =>
+                              {
+                                  source.Read(read =>
+                                  {
+                                      read.Action("getComboConfig", "Documento");
+                                  });
+                              })
+                              .HtmlAttributes(new { style = "width: 100%" })
+                              .Events(e=> {
+                                  e.Select("FileInfoConfigSelect");
+                              })
+                        )
+                    </div>
+                </div>
+                @if (config != null)
+                {
+                    <div class="col-12">
+                        @(Html.Kendo().TabStrip()
+                    .Name("panelbar")
+                    .SelectedIndex(0)
+                    .Items(panelbar =>
+                    {
+                        panelbar.Add().Text("Maestro")
+                            .LoadContentFrom(Url.Action("FieldMaster", "Campo", new { IdFileInfoConfig = config.Id }));
+
+                        panelbar.Add().Text("Detalle")
+                            .LoadContentFrom(Url.Action("FieldDetail", "Campo", new { IdFileInfoConfig = config.Id }));
+
+                        if (config.UseAttached)
+                        {
+                            panelbar.Add().Text("Adjuntos")
+                            .LoadContentFrom(Url.Action("FieldAttached", "Campo", new { IdFileInfoConfig = config.Id }));
+                        }
+                    })
+                        )
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function FileInfoConfigSelect(e) {
+        $("#loading").fadeIn();
+        var item = this.dataItem(e.item);
+        console.log(item);
+        if (item.Id == "") {
+            var result = wsExecute("GET", "json", "@Url.Action("FileSelectDestroy", "Campo")", null, false);
+            if (result === true) {
+                window.location.reload();
+            }
+            else {
+                $("#loading").fadeOut();
+            }
+        }
+        else {
+            window.location.href = "@Url.Action("Router", "Campo")" + "?IdFileInfoConfig=" + item.Id;
+        }
+    }
+</script>

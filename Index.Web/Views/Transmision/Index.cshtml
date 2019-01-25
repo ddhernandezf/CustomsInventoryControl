@@ -1,0 +1,793 @@
+﻿@using Kendo.Mvc.UI;
+@using Index.Commons;
+
+@{
+    ViewBag.Title = "Aduana";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <!-- start: FORM VALIDATION 1 PANEL -->
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="view-title">
+                    <div class="view-logo"><img src="@Url.Content("~/Content/Images/Headers/TransmitionWhite.png")" /></div>
+                    <div class="view-text">Transmisión a OPA</div>
+                </div>
+            </div>
+            <div class="panel-body">
+                @(Html.Kendo().TabStrip()
+                    .Name("tabstrip")
+                    .Animation(a =>
+                    {
+                        a.Open(f => f.Fade(FadeDirection.In));
+                    })
+                    .Events(e =>
+                    {
+                        e.Select("tabstripSelect");
+                        e.ContentLoad("tabstripContentLoad");
+                    })
+                    .SelectedIndex(0)
+                    .Items(panelbar =>
+                    {
+                        panelbar.Add().Text("Nuevo")
+                            .LoadContentFrom(Url.Action("Nuevo", "Transmision"));
+                        panelbar.Add().Text("Cola")
+                            .LoadContentFrom(Url.Action("Cola", "Transmision"));
+                        panelbar.Add().Text("Transmitidos")
+                            .LoadContentFrom(Url.Action("Transmitido", "Transmision"));
+                    })
+                )
+            </div>
+        </div>
+    </div>
+</div>
+
+@(Html.Kendo().Window()
+    .Name("msjTransmition")
+    .Title("Faltan configuraciones")
+    .Width(500)
+    .Height(160)
+    .Modal(true)
+    .Visible(false)
+    .Events(e=> {
+        e.Close("msjTransmitionClose");
+    })
+    .Content(@<text>
+        <div style="display: inline-block;width: 98%;margin-top: 10px;">
+            <div id="container" style="text-align: center;font-weight: bolder;width: 100%;display: inline-block;"></div>
+            <div style="width: 100%;display: inline-block;float: left;text-align: center;margin-top: 15px;">
+                @(Html.Kendo().Button()
+                .Name("btnUser")
+                .ImageUrl(Url.Content("~/Content/Images/Menu/Usuarios.png"))
+                .Events(e=> {
+                    e.Click("btnUserClick");
+                })
+                )
+                &nbsp;
+                @(Html.Kendo().Button()
+                .Name("btnHome")
+                .ImageUrl(Url.Content("~/Content/Images/Menu/Home.png"))
+                .Events(e =>
+                {
+                    e.Click("btnHomeClick");
+                })
+                )
+            </div>
+        </div>
+    </text>)
+)
+
+@(Html.Kendo().Window()
+    .Name("mostrarRespuestas")
+    .Title("Historial de repuestas de proceso de transmisión")
+    .Width(800)
+    .Modal(true)
+    .Visible(false)
+    .Actions(a =>
+    {
+        a.Maximize();
+        a.Close();
+    })
+)
+
+<style>
+    .error {
+        color: red;
+    }
+
+    .error-msg {
+        color: red;
+        font-size: 10px;
+        text-align: justify;
+        line-height: 12px;
+    }
+
+    .check-container {
+        width:100%;
+        text-align: center;
+    }
+</style>
+
+<script>
+    var tabstrip;
+    var newfilterDates = null, newfilterpriority = null, newfilterstartdate = null, newfilterenddate = null, newIsValid = null;
+    var newDropDownDate, newDropDownPriority, newDatePickerStartDate, newDatePickerEndDate, grdNewDataToQueue, NewToolbar;
+
+    $(document).ready(function () {
+        $("#loading").fadeIn();
+        tabstrip = $("#tabstrip").data("kendoTabStrip");
+        var emaildata = wsExecute('GET', 'json', '@Url.Action("ValidateEmail", "Transmision")', null, false);
+        var msg = '';
+        var container = $("#container");
+        var btnUser = $("#btnUser");
+        var btnHome = $("#btnHome");
+
+        if (emaildata.Email == null) {
+            if (emaildata.HasPremission === true) {
+                container.html('Hemos detectado que en la configuración de la información de tu usuario, hace falta un correo electronico de trabajo.');
+                btnUser.show();
+                btnHome.show();
+            }
+            else {
+                container.html('Hemos detectado que en la configuración de la información de tu usuario, hace falta un correo electronico de trabajo. Solicita al administrador de seguridad que te habilite uno.');
+            }
+            var win = $("#msjTransmition").data("kendoWindow");
+            win.center();
+            win.open();
+
+            setTimeout(function () {
+                newDropDownDate.close();
+            }, 1000);
+        }
+    });
+
+    function btnUserClick(e) {
+        $("#loading").fadeIn();
+        setTimeout(function () {
+            window.location.href = "@Url.Action("Index","Usuario")";
+        }, 500);
+    }
+
+    function btnHomeClick(e) {
+        $("#loading").fadeIn();
+        setTimeout(function () {
+            window.location.href = "@Url.Action("Index","Home")";
+        }, 500);
+    }
+
+    function msjTransmitionClose(e) {
+        $("#loading").fadeIn();
+        setTimeout(function () {
+            window.location.href = "@Url.Action("Index","Home")";
+        }, 500);
+    }
+
+    function tabstripSelect(e) {
+    }
+
+    function tabstripContentLoad(e) {
+        if (tabstrip.select().index() == 0) {
+            $("#loading").fadeIn();
+            newDropDownDate = $("#Fecha").data("kendoDropDownList");
+            newDropDownPriority = $("#Prioridad").data("kendoDropDownList");
+            newDatePickerStartDate = $("#StartDate").data("kendoDatePicker");
+            newDatePickerEndDate = $("#EndDate").data("kendoDatePicker");
+            grdNewDataToQueue = $("#grdNewDataToQueue").data("kendoGrid");
+
+            $("#newDropDownFilter").kendoDropDownList({
+                dataTextField: "text",
+                dataValueField: "value",
+                dataSource: [
+                    { text: "Todos", value: 1 },
+                    { text: "Errores", value: 2 },
+                    { text: "Sin Error", value: 3 }
+                ],
+                select: function (e) {
+                    var item = this.dataItem(e.item);
+                    if (item.value == "") {
+                        newIsValid = null;
+                    }
+                    else {
+                        newIsValid = (item.value == 1) ? null : ((item.value == 2) ? false : true);
+                        $("#newBtnFiltrar").trigger('click');
+                    }
+                    $("#newDropDownSelector").data("kendoDropDownList").select(0);
+                }
+            });
+
+            $("#newDropDownSelector").kendoDropDownList({
+                optionLabel: "Seleccionar...",
+                dataTextField: "text",
+                dataValueField: "value",
+                dataSource: [
+                    { text: "Todos", value: 1 },
+                    { text: "Ninguno", value: 2 }
+                ],
+                select: function (e) {
+                    var item = this.dataItem(e.item);
+                    if (item.value != "") {
+                        if (item.value == 1) {
+                            $('.chk-transmition:enabled').prop('checked', true);
+                        }
+                        else if (item.value == 2) {
+                            $('.chk-transmition:enabled').prop('checked', false);
+                        }
+                    }
+                }
+            });
+
+            newDropDownDate.open();
+            NewToolbar = $("#NewToolbar").data("kendoToolBar");
+            EnableToolbarElements(false);
+        }
+        else {
+            $("#loading").fadeIn();
+        }
+
+        $("#loading").fadeOut();
+    }
+
+    function NewFechaSelect(e) {
+        var item = this.dataItem(e.item);
+        if (item.Id == "") {
+            $("#FechaError").html('*');
+            newfilterDates = null;
+            newDropDownDate.open();
+        }
+        else {
+            $("#FechaError").html('');
+            newfilterDates = item.Id;
+            newDropDownPriority.open();
+            $("#newBtnFiltrar").trigger('click');
+        }
+    }
+
+    function NewPrioridadSelect(e) {
+        var item = this.dataItem(e.item);
+        if (item.Id == "") {
+            $("#PrioridadError").html('*');
+            newfilterpriority = null;
+            setTimeout(function () {
+                newDropDownPriority.open();
+            }, 200);
+        }
+        else {
+            $("#PrioridadError").html('');
+            newfilterpriority = item.Id;
+
+            if (newDatePickerStartDate.value() == "") {
+                newDatePickerStartDate.value(GetDate());
+            }
+            newDatePickerStartDate.open();
+            $("#newBtnFiltrar").trigger('click');
+        }
+    }
+
+    function NewStartDateChange(e) {
+        if (newDatePickerStartDate.value() == "") {
+            newfilterstartdate = null;
+            newDatePickerEndDate.value("");
+            newDropDownPriority.open();
+            $("#FechaInicioError").html('*');
+        }
+        else {
+            newfilterstartdate = kendo.toString(newDatePickerStartDate.value(), "dd/MM/yyyy");
+            var sdate = new Date(newDatePickerStartDate.value());
+            var edate = sdate.setMonth(sdate.getMonth() + 1);
+            newDatePickerEndDate.min(newDatePickerStartDate.value());
+            newDatePickerEndDate.value(kendo.toString(sdate, "dd/MM/yyyy"));
+            newDatePickerEndDate.open();
+            $("#FechaInicioError").html('');
+            $("#newBtnFiltrar").trigger('click');
+        }
+        newDatePickerEndDate.trigger('change');
+    }
+
+    function NewEndDateChange(e) {
+        if (newDatePickerEndDate.value() == "") {
+            newfilterenddate = null;
+            newDatePickerEndDate.open();
+            $("#FechaFinError").html('*');
+        }
+        else {
+            newfilterenddate = kendo.toString(newDatePickerEndDate.value(), "dd/MM/yyyy");
+            $("#FechaFinError").html('');
+            //$("#newBtnFiltrar").trigger('click');
+        }
+    }
+
+    function btnFiltrarClick(e) {
+        if (newfilterDates == null) {
+            $("#FechaError").html('*');
+        }
+        if (newfilterpriority == null) {
+            $("#PrioridadError").html('*');
+        }
+        if (newfilterstartdate == null) {
+            $("#FechaInicioError").html('*');
+        }
+        if (newfilterenddate == null) {
+            $("#FechaFinError").html('*');
+        }
+        if (newfilterDates != null && newfilterpriority != null && newfilterstartdate != null && newfilterenddate != null) {
+            $("#FechaError").html('');
+            $("#PrioridadError").html('');
+            $("#FechaInicioError").html('');
+            $("#FechaFinError").html('');
+
+            $("#loading").fadeIn();
+            setTimeout(function () {
+                grdNewDataToQueue.dataSource.read();
+                $("#loading").fadeOut();
+            }, 500);
+        }
+    }
+
+    function grdNewDataToQueueFilter(e) {
+        return {
+            UseRegisterDate: (newfilterDates == 1) ? true : false,
+            StartDate: newfilterstartdate,
+            EndDate: newfilterenddate,
+            IsValid: newIsValid
+        }
+    }
+
+    function EnableToolbarElements(BoolVal) {
+        NewToolbar.enable($("#newQueueButton"), BoolVal);
+    }
+
+    function grdNewDataToQueueDataBound(e) {
+        if (e.sender._data.length == 0) {
+            EnableToolbarElements(false);
+        }
+        else {
+            EnableToolbarElements(true);
+        }
+
+        $('.chk-transmition').change(function () {
+            var boolval = $(this).is(':checked');
+            var id = $(this).data('id');
+            updateDataSource(id, boolval);
+        });
+
+        if (this.dataSource.group().length > 0) {
+            $('.k-icon.k-i-collapse').trigger('click');
+        }
+    }
+
+    function newQueueButtonClick(e) {
+        if (grdNewDataToQueue.dataSource.data().length > 0 && newfilterpriority != null) {
+            $("#loading").fadeIn();
+            var strData = '';
+            var items = $('.chk-transmition:checked');
+            var length = items.length
+
+            for (var i = 0; i < length; i++) {
+                if (i == length) {
+                    strData = strData + $(items[i]).data('id');
+                }
+                else {
+                    strData = strData + $(items[i]).data('id') + ',';
+                }
+            }
+
+            //console.log(strData);
+
+            $.ajax({
+                url: '@Url.Action("SaveToQueue", "Transmision")',
+                type: 'POST',
+                contentType: 'application/json;',
+                data: JSON.stringify({
+                    IdPriority: newfilterpriority,
+                    StartDate: newfilterstartdate,
+                    EndDate: newfilterenddate,
+                    FileItemDischargeIds: strData
+                }),
+                success: function (valid) {
+                    wnd = $("#modalWindowAlert").kendoWindow({
+                        title: "Confirmaci&oacute;n",
+                        modal: true,
+                        visible: false,
+                        resizable: false,
+                        width: 300
+                    }).data("kendoWindow");
+
+                    $("#yes").hide();
+                    $("#no").hide();
+
+                    if (valid === true) {
+                        $("#confirmMessage").html("Se guardo el registro correctamente");
+                        tabstrip.reload(tabstrip.select());
+                        newfilterDates = null; newfilterpriority = null; newfilterstartdate = null; newfilterenddate = null; newIsValid = null;
+                        setTimeout(function () {
+                            var index = tabstrip.tabGroup.children("li").eq(1);
+                            tabstrip.select(index);
+                            newDropDownDate.close();
+                            $("#loading").fadeOut();
+
+                            if ($("#grdQuegue").data("kendoGrid") != undefined) {
+                                $("#grdQuegue").data("kendoGrid").dataSource.read();
+                            }
+
+                        }, 1000);
+                    }
+                    else {
+                        $("#confirmMessage").html(valid);
+                    }
+
+                    wnd.center().open();
+                    $("#loading").fadeOut();
+                }
+            });
+        }
+    }
+
+    function updateDataSource(IdFileItemDischarge, BoolVal) {
+        var data = grdNewDataToQueue.dataSource.data();
+
+        for (var i = 0; i < data.length; i++) {
+            if ('items' in data[i]) {
+                for (var j = 0; j < data[i].items.length; j++) {
+                    if (data[i].items[j].IdFileItemDischarge == IdFileItemDischarge) {
+                        data[0].items.at(j).set("Assigned", BoolVal);
+                        break;
+                    }
+                }
+            }
+            else {
+                if (data[i].IdFileItemDischarge == IdFileItemDischarge) {
+                    data.at(i).set("Assigned", BoolVal);
+                    break;
+                }
+            }
+        }
+    }
+</script>
+
+<script id="script-cola">
+    function onRequestEndgrdQuegue(e) {
+        wnd = $("#modalWindowAlert").kendoWindow({
+            title: "Confirmaci&oacute;n",
+            modal: true,
+            visible: false,
+            resizable: false,
+            width: 300
+        }).data("kendoWindow");
+
+        $("#yes").hide();
+        $("#no").hide();
+
+        if (e.type == "destroy" && !e.response.Errors) {
+            $("#confirmMessage").html("Registro eliminado exitosamente");
+            wnd.center().open();
+            this.read();
+        }
+
+        if (e.type == "update" && !e.response.Errors) {
+            $("#confirmMessage").html("Registro actualizado exitosamente");
+            wnd.center().open();
+            this.read();
+        }
+
+        if (e.type == "create" && !e.response.Errors) {
+            $("#confirmMessage").html("Registro agregado exitosamente");
+            wnd.center().open();
+            this.read();
+        }
+    }
+
+    function errorHandlergrdQuegue(args) {
+        if (typeof args.errors === "string") {
+            onErrorGeneral(args.errors);
+        }
+        if (args.errors) {
+            var grid = $("#grdQuegue").data("kendoGrid");
+            grid.one("dataBinding", function (e) {
+                e.preventDefault();
+
+                for (var error in args.errors) {
+                    showMessage(grid.editable.element, error, args.errors[error].errors);
+                }
+            });
+        }
+        if (args.errors.errorGeneral) {
+            wnd = $("#modalWindowAlert").kendoWindow({
+                title: "Error",
+                modal: true,
+                visible: false,
+                resizable: false,
+                width: 300
+            }).data("kendoWindow");
+
+            $("#yes").hide();
+            $("#no").hide();
+            $("#confirmMessage").html(args.errors.errorGeneral.errors[0]);
+            wnd.center().open();
+        }
+
+        $("#grdQuegue").data("kendoGrid").dataSource.read();
+    }
+
+    function showMessage(container, name, errors) {
+        container.find("[data-valmsg-for=" + name + "],[data-val-msg-for=" + name + "]")
+                 .replaceWith(validationMessageTmpl({ field: name, message: errors[0] }))
+    }
+
+    function grdQuegueDataBound(e) {
+        setTimeout(function () {
+            var grid = $("#grdQuegue").data("kendoGrid");
+            var data = grid.dataSource.data();
+            for (var i = 0; i < data.length; i++) {
+                var currentUid = data[i].uid;
+
+                if (data[i].Transmited != 0 || data[i].StateName != 'Error Transmisión') {
+                    var currenRow = grid.table.find("tr[data-uid='" + currentUid + "']");
+                    var removeButton = $(currenRow).find(".k-grid-delete");
+                    removeButton.hide();
+                }
+            }
+
+            $(".k-grid .k-grid-header-wrap table thead th.k-hierarchy-cell").css("border-right-width", "0px");
+            $(".k-grid .k-grid-content table tbody tr td.k-hierarchy-cell").css("border-right-width", "0px");
+        }, 500);
+    }
+
+    function grdTransmitedDataBound(e) {
+        setTimeout(function () {
+            $(".k-grid .k-grid-header-wrap table thead th.k-hierarchy-cell").css("border-right-width", "0px");
+            $(".k-grid .k-grid-content table tbody tr td.k-hierarchy-cell").css("border-right-width", "0px");
+        }, 500);
+    }
+
+    function showDetailMessage(iddetail) {
+        $("#loading").fadeIn();
+        var win = $("#mostrarRespuestas").data("kendoWindow");
+        win.refresh({ url: "@Url.Action("DetalleRespuesta", "Transmision")", data: { IdOpaDetail: iddetail } });
+
+        setTimeout(function () {
+            win.open();
+            win.center();
+            setTimeout(function () {
+                win.center();
+                setTimeout(function () {
+                    $("#grdResponseMsg").data("kendoGrid").dataSource.read();
+                    $("#loading").fadeOut();
+                }, 1000);
+            }, 1500);
+        }, 3000);
+    }
+
+    function queueAgain(idopaheader, idopadetail) {
+        $("#loading").fadeIn();
+
+        setTimeout(function () {
+            var result = wsExecute('GET', 'json', '@Url.Action("ReproccessItem", "Transmision")', { 'IdOpaDetail': idopadetail }, false);
+            if (result === true) {
+                var grid = $("#grdQuegue").data("kendoGrid");
+                var index = 0;
+                grid.dataSource.read();
+
+                setTimeout(function () {
+                    var data = grid.dataSource.data();
+                    for (var i = 0; i < data.length; i++) {
+                        if (data[i].Id == idopaheader) {
+                            index = i;
+                            break;
+                        }
+                    }
+
+                    var viewrow = grid.tbody.find(">tr.k-master-row").eq(index);
+                    grid.expandRow(viewrow);
+                    $("#loading").fadeOut();
+                }, 500);
+            }
+            else {
+                alert(result);
+            }
+        }, 100);
+    }
+
+    function queueBatchAgain(idopaheader) {
+        var confirmresult = confirm("Se encuentra seguro de reprocesar todo el batch.");
+
+        if (confirmresult == true) {
+            $("#loading").fadeIn();
+
+            setTimeout(function () {
+                var result = wsExecute('GET', 'json', '@Url.Action("ReproccessBatch", "Transmision")', { 'IdOpaHeader': idopaheader }, false);
+                if (result === true) {
+                    var grid = $("#grdQuegue").data("kendoGrid");
+                    var index = 0;
+                    grid.dataSource.read();
+
+                    setTimeout(function () {
+                        var data = grid.dataSource.data();
+                        for (var i = 0; i < data.length; i++) {
+                            if (data[i].Id == idopaheader) {
+                                index = i;
+                                break;
+                            }
+                        }
+
+                        var viewrow = grid.tbody.find(">tr.k-master-row").eq(index);
+                        grid.expandRow(viewrow);
+                        $("#loading").fadeOut();
+                    }, 500);
+                }
+                else {
+                    alert(result);
+                }
+            }, 100);
+        }
+        $("#grdQuegue").data("kendoGrid").dataSource.read();
+    }
+
+    function DeleteOpaDetailItem(idopadetail, gridname) {
+        var r = confirm("¿Se encuentra realmente seguro de eliminar este registro?");
+        if (r == true) {
+            var result = wsExecute('GET', 'json', '@Url.Action("DeleteItem", "Transmision")' + '?IdOpaDetail=' + idopadetail, null, false);
+            $("#gridQue_" + gridname).data("kendoGrid").dataSource.read();
+        }
+    }
+
+    function subGridDataBound(e) {
+        setTimeout(function () {
+            $('.k-icon.k-i-collapse').trigger('click');
+        }, 500);
+    }
+
+    function EliminarErrBatchClick(e) {
+        var r = confirm("¿Se encuentra realmente seguro de eliminar este registro?");
+        if (r == true) {
+            var idopaheader = $(e).data('id');
+            var result = wsExecute('GET', 'json', '@Url.Action("DeleteWithErrors", "Transmision")' + '?IdOpaHeader=' + idopaheader, null, false);
+            $("#grdQuegue").data("kendoGrid").dataSource.read();
+        }
+    }
+</script>
+
+<script id="QueueTemplate" type="text/kendo-tmpl">
+    @(Html.Kendo().Grid<Index.Commons.Transmition.OpaDetail>()
+            .Name("gridQue_#=Id#")
+            .Events(e=> {
+                e.DataBound("subGridDataBound(gridQue_#=Id#)");
+            })
+            .Columns(c =>
+            {
+                c.Bound(p => p.Id).Hidden(true);
+                c.Bound(p => p.IdFileItemDischarge).Hidden(true);
+                c.Bound(p => p.IdFileHeaderStock).Hidden(true);
+                c.Bound(p => p.IdFileHeaderSubstract).Hidden(true);
+                c.Bound(p => p.IdFileDetailStock).Hidden(true);
+                c.Bound(p => p.IdFileDetailSubstract).Hidden(true);
+                c.Bound(p => p.Errors).Width(100).Filterable(false).Title(" ")
+                    .ClientTemplate("\\#if(Errors > 0){\\# <a class='messagebutton' style='cursor:pointer;' onclick='showDetailMessage(\\#=Id\\#);'><img style='width: 20px;' title='Ver Mensaje' src='" + @Url.Content("~/Content/Images/ShowMessage.png") + "' /></a>&nbsp; \\#}else if(StateName == 'Transmitido'){\\# <a class='messagebutton' style='cursor:pointer;' onclick='showDetailMessage(\\#=Id\\#);'><img style='width: 20px;' title='Ver Mensaje' src='" + @Url.Content("~/Content/Images/ShowMessage.png") + "' /></a>&nbsp; \\#}else{\\# \\#=''\\# \\#}\\#"
+                    + "\\#if(StateName == 'Error Transmisión'){\\# <a class='refreshbutton' style='cursor:pointer;' onclick='queueAgain(#=Id#, \\#=Id\\#);'><img style='width: 20px;' title='Reprocesar' src='" + @Url.Content("~/Content/Images/RefreshProccess.png") + "' /></a>&nbsp;"
+                    + "<a class='refreshbutton' style='cursor:pointer;position: absolute;' onclick='DeleteOpaDetailItem(\\#=Id\\#, #=Id#);'><img style='width: 20px;' title='Reprocesar' src='" + @Url.Content("~/Content/Images/Delete.png") + "' /></a>"
+                    + " \\#}else{\\# \\#=''\\# \\#}\\#");
+                c.Bound(p => p.StateName).Title("Estado").Width(150).Filterable(f => f.Cell(r => r.Operator("contains")));
+                c.Bound(p => p.IdDocumentSubstract).ClientTemplate("\\#=DocumentNameSubstract\\# \\#=IdDocumentSubstract\\#").Title("Documento Exportación").Width(250).Filterable(false);
+                c.Bound(p => p.TransactionLineSubstract).Title("Línea Exportación").Width(175).Filterable(false);
+                c.Bound(p => p.QuantitySubstract).ClientFooterTemplate("\\#=kendo.toString(sum,'n6')\\#")
+                    .ClientTemplate("\\#=kendo.toString(QuantitySubstract,'n6')\\#").Title("Cantidad").Width(150).Filterable(false);
+                c.Bound(p => p.CifSubstract).ClientFooterTemplate("\\#=kendo.toString(sum,'c6')\\#")
+                    .ClientTemplate("\\#=kendo.toString(CifSubstract,'c6')\\#").Title("CIF").Width(125).Filterable(false);
+                c.Bound(p => p.FobSubstract).ClientFooterTemplate("\\#=kendo.toString(sum,'c6')\\#")
+                    .ClientTemplate("\\#=kendo.toString(FobSubstract,'c6')\\#").Title("FOB").Width(125).Filterable(false);
+                c.Bound(p => p.CustomDutiesSubstract).ClientFooterTemplate("\\#=kendo.toString(sum,'c6')\\#")
+                    .ClientTemplate("\\#=kendo.toString(CustomDutiesSubstract,'c6')\\#").Title("DAI").Width(125).Filterable(false);
+                c.Bound(p => p.IvaSubstract).ClientFooterTemplate("\\#=kendo.toString(sum,'c6')\\#")
+                    .ClientTemplate("\\#=kendo.toString(IvaSubstract,'c6')\\#").Title("IVA").Width(125).Filterable(false);
+                c.Bound(p => p.IdDocumentStock).ClientTemplate("\\#=DocumentNameStock\\# \\#=IdDocumentStock\\#").Title("Documento Importación").Width(250).Filterable(false);
+                c.Bound(p => p.TransactionLineStock).Title("Línea Importación").Width(175).Filterable(false);
+                c.Bound(p => p.StartDate).ClientTemplate("\\#if(StartDate == null){\\# \\#=''\\# \\#}else{\\#\\#=kendo.toString(StartDate, 'dd/MM/yyyy hh:mm:ss')\\#\\#}\\#").Title("Inicio Proceso").Width(180).Filterable(false);
+                c.Bound(p => p.EndDate).ClientTemplate("\\#if(EndDate == null){\\# \\#=''\\# \\#}else{\\#\\#=kendo.toString(EndDate, 'dd/MM/yyyy  hh:mm:ss')\\#\\#}\\#").Title("Fin Proceso").Width(180).Filterable(false);
+            })
+            .ToolBar(t=> {
+                t.Template(@<text>
+                    <div class="tlb-grid">
+                        <button data-id="#=Id#" class="k-button k-primary" onclick="EliminarErrBatchClick(this);">
+                            <img style="width:20px;" src="@Url.Content("~/Content/Images/Delete.png")" />
+                            Eliminar Erroneos
+                        </button>
+                    </div>
+                </text>);
+            })
+            .Filterable(f =>
+            {
+                f.Mode(GridFilterMode.Row);
+            })
+            .Editable(e =>
+            {
+                e.Mode(GridEditMode.InLine).DisplayDeleteConfirmation("¿Se encuentra realmente seguro de eliminar el registro?");
+            })
+            .DataSource(dataSource => dataSource
+                .Ajax()
+                .Group(g =>
+                {
+                    g.Add(f => f.IdDocumentSubstract);
+                })
+                .Aggregates(a =>
+                {
+                    a.Add(p => p.QuantitySubstract).Sum();
+                    a.Add(p => p.CifSubstract).Sum();
+                    a.Add(p => p.FobSubstract).Sum();
+                    a.Add(p => p.CustomDutiesSubstract).Sum();
+                    a.Add(p => p.IvaSubstract).Sum();
+                })
+                .Model(m =>
+                {
+                    m.Id(o => o.Id);
+                })
+                .Read(r => r.Action("ReadDetail", "Transmision", new { IdOpaHeader = "#=Id#" }))
+            )
+            .Pageable()
+            .Sortable()
+            .ToClientTemplate()
+    )
+</script>
+
+<script id="script-transmitido">
+    function onRequestEndgrdTransmited(e) {
+        wnd = $("#modalWindowAlert").kendoWindow({
+            title: "Confirmaci&oacute;n",
+            modal: true,
+            visible: false,
+            resizable: false,
+            width: 300
+        }).data("kendoWindow");
+
+        $("#yes").hide();
+        $("#no").hide();
+
+        if (e.type == "destroy" && !e.response.Errors) {
+            $("#confirmMessage").html("Registro eliminado exitosamente");
+            wnd.center().open();
+            this.read();
+        }
+
+        if (e.type == "update" && !e.response.Errors) {
+            $("#confirmMessage").html("Registro actualizado exitosamente");
+            wnd.center().open();
+            this.read();
+        }
+
+        if (e.type == "create" && !e.response.Errors) {
+            $("#confirmMessage").html("Registro agregado exitosamente");
+            wnd.center().open();
+            this.read();
+        }
+    }
+
+    function errorHandlergrdTransmited(args) {
+        if (typeof args.errors === "string") {
+            onErrorGeneral(args.errors);
+        }
+        if (args.errors) {
+            var grid = $("#grdTransmited").data("kendoGrid");
+            grid.one("dataBinding", function (e) {
+                e.preventDefault();
+
+                for (var error in args.errors) {
+                    showMessage(grid.editable.element, error, args.errors[error].errors);
+                }
+            });
+        }
+        if (args.errors.errorGeneral) {
+            wnd = $("#modalWindowAlert").kendoWindow({
+                title: "Error",
+                modal: true,
+                visible: false,
+                resizable: false,
+                width: 300
+            }).data("kendoWindow");
+
+            $("#yes").hide();
+            $("#no").hide();
+            $("#confirmMessage").html(args.errors.errorGeneral.errors[0]);
+            wnd.center().open();
+        }
+    }
+</script>

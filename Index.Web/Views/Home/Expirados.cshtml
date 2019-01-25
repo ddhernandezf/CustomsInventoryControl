@@ -1,0 +1,35 @@
+﻿@using Index.Commons.Dashboard;
+@using Kendo.Mvc.UI;
+
+@{
+    Layout = null;
+}
+@(Html.Kendo().Grid<ExpiredDetail>()
+    .Name("grdExpired")
+    .Columns(c =>
+    {
+        c.Bound(p => p.IdFileHeader).Hidden(true);
+        c.Bound(p => p.IdState).Hidden(true);
+        c.Bound(p => p.Document).Width(350).Title("Documento");
+        c.Bound(p => p.StateName).Width(150).Title("Estado");
+        c.Bound(p => p.StartDate).Width(150).Title("Fecha Inicio").ClientTemplate("#=kendo.toString(StartDate, 'dd/MM/yyyy')#");
+        c.Bound(p => p.EndDate).Width(150).Title("Fecha Fin").ClientTemplate("#=kendo.toString(EndDate, 'dd/MM/yyyy')#");
+        c.Bound(p => p.Days).Width(150).Title("Dias transcurridos");
+        c.Bound(p => p.Label).Width(150).Title("Mensaje");
+    })
+    .Pageable(p =>
+    {
+        p.Refresh(true);
+    })
+    .Scrollable()
+    .DataSource(dataSource => dataSource
+    .Ajax()
+    .PageSize(20)
+    .Model(m =>
+    {
+        m.Id(o => o.IdFileHeader);
+    })
+    .Read(r => r.Action("ReadExpiredDetail", "Dashboard", new { IdCustomer = ViewBag.IdCustomer, IdAccount = ViewBag.IdAccount }))
+    )
+)
+

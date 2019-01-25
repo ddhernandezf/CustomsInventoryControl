@@ -1,0 +1,167 @@
+﻿@using Kendo.Mvc.UI;
+@model Index.Commons.User
+
+<div class="generali-popup-form">
+    @Html.HiddenFor(m => m.Id)
+<div class="error">
+        @Html.ValidationMessage("errorGeneral")
+    </div>
+    <div class="col-5">
+        <div class="col-12 title">@Html.DisplayNameFor(x => x.UserName)</div>
+        <div class="col-12 item">
+            @(Html.Kendo().TextBox()
+                    .Name("UserName")
+                    .HtmlAttributes(new { Style = "width:100%;" })
+                    .Value(Model.UserName)
+            )
+            <div class="error">@Html.ValidationMessageFor(m => m.UserName)</div>
+        </div>
+    </div>
+    <div class="col-5">
+        <div class="col-2 title">@Html.DisplayNameFor(x => x.Nit)</div>
+        <div class="col-12 item">
+            @(Html.Kendo().TextBox()
+                    .Name("Nit")
+                    .HtmlAttributes(new { Style = "width:100%;" })
+                    .Value(Model.Nit)
+            )
+            <div class="error">@Html.ValidationMessageFor(m => m.Nit)</div>
+        </div>
+    </div>
+    <div class="col-5">
+        <div class="col-12 title">@Html.DisplayNameFor(x => x.FirstName)</div>
+        <div class="col-12 item">
+            @(Html.Kendo().TextBox()
+                    .Name("FirstName")
+                    .HtmlAttributes(new { Style = "width:100%;" })
+                    .Value(Model.FirstName)
+            )
+            <div class="error">@Html.ValidationMessageFor(m => m.FirstName)</div>
+        </div>
+    </div>
+    <div class="col-5">
+        <div class="col-12 title">@Html.DisplayNameFor(x => x.LastName)</div>
+        <div class="col-12 item">
+            @(Html.Kendo().TextBox()
+                    .Name("LastName")
+                    .HtmlAttributes(new { Style = "width:100%;" })
+                    .Value(Model.LastName)
+            )
+            <div class="error">@Html.ValidationMessageFor(m => m.LastName)</div>
+        </div>
+    </div>
+    <div class="col-5">
+        <div class="col-12 title">@Html.DisplayNameFor(x => x.MobilePassword)</div>
+        <div class="col-12 item">
+            @(Html.Kendo().TextBox()
+                    .Name("MobilePassword")
+                    .HtmlAttributes(new { Style = "width:100%;", @type="password" })
+                    .Value(Model.MobilePassword)
+            )
+            <div class="error">@Html.ValidationMessageFor(m => m.MobilePassword)</div>
+        </div>
+    </div>
+    <div class="col-5">
+        <div class="col-12 title">@Html.DisplayNameFor(x => x.SitePassword)</div>
+        <div class="col-12 item">
+            @(Html.Kendo().TextBox()
+                    .Name("SitePassword")
+                    .HtmlAttributes(new { Style = "width:100%;", @type = "password" })
+                    .Value(Model.SitePassword)
+            )
+            <div class="error">@Html.ValidationMessageFor(m => m.SitePassword)</div>
+        </div>
+    </div>
+    <div class="col-3">
+        <div class="col-12 title">@Html.DisplayNameFor(x => x.PasswordReset)</div>
+        <div class="col-12 item text-center">
+            @(Html.Kendo().CheckBox()
+                .Name("PasswordReset")
+                .Checked(Model.PasswordReset)
+            )
+            <div class="error">@Html.ValidationMessageFor(m => m.PasswordReset)</div>
+        </div>
+    </div>
+    <div class="col-3">
+        <div class="col-12 title">@Html.DisplayNameFor(x => x.OAuthSite)</div>
+        <div class="col-12 item text-center">
+            @(Html.Kendo().CheckBox()
+                .Name("OAuthSite")
+                .Checked(Model.OAuthSite)
+            )
+            <div class="error">@Html.ValidationMessageFor(m => m.OAuthSite)</div>
+        </div>
+    </div>
+    <div class="col-2">
+        <div class="col-12 title">@Html.DisplayNameFor(x => x.OAuthMobile)</div>
+        <div class="col-12 item text-center">
+            @(Html.Kendo().CheckBox()
+                .Name("OAuthMobile")
+                .Checked(Model.OAuthMobile)
+            )
+            <div class="error">@Html.ValidationMessageFor(m => m.OAuthMobile)</div>
+        </div>
+    </div>
+    <div class="col-2">
+        <div class="col-12 title">@Html.DisplayNameFor(x => x.Active)</div>
+        <div class="col-12 item text-center">
+            @(Html.Kendo().CheckBox()
+                .Name("Active")
+                .Checked(Model.Active)
+            )
+            <div class="error">@Html.ValidationMessageFor(m => m.Active)</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        setTimeout(function () {
+            $("#UserName").focus();
+
+            $("#UserName").change(function () {
+                $("#Nit").focus();
+            });
+
+            $("#Nit").change(function () {
+                $("#Nit").focus();
+            });
+
+            $("#Nit").change(function () {
+                $("#FirstName").focus();
+            });
+
+            $("#FirstName").change(function () {
+                $("#LastName").focus();
+            });
+
+            $("#LastName").change(function () {
+                $("#MobilePassword").focus();
+            });
+
+            $("#MobilePassword").change(function () {
+                $("#SitePassword").focus();
+            });
+
+            $("#SitePassword").change(function () {
+                $("#PasswordReset").focus();
+            });
+
+            $("#PasswordReset").change(function () {
+                $("#OAuthSite").focus();
+            });
+
+            $("#OAuthSite").change(function () {
+                $("#OAuthMobile").focus();
+            });
+
+            $("#OAuthMobile").change(function () {
+                $("#Active").focus();
+            });
+
+            $("#Active").change(function () {
+                $(".k-button.k-button-icontext.k-primary.k-grid-update").focus();
+            });
+        }, 500);
+    });
+</script>

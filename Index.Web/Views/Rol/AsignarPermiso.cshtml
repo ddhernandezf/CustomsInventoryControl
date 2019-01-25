@@ -1,0 +1,70 @@
+﻿@using Index.Commons;
+@using Kendo.Mvc.UI;
+
+@{
+    List<PremissionTree> data = (List<PremissionTree>)ViewBag.data;
+    Layout = null;
+}
+
+@(Html.Kendo().TreeView()
+        .Name("treeview")
+        .HtmlAttributes(new { @style = "width:100%;" })
+        .TemplateId("accountingitemtreevew")
+        .Events(e => {
+            e.Select("treeviewSelect");
+        })
+)
+
+
+<style>
+    img {
+        width: 20px;
+    }
+
+    .k-checkbox-label:before {
+        border-color: #666;
+        background: #fff;
+        border-radius: 1px;
+        margin-top: -8px;
+        width: 15px;
+        height: 15px;
+        margin-left: 10px;
+    }
+</style>
+<script>
+    var treedata, treeview;
+
+    $(document).ready(function () {
+        $("#loading").fadeIn();
+        setTimeout(function () {
+            treedata = wsExecute('GET', 'json', '@Url.Action("GetPremissionJson", "Rol")' + '?idrole=@ViewBag.IdRole', null, false);
+            console.log(treedata);
+            treedata = proccessObjectTree(treedata);
+
+            treeview = $("#treeview").data("kendoTreeView");
+            treeview.dataSource.data(treedata);
+            $("#loading").fadeOut();
+        }, 500);
+    });
+
+    function premissionAssignment(addorremove, id) {
+        var result;
+        if (addorremove) {
+            result = wsExecute('POST', 'json', '@Url.Action("AddPremissionAsignment", "Rol")', { 'model': { IdRole: '@ViewBag.idrole', IdPremission: id } }, false);
+        }
+        else {
+            result = wsExecute('POST', 'json', '@Url.Action("RemovePremissionAssignment", "Rol")', { 'model': { IdRole: '@ViewBag.idrole', IdPremission: id } }, false);
+        }
+    }
+</script>
+<script id="accountingitemtreevew" type="text/kendo-ui-template">
+    #: item.text #
+    # if (!item.items) { #
+    # if (item.checked) { #
+    <input type='checkbox' data-id='#=item.id#' value='#=item.id#' id='#=item.uid#' checked='checked' onchange="onCheck(this);">
+    # } #
+    # if (!item.checked) { #
+    <input type='checkbox' data-id='#=item.id#' value='#=item.id#' id='#=item.uid#' onchange="onCheck(this);">
+    # } #
+    # } #
+</script>

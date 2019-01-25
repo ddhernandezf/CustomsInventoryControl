@@ -1,0 +1,91 @@
+﻿@using Index.Commons;
+@using Kendo.Mvc.UI;
+
+@{
+    Layout = null;
+    List<Field> fields = (List<Field>)ViewBag.Fields;
+    Boolean IsSubstract = (Boolean)ViewBag.IsSubstract;
+    Field idsupplier = fields.Where(x => x.DataBaseName == "IdSupplier").FirstOrDefault();
+    Field description = fields.Where(x => x.DataBaseName == "Description").FirstOrDefault();
+    Field number = fields.Where(x => x.DataBaseName == "AttachedNumber").FirstOrDefault();
+    Field date = fields.Where(x => x.DataBaseName == "AttachedDate").FirstOrDefault();
+    
+    String descSupplier = (idsupplier.Label == null) ? idsupplier.FieldName : idsupplier.Label;
+    String descTitle = (description.Label == null) ? description.FieldName : description.Label;
+    String numberTitle = (number.Label == null) ? number.FieldName : number.Label;
+    String dateTitle = (date.Label == null) ? date.FieldName : date.Label;
+} 
+
+@(Html.Kendo().Grid<FileAttached>()
+                    .Name("grdAttached")
+                    .Events(e=> {
+                        e.Edit("grdAttachedEdit");
+                    })
+                    .Columns(c =>
+                    {
+                        c.Bound(p => p.Id);
+                        c.Bound(p => p.IdFileHeader).Hidden(true);
+                        c.Bound(p => p.IdSupplier).Hidden(true);
+                        if (idsupplier.IsUsed)
+                        {
+                            c.Bound(p => p.SupplierName).Width(250).Filterable(f => f.Cell(r => r.Operator("contains"))).Title(descSupplier);
+                        }
+                        if (description.IsUsed)
+                        {
+                            c.Bound(p => p.Description).Width(175).Filterable(f => f.Cell(r => r.Operator("contains"))).Title(descTitle);
+                        }
+                        if (number.IsUsed)
+                        {
+                            c.Bound(p => p.AttachedNumber).Width(150).Filterable(f => f.Cell(r => r.Operator("contains"))).Title(numberTitle);
+                        }
+                        if (date.IsUsed)
+                        {
+                            c.Bound(p => p.AttachedDate).Width(175).Filterable(f => f.Cell(r => r.Operator("contains"))).Title(dateTitle).Format("{0: dd/MM/yyyy}");
+                        }
+                        c.Command(cmd =>
+                        {
+                            cmd.Edit().Text(" ");
+                            cmd.Destroy().Text(" ");
+                        }).Width(100).Locked(true).Lockable(false);
+                    })
+                    .Editable(e =>
+                    {
+                        e.Mode(GridEditMode.PopUp)
+                         .DisplayDeleteConfirmation("¿Se encuentra realmente seguro de eliminar el registro?")
+                         .TemplateName("TemplateAttached")
+                         .Window(w =>
+                            w.Title("Ingreso de documentos adjuntos")
+                            .Width(700)
+                         );
+                    })
+                    .ToolBar(t =>
+                    {
+                        t.Create().Text("Nuevo").HtmlAttributes(new { @class = "k-primary" });
+                    })
+                    .Pageable(p =>
+                    {
+                        p.Refresh(true);
+                    })
+                    .Scrollable()
+                    .Filterable(f =>
+                    {
+                        f.Mode(GridFilterMode.Row);
+                    })
+                    .DataSource(dataSource => dataSource
+                        .Ajax()
+                        .PageSize(20)
+                        .Model(m =>
+                        {
+                            m.Id(o => o.Id);
+                        })
+                        .Read(r => r.Action("AdjuntoRead", "Transaccion"))
+                        .Create(c => c.Action("AdjuntoCreate", "Transaccion"))
+                        .Update(u => u.Action("AdjuntoUpdate", "Transaccion"))
+                        .Destroy(d => d.Action("AdjuntoDelete", "Transaccion"))
+                        .Events(e =>
+                        {
+                            e.Error("errorHandlerAttached");
+                            e.RequestEnd("onRequestEndAttached");
+                        })
+                     )
+)

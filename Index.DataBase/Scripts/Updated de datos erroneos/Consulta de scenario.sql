@@ -1,0 +1,14 @@
+--SELECT	odh.IdFileDetailStock, odh.IdFileDetailSubstract, odh.IdFileItemDischarge
+--					  FROM	FileItemDischarge fid INNER JOIN (	SELECT	IdFileDetailStock, IdFileDetailSubstract, COUNT(*)[counter]
+--																  FROM	FileItemDischarge
+--																 GROUP	BY IdFileDetailStock, IdFileDetailSubstract
+--																HAVING	COUNT(*) > 1) a ON fid.IdFileDetailStock = a.IdFileDetailStock AND fid.IdFileDetailSubstract = a.IdFileDetailSubstract
+--												  LEFT OUTER JOIN OpaDetailHist odh ON fid.Id = odh.IdFileItemDischarge
+--												  INNER JOIN FileDetail fd ON fd.Id = fid.IdFileDetailStock
+--												  INNER JOIN FileHeader fh ON fh.Id = fd.IdFileHeader
+--					 WHERE	(fid.Quantity + fid.Decrease) <> odh.QuantitySubstract
+--					   AND	fid.CIFcost <> odh.CifSubstract
+--					   AND	fid.FOcost <> odh.FobSubstract
+--					   AND	fid.CustomDuties <> odh.CustomDutiesSubstract 
+--					   AND	fid.Iva <> odh.IvaSubstract
+--					   --AND	fh.IdCustomer = 68

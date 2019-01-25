@@ -1,0 +1,28 @@
+﻿
+@using Index.Commons.Transmition;
+@using Kendo.Mvc.UI;
+
+@{
+    Layout = null;
+}
+
+@(Html.Kendo().Grid<OpaMessageDetail>()
+                    .Name("grdResponseMsg")
+                    .Columns(c =>
+                    {
+                        c.Bound(p => p.ErrorType).Title("Tipo de error").Width(85);
+                        c.Bound(p => p.Message).Title("Mensaje").Width(200);
+                        c.Bound(p => p.ResponseDate).Title("Fecha").ClientTemplate("#=kendo.toString(ResponseDate, 'dd/MM/yyyy')#").Width(60);
+                        c.Bound(p => p.ResponseDate).Title("Hora").ClientTemplate("#=kendo.toString(ResponseDate, 'HH:mm:ss')#").Width(50);
+                    })
+                    .Pageable(p =>
+                    {
+                        p.Refresh(true);
+                    })
+                    .Scrollable()
+                    .DataSource(dataSource => dataSource
+                        .Ajax()
+                        .PageSize(20)
+                        .Read(r => r.Action("ReadResponseDetail", "Transmision", new { IdOpaDetail = ViewBag.IdOpaDetail }))
+                     )
+)

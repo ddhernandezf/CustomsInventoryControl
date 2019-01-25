@@ -1,0 +1,453 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{4612B805-177E-4328-8976-29EB77D5A05C}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Index.Dal</RootNamespace>
+    <AssemblyName>Index.Dal</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BL\Freeze.cs" />
+    <Compile Include="BL\Adjustment.cs" />
+    <Compile Include="BL\Dashboard.cs" />
+    <Compile Include="BL\Account.cs" />
+    <Compile Include="BL\AccountingItem.cs" />
+    <Compile Include="BL\ItemDischarge.cs" />
+    <Compile Include="BL\FileAttached.cs" />
+    <Compile Include="BL\FileItemDischarge.cs" />
+    <Compile Include="BL\Parameters.cs" />
+    <Compile Include="BL\Cellar.cs" />
+    <Compile Include="BL\Country.cs" />
+    <Compile Include="BL\Currency.cs" />
+    <Compile Include="BL\Customer.cs" />
+    <Compile Include="BL\Customs.cs" />
+    <Compile Include="BL\Field.cs" />
+    <Compile Include="BL\FileDetail.cs" />
+    <Compile Include="BL\FileInfo.cs" />
+    <Compile Include="BL\FileMasterDisplay.cs" />
+    <Compile Include="BL\Formula.cs" />
+    <Compile Include="BL\Menu.cs" />
+    <Compile Include="BL\Item.cs" />
+    <Compile Include="BL\Email.cs" />
+    <Compile Include="BL\EmailType.cs" />
+    <Compile Include="BL\Address.cs" />
+    <Compile Include="BL\AddressType.cs" />
+    <Compile Include="BL\FileHeader.cs" />
+    <Compile Include="BL\Resolution.cs" />
+    <Compile Include="BL\Supplier.cs" />
+    <Compile Include="BL\UnitMeasurement.cs" />
+    <Compile Include="BL\Phone.cs" />
+    <Compile Include="BL\PhoneType.cs" />
+    <Compile Include="BL\Premission.cs" />
+    <Compile Include="BL\Warranty.cs" />
+    <Compile Include="fn_mgr_split_string_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Index.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Index.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Index.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Index.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Index.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="BL\Role.cs" />
+    <Compile Include="BL\User.cs" />
+    <Compile Include="REPORTS\DischargeDetail.cs" />
+    <Compile Include="REPORTS\ExportList.cs" />
+    <Compile Include="REPORTS\FormulaReport.cs" />
+    <Compile Include="REPORTS\FrozenList.cs" />
+    <Compile Include="REPORTS\ItemReport.cs" />
+    <Compile Include="REPORTS\SwornDeclaration.cs" />
+    <Compile Include="spg_AccountByCustomer_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_AccountingItems_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_AccountingItemTree_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_Account_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_AddressType_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_Address_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_Adjustment_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_Cellar_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_Country_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_Currency_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_CustomerAccountData_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_CustomerAccountToAssing_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_CustomerAccount_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_CustomerAssignedByUser_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_CustomerByUser_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_CustomerToAssignUser_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_Customer_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_Customs_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_DashboardCustomer_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_DashboardExpiredDetail_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_DashboardExpired_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_DashboardTransmitedDetail_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_DashboardTransmited_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_DetailResponse_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_DischargeDetailResume_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_DischargeParameters_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_DischargeRawMaterial_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_DischargeTransactions_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_EmailType_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_Email_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_Enterprise_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_FieldsAttachedDisplay_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_FieldsDetailDisplay_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_FieldsMasterDisplay_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_FileAttachedDisplay_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_FileAttached_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_FileDetailDisplay_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_FileDetailValidationData_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_FileDetail_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_FileHeaderCurrentMonth_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_FileHeaderFiltered_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_FileHeaderValidationData_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_FileHeader_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_FileInfoConfig_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_FileInfoType_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_FileInfo_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_FileMasterDisplay_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_FilItemDischargeValidate_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_Formula_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_FreezeDocument_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_FreezeRegister_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_ItemFormula_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_Item_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_MenuByUser_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_Menu_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_OpaDetail_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_OpaHeader_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_OpaResponse_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_Parameters_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_person_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_PhoneType_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_Phone_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_PremissionByRole_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_premission_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_Priority_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_QueueItems_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_Queue_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_Report_DischargeDetail_FilteredDetail_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_Report_DischargeDetail_FilteredHeader_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_Report_DischargeDetail_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_Report_ExportList_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_Report_Formula_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_Report_FrozenList_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_Report_Item_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_Report_SwornDeclaration_One_FilteredDetail_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_Report_SwornDeclaration_One_FilteredHeader_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_Report_SwornDeclaration_One_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_Resolution_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_RoleByUserToAssign_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_RoleByUser_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_Role_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_States_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_Supplier_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_TransmitionDataByIds_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_TransmitionData_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_TransmitionGetUserEmail_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_TransmitionResult_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_UnitMeasurement_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_UserProccess_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_User_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spg_Warranty_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spi_FileHeader_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spu_FileHeader_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="sp_MobileLogin_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="sp_SiteLogin_Result.cs">
+      <DependentUpon>Index.tt</DependentUpon>
+    </Compile>
+    <Compile Include="TRANSMITION\Priority.cs" />
+    <Compile Include="TRANSMITION\Detail.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Index.Commons\Index.Commons.csproj">
+      <Project>{261c9a09-cc90-469e-8b3f-21a3873c5ae8}</Project>
+      <Name>Index.Commons</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Index.Functionalities\Index.Functionalities.csproj">
+      <Project>{2665dfef-b528-4845-98f6-7dcdcf076fd1}</Project>
+      <Name>Index.Functionalities</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EntityDeploy Include="Index.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>Index.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.Config" />
+    <None Include="Index.edmx.diagram">
+      <DependentUpon>Index.edmx</DependentUpon>
+    </None>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Index.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>Index.edmx</DependentUpon>
+      <LastGenOutput>Index.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="Index.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>Index.edmx</DependentUpon>
+      <LastGenOutput>Index.cs</LastGenOutput>
+    </Content>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

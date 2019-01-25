@@ -1,0 +1,73 @@
+﻿@using Index.Commons;
+@using Kendo.Mvc.UI;
+
+@{
+    Layout = null;
+}
+
+@(Html.Kendo().Grid<FileInfoConfig>()
+                    .Name("grdFileConfig")
+                    .Columns(c =>
+                    {
+                        c.Bound(p => p.Id);
+                        c.Bound(p => p.IdFileInfo).Hidden(true);
+                        c.Bound(p => p.IdFileInfoType).Hidden(true);
+                        c.Bound(p => p.IdAccount).Hidden(true);
+                        c.Bound(p => p.AccountName).Width(250).Filterable(f => f.Cell(r => r.Operator("contains")));
+                        c.Bound(p => p.DropDownName).Width(250).Filterable(f => f.Cell(r => r.Operator("contains")));
+                        c.Bound(p => p.Active).Width(100).Filterable(f => f.Multi(true).Search(true)).ClientTemplate("<input type='checkbox' #=(Active == true) ? 'checked' : ''#  disabled/>");
+                        c.Bound(p => p.Addition).Width(100).Filterable(false).ClientTemplate("<input type='checkbox' #=(Addition == true) ? 'checked' : ''#  disabled/>");
+                        c.Bound(p => p.Substraction).Width(100).Filterable(false).ClientTemplate("<input type='checkbox' #=(Substraction == true) ? 'checked' : ''#  disabled/>");
+                        c.Bound(p => p.UseAttached).Width(150).Filterable(false).ClientTemplate("<input type='checkbox' #=(UseAttached == true) ? 'checked' : ''#  disabled/>");
+                        c.Bound(p => p.UseExpired).Width(150).Filterable(false).ClientTemplate("<input type='checkbox' #=(UseExpired == true) ? 'checked' : ''#  disabled/>");
+                        c.Bound(p => p.UseRawMaterial).Width(150).Filterable(false).ClientTemplate("<input type='checkbox' #=(UseRawMaterial == true) ? 'checked' : ''#  disabled/>");
+                        c.Bound(p => p.Transmissible).Width(150).Filterable(false).ClientTemplate("<input type='checkbox' #=(Transmissible == true) ? 'checked' : ''#  disabled/>");
+                        c.Bound(p => p.Id).Width(25).Visible(true).Filterable(false).Title(" ").Locked(true).Lockable(false)
+                            .ClientTemplate("<a style='cursor:pointer;' onclick='showWindowField(#=Id#);'><img style='width: 25px;' title='Definir campos' src='" + @Url.Content("~/Content/Images/Menu/Campos.png") + "' /></a>");
+                        c.Command(cmd =>
+                        {
+                            cmd.Edit().Text(" ");
+                            cmd.Destroy().Text(" ");
+                        }).Width(100).Locked(true).Lockable(false);
+                    })
+                    .Editable(e =>
+                    {
+                        e.Mode(GridEditMode.PopUp)
+                         .DisplayDeleteConfirmation("¿Se encuentra realmente seguro de eliminar el registro?")
+                         .TemplateName("TemplateConfig")
+                         .Window(w =>
+                            w.Title("Formulario de configuración de documentos")
+                            .Width(700)
+                         );
+                    })
+                    .ToolBar(t =>
+                    {
+                        t.Create().Text("Nuevo").Text("Nuevo").HtmlAttributes(new { @class = "k-primary" });
+                    })
+                    .Pageable(p =>
+                    {
+                        p.Refresh(true);
+                    })
+                    .Scrollable()
+                    .Filterable(f =>
+                    {
+                        f.Mode(GridFilterMode.Row);
+                    })
+                    .DataSource(dataSource => dataSource
+                        .Ajax()
+                        .PageSize(20)
+                        .Model(m =>
+                        {
+                            m.Id(o => o.Id);
+                        })
+                        .Read(r => r.Action("ReadConfig", "Documento"))
+                        .Create(c => c.Action("CreateConfig", "Documento"))
+                        .Update(u => u.Action("UpdateConfig", "Documento"))
+                        .Destroy(d => d.Action("DeleteConfig", "Documento"))
+                        .Events(e =>
+                        {
+                            e.Error("errorHandlerFileConfig");
+                            e.RequestEnd("onRequestEndFileConfig");
+                        })
+                     )
+)

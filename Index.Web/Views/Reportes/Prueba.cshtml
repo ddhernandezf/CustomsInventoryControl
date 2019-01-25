@@ -1,0 +1,100 @@
+﻿@using Kendo.Mvc.UI;
+@using Index.Commons;
+
+@{
+    ViewBag.Title = "Materia prima";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <!-- start: FORM VALIDATION 1 PANEL -->
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="view-title">
+                    <div class="view-text">Reporte de pruebas</div>
+                    <div class="custumer-account">
+                        @{
+                            var customer = (Session["CUSTOMERINFO"] == null) ? null : (Customer)Session["CUSTOMERINFO"];
+                            var cuenta = (Session["ACCOUNTINFO"] == null) ? null : (Account)Session["ACCOUNTINFO"];
+
+                            if (customer != null)
+                            {
+                                <div class="customer"><span class="title">Cliente seleccionado: </span> @customer.EnterpriseName</div>
+                            }
+                            if (cuenta != null)
+                            {
+                                <div class="account"><span class="title">Cuenta selecionada: </span> @cuenta.Name</div>
+                            }
+                        }
+                    </div>
+                </div>
+                <div class="cr-filter">
+                    <div class="col-3">
+                        <div class="col-12 title">Id país</div>
+                        <div class="col-12 item">
+                            @(Html.Kendo().TextBox()
+                                .Name("IdCountry")
+                                .HtmlAttributes(new { Style = "width:100%;" })
+                            )
+                        </div>
+                    </div>
+                    @(Html.Kendo().Button()
+                        .Name("btnFiltrar")
+                        .ImageUrl(Url.Content("~/Content/Images/Filter.png"))
+                        .Events(e =>
+                        {
+                            e.Click("btnFiltrarClick");
+                        })
+                    )
+                </div>
+            </div>
+            <div class="panel-body">
+                <div class="cr-report">
+                    <iframe id="rptViewer" width="400" height="200" src="@Url.Content("~/Reportes/CrViewer.aspx")"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .cr-filter {
+        display: inline-block;
+        width: 100%;
+        border-top: solid;
+        border-width: 0.4px;
+        padding: 0px;
+        margin: 0px;
+    }
+
+    #btnFiltrar {
+        border: solid;
+        border-width: 0.4px;
+        margin-top: 20px;
+        float: right;
+    }
+</style>
+
+<script>
+    var frame = $("#rptViewer");
+
+    $(document).ready(function () {
+        frame.css({ width: "100%", height: "400px" });
+    });
+
+    function btnFiltrarClick(e) {
+        $("#loading").fadeIn();
+
+        setTimeout(function () {
+            var idcountry = ($("#IdCountry").val() == '') ? null : $("#IdCountry").val();
+
+            var url = '@Url.Content("~/Reportes/CrViewer.aspx")' + '?Report=PRUEBA&IdCountry=' + idcountry;
+            frame.attr('src', url);
+
+            setTimeout(function () {
+                $("#loading").fadeOut();
+            }, 700);
+        }, 500)
+    }
+</script>

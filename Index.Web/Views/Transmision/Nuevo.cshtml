@@ -1,0 +1,182 @@
+﻿@using Kendo.Mvc.UI;
+@using Index.Commons;
+@{
+    Layout = null;
+}
+
+<div class="row">
+    <div class="col-md-11">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="view-title">
+                    <div class="col-3">
+                        <div class="col-12 title">Fechas</div>
+                        <div class="col-12 item">
+                            @(Html.Kendo().DropDownList()
+                                  .Name("Fecha")
+                                  .DataTextField("Name")
+                                  .DataValueField("Id")
+                                  .OptionLabel("Seleccionar...")
+                                  .SelectedIndex(0)
+                                  .Filter("contains")
+                                  .BindTo(new List<GenericDropDownList>() {
+                                      new GenericDropDownList() {
+                                          Id = 1,
+                                          Name = "Fecha de sistema"
+                                      },
+                                      new GenericDropDownList() {
+                                          Id = 2,
+                                          Name = "Fecha de documento"
+                                      }
+                                  })
+                                  .Events(e=> {
+                                      e.Select("NewFechaSelect");
+                                  })
+                                  .HtmlAttributes(new { style = "width: 100%" })
+                            )
+                            <div id="FechaError" class="error"></div>
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        <div class="col-12 title">Prioridad</div>
+                        <div class="col-12 item">
+                            @(Html.Kendo().DropDownList()
+                              .Name("Prioridad")
+                              .DataTextField("Name")
+                              .DataValueField("Id")
+                              .OptionLabel("Seleccionar...")
+                              .SelectedIndex(0)
+                              .Filter("contains")
+                              .DataSource(source =>
+                              {
+                                  source.Read(read =>
+                                  {
+                                      read.Action("getCombo", "Prioridad");
+                                  });
+                              })
+                              .Events(e=> {
+                                  e.Select("NewPrioridadSelect");
+                              })
+                              .HtmlAttributes(new { style = "width: 100%" })
+                            )
+                            <div id="PrioridadError" class="error"></div>
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        <div class="col-12 title">Fecha inicio</div>
+                        <div class="col-12 item">
+                            @(Html.Kendo().DatePicker()
+                                .Name("StartDate")
+                                .HtmlAttributes(new { Style = "width:100%;" })
+                                .Format("dd/MM/yyyy")
+                                .Events(e =>
+                                {
+                                    e.Change("NewStartDateChange");
+                                })
+                            )
+                            <div id="FechaInicioError" class="error"></div>
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        <div class="col-12 title">Fecha fin</div>
+                        <div class="col-12 item">
+                            @(Html.Kendo().DatePicker()
+                                .Name("EndDate")
+                                .HtmlAttributes(new { Style = "width:100%;" })
+                                .Format("dd/MM/yyyy")
+                                .Events(e =>
+                                {
+                                    e.Change("NewEndDateChange");
+                                })
+                            )
+                            <div id="FechaFinError" class="error"></div>
+                        </div>
+                    </div>
+                    @(Html.Kendo().ToolBar()
+                        .Name("KendoToolbar")
+                        .HtmlAttributes(new { @style = "text-align: right;float: right;margin-top: 18px;" })
+                        .Items(i =>
+                        {
+                            i.Add().Type(CommandType.Button).ImageUrl(Url.Content("~/Content/Images/Filter.png")).Click("btnFiltrarClick").HtmlAttributes(new { @id="newBtnFiltrar" });
+                        })
+                    )
+                </div>
+            </div>
+            <div class="panel-body">
+                @(Html.Kendo().ToolBar()
+                    .Name("NewToolbar")
+                    .HtmlAttributes(new { @style="width:95%;" })
+                    .Items(items =>
+                    {
+                        items.Add().Type(CommandType.Button).Id("newQueueButton").Text("Agregar a Cola").HtmlAttributes(new { @class="k-primary" }).Click("newQueueButtonClick");
+                        items.Add().Type(CommandType.Separator);
+                        items.Add().Template("<label>Filtro:</label>");
+                        items.Add().Template("<input id='newDropDownFilter' style='width: 150px;' />").Overflow(ShowInOverflowPopup.Never);
+                        items.Add().Type(CommandType.Separator);
+                        items.Add().Template("<label>Seleccionar:</label>");
+                        items.Add().Template("<input id='newDropDownSelector' style='width: 150px;' />").Overflow(ShowInOverflowPopup.Never);
+                    })
+                )
+
+                @(Html.Kendo().Grid<Index.Commons.Transmition.OpaDetail>()
+                    .Name("grdNewDataToQueue")
+                    .HtmlAttributes(new { @style = "width: 95%; font-size: 12px;" })
+                    .AutoBind(false)
+                    .Events(e=> {
+                        e.DataBound("grdNewDataToQueueDataBound");
+                    })
+                    .Columns(c =>
+                    {
+                        c.Bound(p => p.Id).Hidden(true);
+                        c.Bound(p => p.IdFileItemDischarge).Hidden(true);
+                        c.Bound(p => p.IdFileHeaderStock).Hidden(true);
+                        c.Bound(p => p.IdFileHeaderSubstract).Hidden(true);
+                        c.Bound(p => p.IdFileDetailStock).Hidden(true);
+                        c.Bound(p => p.IdFileDetailSubstract).Hidden(true);
+                        c.Bound(p => p.Assigned).Filterable(false).Width(150).ClientTemplate("<div class='check-container'><input data-id='#=IdFileItemDischarge#' class='chk-transmition' type='checkbox' #= Assigned ? checked='checked' : ''# #= IsValid ? '' : disabled='disabled' # /></div>")
+                            .Title("Seleccionado").Locked(true).Lockable(false).ClientFooterTemplate("#=count#");
+                        c.Bound(p => p.IdDocumentSubstract).ClientTemplate("#=DocumentNameSubstract# #=IdDocumentSubstract#").Title("Documento Exportación").Width(300).Filterable(false);
+                        c.Bound(p => p.TransactionLineSubstract).Title("Línea Exportación").Width(175).Filterable(false);
+                        c.Bound(p => p.QuantitySubstract).ClientFooterTemplate("#=kendo.toString(sum,'n6')#")
+                            .ClientTemplate("#=kendo.toString(QuantitySubstract,'n6')#").Title("Cantidad").Width(200).Filterable(false);
+                        c.Bound(p => p.CifSubstract).ClientFooterTemplate("#=kendo.toString(sum,'c6')#")
+                            .ClientTemplate("#=kendo.toString(CifSubstract,'c6')#").Title("CIF").Width(200).Filterable(false);
+                        c.Bound(p => p.FobSubstract).ClientFooterTemplate("#=kendo.toString(sum,'c6')#")
+                            .ClientTemplate("#=kendo.toString(FobSubstract,'c6')#").Title("FOB").Width(200).Filterable(false);
+                        c.Bound(p => p.CustomDutiesSubstract).ClientFooterTemplate("#=kendo.toString(sum,'c6')#")
+                            .ClientTemplate("#=kendo.toString(CustomDutiesSubstract,'c6')#").Title("DAI").Width(200).Filterable(false);
+                        c.Bound(p => p.IvaSubstract).ClientFooterTemplate("#=kendo.toString(sum,'c6')#")
+                            .ClientTemplate("#=kendo.toString(IvaSubstract,'c6')#").Title("IVA").Width(200).Filterable(false);
+                        c.Bound(p => p.IdDocumentStock).ClientTemplate("#=DocumentNameStock# #=IdDocumentStock#").Title("Documento Importación").Width(300).Filterable(false);
+                        c.Bound(p => p.TransactionLineStock).Title("Línea Importación").Width(175).Filterable(false);
+                        c.Bound(p => p.AuthorizationDate).ClientTemplate("#=kendo.toString(AuthorizationDate,'dd/MM/yyyy')#").Title("Fecha documento").Width(175).Filterable(false);
+                        c.Bound(p => p.RegisterDate).ClientTemplate("#=kendo.toString(RegisterDate,'dd/MM/yyyy')#").Title("Fecha sistema").Width(150).Filterable(false);
+                        c.Bound(p => p.Message).Title("Mensaje de error").ClientTemplate("#if(Message == null){# #=''# #}else{#<div class='error-msg'>#=Message#</div>#}#").Width(300).Filterable(false);
+                    })
+                    .Scrollable()
+                    .DataSource(dataSource => dataSource
+                        .Ajax()
+                        //.Group(g =>
+                        //{
+                        //    g.Add(f => f.IdDocumentSubstract);
+                        //})
+                        .Aggregates(a =>
+                        {
+                            a.Add(p => p.Assigned).Count();
+                            a.Add(p => p.QuantitySubstract).Sum();
+                            a.Add(p => p.CifSubstract).Sum();
+                            a.Add(p => p.FobSubstract).Sum();
+                            a.Add(p => p.CustomDutiesSubstract).Sum();
+                            a.Add(p => p.IvaSubstract).Sum();
+                        })
+                        .Model(m =>
+                        {
+                            m.Id(o => o.Id);
+                        })
+                        .Read(r => r.Action("ReadFilteredData", "Transmision").Data("grdNewDataToQueueFilter"))
+                     )
+                )
+            </div>
+        </div>
+    </div>
+</div>

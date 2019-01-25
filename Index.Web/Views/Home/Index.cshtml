@@ -1,0 +1,212 @@
+﻿@using Kendo.Mvc.UI;
+@using Index.Commons;
+
+@{
+    ViewBag.Title = "Productos";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    Index.Commons.Dashboard.Customer dashCustomer = (ViewBag.Customer == null) ? null : (Index.Commons.Dashboard.Customer)ViewBag.Customer;
+    Index.Commons.Dashboard.Expired dashExpired = (ViewBag.Expired == null) ? null : (Index.Commons.Dashboard.Expired)ViewBag.Expired;
+    Index.Commons.Dashboard.Transmited dashTransmited = (ViewBag.Transmited == null) ? null : (Index.Commons.Dashboard.Transmited)ViewBag.Transmited;
+
+    var customer = (Session["CUSTOMERINFO"] == null) ? null : (Index.Commons.Customer)Session["CUSTOMERINFO"];
+    var cuenta = (Session["ACCOUNTINFO"] == null) ? null : (Index.Commons.Account)Session["ACCOUNTINFO"];
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <!-- start: FORM VALIDATION 1 PANEL -->
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="view-title">
+                    <div class="view-logo"><img src="@Url.Content("~/Content/Images/Headers/DashboardWhite.png")" /></div>
+                    <div class="view-text">DASHBOARD</div>
+                </div>
+            </div>
+            <div class="panel-body">
+                @if (dashCustomer != null)
+                {
+                    <div class="col-11 dash-comp" style="margin-bottom:10px;">
+                        <div class="dash-title">RESOLUCIÓN DEL CLIENTE @customer.EnterpriseName.ToUpper()</div>
+                        <div class="dash-content">
+                            <div class="dashCustomer-item"><strong>Días transcurridos: </strong> @dashCustomer.Days</div>
+                            <div class="dashCustomer-item">@dashCustomer.Label</div>
+                        </div>
+                    </div>
+                }
+                @if (dashExpired != null)
+                {
+                    <div class="col-5 dash-comp">
+                        <div class="dash-title">DOCUMENTOS EXPIRADOS <a class="dash-detail" href="javascript:callWindowExpired(@customer.Id, @cuenta.Id);">Detalle</a></div>
+                        <div class="dash-content">
+                            @(Html.Kendo().Chart()
+                            .Name("customerChart")
+                                    .Title(title => title
+                                        .Text("Total: " + dashExpired.Total + " documentos")
+                                        .Position(ChartTitlePosition.Bottom))
+                                .Legend(legend => legend
+                                    .Visible(false)
+                                )
+                                .ChartArea(chart => chart
+                                    .Background("transparent")
+                                 )
+                                //.HtmlAttributes(new { style = "background: center no-repeat url(" + @Url.Content("~/Content/shared/world-map.png") })
+                                .HtmlAttributes(new { style = "background: center" })
+                                .Series(series =>
+                                {
+                                    series.Pie(new dynamic[] {
+                                        new {category="Expirados",value = dashExpired.ExpiredPercent,color="#005CA8"},
+                                        new {category="Por expirar",value = dashExpired.ToExpirePercent,color="#3B75A4"},
+                                        new {category="En tiempo",value = dashExpired.InTimePercent,color="#5C81A0"}
+                                    })
+                                    .Labels(labels => labels
+                                        .Template("#= category #: \n #= value#%")
+                                        .Background("transparent")
+                                        .Visible(true)
+                                    )
+                                    .StartAngle(150);
+                                })
+                                .Tooltip(tooltip => tooltip
+                                    .Visible(true)
+                                    .Format("{0}%")
+                                )
+                            )
+                        </div>
+                    </div>
+                }
+                &nbsp;
+                @if (dashTransmited != null)
+                {
+                    <div class="col-5 dash-comp" style="float:right;margin-right:6.5%;">
+                        <div class="dash-title">DOCUMENTOS TRANSMITIDOS<a class="dash-detail" href="javascript:callWindowTransmited(@customer.Id, @cuenta.Id);">Detalle</a></div>
+                        <div class="dash-content">
+                            @(Html.Kendo().Chart()
+                            .Name("documentChart")
+                                    .Title(title => title
+                                        .Text("Total: " + dashTransmited.Total + " documentos")
+                                        .Position(ChartTitlePosition.Bottom))
+                                .Legend(legend => legend
+                                    .Visible(false)
+                                )
+                                .ChartArea(chart => chart
+                                    .Background("transparent")
+                                 )
+                                //.HtmlAttributes(new { style = "background: center no-repeat url(" + @Url.Content("~/Content/shared/world-map.png") })
+                                .HtmlAttributes(new { style = "background: center" })
+                                .Series(series =>
+                                {
+                                    series.Pie(new dynamic[] {
+                                        new {category="En Cola",value = dashTransmited.QueuePercent,color="#005CA8"},
+                                        new {category="Guardados",value = dashTransmited.SavedPercent,color="#3B75A4"},
+                                        new {category="Transmitidos",value = dashTransmited.TransmitedPercent,color="#5C81A0"}
+                                    })
+                                    .Labels(labels => labels
+                                        .Template("#= category #: \n #= value#%")
+                                        .Background("transparent")
+                                        .Visible(true)
+                                    )
+                                    .StartAngle(150);
+                                })
+                                .Tooltip(tooltip => tooltip
+                                    .Visible(true)
+                                    .Format("{0}%")
+                                )
+                            )
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@(Html.Kendo().Window()
+    .Name("fileExpired")
+    .Title("Documentos expirados")
+    .Width(800)
+    .Modal(true)
+    .Visible(false)
+    .Actions(a =>
+    {
+        a.Maximize();
+        a.Close();
+    })
+)
+
+@(Html.Kendo().Window()
+    .Name("fileTransmited")
+    .Title("Documentos Transmitidos")
+    .Width(800)
+    .Modal(true)
+    .Visible(false)
+    .Actions(a =>
+    {
+        a.Maximize();
+        a.Close();
+    })
+)
+
+<style>
+    .dash-comp {
+        border: solid;
+        border-width: 1px;
+        border-radius: 5px;
+        border-color: #005CA8;
+    }
+
+    .dash-title {
+        border-bottom: solid;
+        border-width: 1px;
+        position: relative;
+        display: inline-block;
+        float: left;
+        width: 100%;
+        margin: 0px;
+        padding: 0px;
+        text-align: center;
+        border-color: #005CA8;
+    }
+
+    .dash-detail {
+        float: right;
+        font-size: 10px;
+        color: #005CA8;
+        font-weight: bolder;
+        z-index: 100001;
+    }
+
+    .dash-content {
+        display: inline-block;
+        padding: 0px;
+        margin: 0px;
+        width: 100%;
+    }
+</style>
+
+<script>
+    function callWindowExpired(idcustomer, idaccount) {
+        $("#loading").fadeIn();
+
+        setTimeout(function () {
+            var win = $("#fileExpired").data("kendoWindow");
+            win.refresh({ url: "@Url.Action("Expirados", "Home")", data: { IdCustomer: idcustomer, IdAccount: idaccount } });
+            win.center();
+            win.open();
+
+            $("#loading").fadeOut();
+        }, 700);
+    }
+
+    function callWindowTransmited(idcustomer, idaccount) {
+        $("#loading").fadeIn();
+
+        setTimeout(function () {
+            var win = $("#fileTransmited").data("kendoWindow");
+            win.refresh({ url: "@Url.Action("Transmitidos", "Home")", data: { IdCustomer: idcustomer, IdAccount: idaccount } });
+            win.center();
+            win.open();
+
+            $("#loading").fadeOut();
+        }, 700);
+    }
+</script>

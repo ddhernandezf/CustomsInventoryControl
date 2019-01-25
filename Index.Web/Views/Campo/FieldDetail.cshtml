@@ -1,0 +1,73 @@
+﻿@using System
+@using Kendo.Mvc.UI
+@using Index.Commons;
+
+@{
+    Index.Commons.FileInfoConfig config = (Index.Commons.FileInfoConfig)ViewBag.FileInfoConfig;
+    Layout = null;
+}
+
+@(Html.Kendo().Grid<Field>()
+    .Name("grdCrudDetail")
+    .Columns(c =>
+    {
+        c.Bound(p => p.Id);
+        c.Bound(p => p.IdTable).Hidden(true);
+        c.Bound(p => p.TableName).Hidden(true);
+        c.Bound(p => p.DataBaseName).Hidden(true);
+        c.Bound(p => p.IsRequeriedInternal).Hidden(true);
+        c.Bound(p => p.IdFileInfoConfig).Hidden(true);
+        c.Bound(p => p.IdMaster).Hidden(true);
+        c.Bound(p => p.FieldName).Width(150).Filterable(f => f.Cell(r => r.Operator("contains"))).Title("Campo");
+        c.Bound(p => p.Label).Width(150).Filterable(f => f.Cell(r => r.Operator("contains"))).Title("Etiqueta");
+        c.Bound(p => p.IsUsed).Filterable(false).Width(60).ClientTemplate("<input type='checkbox' #= IsUsed ? checked='checked' :'' # disabled='disabled'/>").Title("Visib.");
+        c.Bound(p => p.IsRequeried).Filterable(false).Width(60).ClientTemplate("<input type='checkbox' #= IsRequeried ? checked='checked' :'' # disabled='disabled'/>").Title("Requ.");
+        c.Command(cmd =>
+        {
+            cmd.Edit().Text(" ");
+            cmd.Destroy().Text(" ");
+        }).Width(100);
+    })
+    .Editable(e =>
+    {
+        e.Mode(GridEditMode.InLine).DisplayDeleteConfirmation("¿Se encuentra realmente seguro de eliminar el registro?");
+    })
+    .ToolBar(t =>
+    {
+        t.Create().Text("Nuevo");
+    })
+    .Pageable(p =>
+    {
+        p.Refresh(true);
+    })
+    .Scrollable()
+    .Filterable(f =>
+    {
+        f.Mode(GridFilterMode.Row);
+    })
+    .DataSource(dataSource => dataSource
+    .Ajax()
+    .PageSize(20)
+    .Model(m =>
+    {
+        m.Id(o => o.Id);
+        m.Field(o => o.FieldName).Editable(false);
+    })
+    .Read(r => r.Action("ReadDetail", "Campo", new { IdFileInfoConfig = config.Id }))
+    .Create(c => c.Action("CreateDetail", "Campo"))
+    .Update(u => u.Action("UpdateDetail", "Campo"))
+    .Destroy(d => d.Action("DeleteDetail", "Campo"))
+    .Events(e =>
+    {
+        e.Error("errorHandler");
+        e.RequestEnd("onRequestEnd");
+    }))
+)
+
+<script>
+    $(document).ready(function () {
+        setTimeout(function () {
+            $('.k-grid-add').hide();
+        }, 500)
+    });
+</script>

@@ -1,0 +1,287 @@
+﻿@using System
+@using Kendo.Mvc.UI
+@using Kendo.Mvc.UI.Fluent
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="icon" type="image/png" href="@Url.Content("~/Content/Images/favicon.ico")" />
+    <!-- start: META -->
+    <meta charset="utf-8" />
+    <!--[if IE]><meta http-equiv='X-UA-Compatible' content="IE=edge,IE=9,IE=8,chrome=1" /><![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta content="Index" name="description" />
+    <meta content="R&M" name="author" />
+    <!-- end: META -->
+    <title>Index S.A. - @ViewBag.Title</title>
+
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    @Styles.Render("~/TelerikMVC/CSS")
+    @Scripts.Render("~/TelerikMVC/JS")
+    @Scripts.Render("~/TelerikMVC/CULTURE")
+
+    <link rel="shortcut icon" href="~/favicon.ico" />
+</head>
+<body>
+    <!-- start: HEADER -->
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <!-- start: TOP NAVIGATION CONTAINER -->
+        <div class="container">
+            <div class="navbar-header">
+                <!-- start: RESPONSIVE MENU TOGGLER -->
+                <button data-target=".navbar-collapse" data-toggle="collapse" class="navbar-toggle" type="button">
+                    <span class="clip-list-2"></span>
+                </button>
+                <!-- end: RESPONSIVE MENU TOGGLER -->
+                <!-- start: LOGO -->
+                <a class="navbar-brand" href="@Url.Action("Index", "Home")">
+                    Index S.A.
+                </a>
+                <!-- end: LOGO -->
+            </div>
+        </div>
+        <!-- end: TOP NAVIGATION CONTAINER -->
+    </div>
+    <!-- end: HEADER -->
+    <!-- start: MAIN CONTAINER -->
+    <div class="main-container">
+        <div class="navbar-content">
+            <!-- start: SIDEBAR -->
+            <div class="main-navigation navbar-collapse collapse">
+                <!-- start: MAIN MENU TOGGLER BUTTON -->
+                <div class="navigation-toggler">
+                    <i class="clip-chevron-left"></i>
+                    <i class="clip-chevron-right"></i>
+                </div>
+                <!-- end: MAIN MENU TOGGLER BUTTON -->
+                <!-- start: MAIN NAVIGATION MENU -->
+                <!-- end: MAIN NAVIGATION MENU -->
+            </div>
+            <!-- end: SIDEBAR -->
+        </div>
+        <!-- start: PAGE -->
+        <div class="main-content">
+            <!-- start: PANEL CONFIGURATION MODAL FORM -->
+            <div class="modal fade" id="panel-config" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                &times;
+                            </button>
+                            <h4 class="modal-title">Panel Configuration</h4>
+                        </div>
+                        <div class="modal-body">
+                            Here will be a configuration form
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">
+                                Close
+                            </button>
+                            <button type="button" class="btn btn-primary">
+                                Save changes
+                            </button>
+                        </div>
+                    </div>
+                    <!-- /.modal-content -->
+                </div>
+                <!-- /.modal-dialog -->
+            </div>
+            <!-- /.modal -->
+            <!-- end: SPANEL CONFIGURATION MODAL FORM -->
+            <div class="container">
+                <!-- start: PAGE HEADER -->
+                <div class="row">
+                    <div class="col-sm-12">
+                        <!-- start: STYLE SELECTOR BOX -->
+                        <div id="style_selector">
+
+                        </div>
+                        <!-- end: STYLE SELECTOR BOX -->
+                        <!-- start: PAGE TITLE & BREADCRUMB -->
+                        <ol class="breadcrumb">
+                            <li>
+                                <i class="clip-home-3"></i>
+                                <a href="@Url.Action("Index", "Home")">
+                                    Inicio
+                                </a>
+                            </li>
+                            <li class="active">
+                                @Session["Encabezado"]
+                            </li>
+                        </ol>
+                        <div class="page-header">
+                            <h1>@Session["Encabezado"] <small>@Session["SubEncabezado"]</small></h1>
+                        </div>
+                        <!-- end: PAGE TITLE & BREADCRUMB -->
+                    </div>
+                </div>
+                <!-- end: PAGE HEADER -->
+                <!-- start: PAGE CONTENT -->
+                <noscript>El navegador debe soportar javascript!</noscript>
+                @RenderBody()
+                <!-- end: PAGE CONTENT-->
+            </div>
+        </div>
+        <!-- end: PAGE -->
+    </div>
+
+    <!-- start: FOOTER -->
+    <div class="footer clearfix">
+        <div class="footer-inner">
+            2016 © - Index S.A.
+        </div>
+        <div class="footer-items">
+            <span class="go-top"><i class="clip-chevron-up"></i></span>
+        </div>
+    </div>
+    <!-- end: FOOTER -->
+
+    <div id="loading">
+        <div id="loadingcontent">
+            <p id="loadingspinner">
+                Procesando...
+            </p>
+        </div>
+    </div>
+
+    <div id="modalWindowAlert">
+        <h3 id="confirmMessage">Delete?</h3>
+        <br /><br /><br /><br /><br />
+        <button id="yes" class="k-primary k-button">Si</button>
+        <button id="no" class="k-simple k-button">No</button>
+    </div>
+
+    @*@Scripts.Render("~/bundles/jquery")*@
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
+</html>
+@(Html.Kendo().Window()
+    .Name("windowChangeRole")
+    .Title("Cambiar de rol")
+    .Width(500)
+    .Height(500)
+    .Modal(true)
+    .Visible(false)
+    .Actions(a =>
+    {
+        a.Maximize();
+        a.Close();
+    })
+)
+
+@(Html.Kendo().Window()
+    .Name("windowChangeCustomer")
+    .Title("Cambiar de cliente")
+    .Width(500)
+    .Height(500)
+    .Modal(true)
+    .Visible(false)
+    .Actions(a =>
+    {
+        a.Maximize();
+        a.Close();
+    })
+)
+
+<script type="text/kendo-template" id="message">
+    <div class="k-widget k-tooltip k-tooltip-validation k-invalid-msg field-validation-error"
+         style="margin: 0.5em; display: block; " data-for="#=field#" data-valmsg-for="#=field#" id="#=field#_validationMessage">
+        <span class="k-icon k-warning"> </span>#=message#<div class="k-callout k-callout-n"></div>
+    </div>
+</script>
+<script>
+    var validationMessageTmpl = kendo.template($("#message").html());
+    function errorHandler(args) {
+        if (typeof args.errors === "string") {
+            onErrorGeneral(args.errors);
+        }
+        if (args.errors) {
+            var grid = $("#grdCrud").data("kendoGrid");
+            grid.one("dataBinding", function (e) {
+                e.preventDefault();
+
+                for (var error in args.errors) {
+                    showMessage(grid.editable.element, error, args.errors[error].errors);
+                }
+            });
+        }
+        if (args.errors.errorGeneral) {
+            wnd = $("#modalWindowAlert").kendoWindow({
+                title: "Error",
+                modal: true,
+                visible: false,
+                resizable: false,
+                width: 300
+            }).data("kendoWindow");
+
+            $("#yes").hide();
+            $("#no").hide();
+            $("#confirmMessage").html(args.errors.errorGeneral.errors[0]);
+            wnd.center().open();
+        }
+    }
+
+    function showMessageAjax(container, name, errors) {
+        container.find("[data-valmsg-for=" + name + "],[data-val-msg-for=" + name + "]")
+                 .replaceWith(validationMessageTmpl({ field: name, message: errors[0] }))
+    }
+</script>
+
+<script>
+    $(document).ready(function () {
+        $("#modalWindowAlert").hide();
+
+        console.log('FLAG' + '@Session["GOTCUSTOMER"]');
+        console.log('INFOC' + '@Session["CUSTOMERINFO"]');
+
+        if ('@Session["GOTCUSTOMER"]' == 'True') {
+            if ('@Session["CUSTOMERINFO"]' == '') {
+                customerChange();
+            }
+        }
+    });
+
+    function roleChange(){
+        var winRole = $("#windowChangeRole").data("kendoWindow");
+        winRole.refresh({ url: "@Url.Action("CambiarRol", "Home")" });
+        winRole.center();
+        winRole.open();
+    }
+
+    function customerChange(){
+        var winRole = $("#windowChangeCustomer").data("kendoWindow");
+        winRole.refresh({ url: "@Url.Action("CambiarCliente", "Home")" });
+        winRole.center();
+        winRole.open();
+    }
+
+    function changeRole(idrole) {
+        var result = wsExecute('GET', 'json', '@Url.Action("ChangeRole", "Seguridad")', { 'IdRole': idrole }, false);
+        if (result == true) {
+            location.reload();
+        }
+        else {
+            $("#logoutForm").submit();
+        }
+    }
+
+    function changeCustomer(idperson, idcustomertype) {
+        var result = wsExecute('GET', 'json', '@Url.Action("ChangeCustomer", "Seguridad")', { 'IdPerson': idperson, 'IdCustomerType': idcustomertype }, false);
+        if (result == true) {
+            location.reload();
+        }
+        else {
+            $("#logoutForm").submit();
+        }
+    }
+</script>
+
+<style>
+    .k-menu .k-image {
+        width: 25px;
+    }
+</style>

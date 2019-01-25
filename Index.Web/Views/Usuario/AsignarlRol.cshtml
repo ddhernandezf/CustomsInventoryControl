@@ -1,0 +1,64 @@
+﻿@using Index.Commons;
+@using Kendo.Mvc.UI;
+
+@{
+    Layout = null;
+}
+
+<div style="width:450px;padding-left: 10px;padding-bottom: 30px;font-size: 12px;">
+    Marque o desmarque los roles que necesita o no utilizara para este usuario.
+</div>
+<div style="width:450px;">
+    @(Html.Kendo().Grid((List<Index.Commons.UserByRole>)ViewBag.data)
+     .Name("grdSecundary")
+     .Columns(c =>
+     {
+        c.Bound(p => p.Id).Hidden(true);
+        c.Bound(p => p.Name).Width(100).Filterable(f => f.Cell(r => r.Operator("contains")));
+        c.Bound(p => p.RoleAssigned).Width(40).Filterable(false).ClientTemplate("<input data-id='#=Id#' type='checkbox' #= RoleAssigned ? checked='checked' :'' #/>").Title("Asignados");
+     })
+     .Scrollable()
+        .Filterable(f =>
+        {
+            f.Mode(GridFilterMode.Row);
+        })
+     .DataSource(dataSource => dataSource
+        .Ajax()
+        .PageSize(20)
+     )
+    )
+</div>
+<script>
+    $(document).ready(function () {
+        $(':checkbox').change(function () {
+            roleAssignment($(this).is(':checked'), parseInt($(this).data("id")));
+        });
+    });
+
+    function roleAssignment(addorremove, id) {
+        var result;
+        if (addorremove) {
+            result = wsExecute('POST', 'json', '@Url.Action("AddRoleAsignment", "Usuario")', { 'model': { UserName: '@ViewBag.UserName', IdRole: id } }, false);
+        }
+        else {
+            result = wsExecute('POST', 'json', '@Url.Action("RemoveRoleAssignment", "Usuario")', { 'model': { UserName: '@ViewBag.UserName', IdRole: id } }, false)
+        }
+
+        if (result.Errors) {
+            if (args.errors.errorGeneral) {
+                wnd = $("#modalWindowAlert").kendoWindow({
+                    title: "Error",
+                    modal: true,
+                    visible: false,
+                    resizable: false,
+                    width: 300
+                }).data("kendoWindow");
+
+                $("#yes").hide();
+                $("#no").hide();
+                $("#confirmMessage").html(args.errors.errorGeneral.errors[0]);
+                wnd.center().open();
+            }
+        }
+    }
+</script>

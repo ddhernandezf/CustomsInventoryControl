@@ -1,0 +1,62 @@
+﻿@using Index.Commons;
+@using Kendo.Mvc.UI;
+
+@{
+    Layout = null;
+}
+@(Html.Kendo().Grid<Address>
+    ()
+    .Name("grdAddress")
+    .Columns(c =>
+    {
+        c.Bound(p => p.Id);
+        c.Bound(p => p.IdPerson).Hidden(true);
+        c.Bound(p => p.AddressTypeDescription).Width(200).Filterable(f => f.Cell(r => r.Operator("contains")));
+        c.Bound(p => p.AddressValue).Width(450).Filterable(f => f.Cell(r => r.Operator("contains")));
+        c.Command(cmd =>
+        {
+            cmd.Edit().Text(" ");
+            cmd.Destroy().Text(" ");
+        }).Width(100).Locked(true).Lockable(false);
+    })
+    .Editable(e =>
+    {
+        e.Mode(GridEditMode.PopUp)
+        .DisplayDeleteConfirmation("¿Se encuentra realmente seguro de eliminar el registro?")
+        .TemplateName("TemplateAddress")
+        .Window(w =>
+        w.Title("Ingreso de dirección")
+        .Width(700)
+        );
+    })
+    .ToolBar(t =>
+    {
+        t.Create().Text("Nuevo").HtmlAttributes(new { @class = "k-primary" });
+    })
+    .Pageable(p =>
+    {
+        p.Refresh(true);
+    })
+    .Scrollable()
+    .Filterable(f =>
+    {
+        f.Mode(GridFilterMode.Row);
+    })
+    .DataSource(dataSource => dataSource
+    .Ajax()
+    .PageSize(20)
+    .Model(m =>
+    {
+        m.Id(o => o.Id);
+    })
+    .Read(r => r.Action("Read", "Direccion", new { IdPerson = ViewBag.IdPerson }))
+    .Create(c => c.Action("Create", "Direccion", new { IdPerson = ViewBag.IdPerson }))
+    .Update(u => u.Action("Update", "Direccion", new { IdPerson = ViewBag.IdPerson }))
+    .Destroy(d => d.Action("Delete", "Direccion", new { IdPerson = ViewBag.IdPerson }))
+    .Events(e =>
+    {
+        e.Error("errorHandlerDireccion");
+        e.RequestEnd("onRequestEndDireccion");
+    })
+    )
+)

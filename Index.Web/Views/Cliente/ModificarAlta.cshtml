@@ -1,0 +1,399 @@
+﻿@using Kendo.Mvc.UI;
+@using Index.Commons;
+@model Formula
+
+@{
+    ViewBag.Title = "Nuevo";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("Nuevo", "Formula", FormMethod.Post))
+{
+    <div class="col-4">
+        <fieldset>
+            <legend>Formula</legend>
+            <div class="generali-popup-form">
+                @Html.HiddenFor(m => m.Id)
+                @Html.HiddenFor(m => m.IdPerson)
+                @Html.HiddenFor(m => m.IdCustomerType)
+                <div class="error">
+                    @Html.ValidationMessage("errorGeneral")
+                </div>
+                <div class="col-8">
+                    <div class="col-12 title">@Html.DisplayNameFor(x => x.IdProduct)</div>
+                    <div class="col-12 item">
+                        @(Html.Kendo().DropDownList()
+                          .Name("IdProduct")
+                          .DataTextField("Name")
+                          .DataValueField("Id")
+                          .OptionLabel("Seleccionar...")
+                          .SelectedIndex(0)
+                          .Filter("contains")
+                          .DataSource(source =>
+                          {
+                              source.Read(read =>
+                              {
+                                  read.Action("getCombo", "Producto");
+                              });
+                          })
+                          .HtmlAttributes(new { style = "width: 100%" })
+                        )
+                        <div class="error">@Html.ValidationMessageFor(m => m.IdProduct)</div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="col-12 title">@Html.DisplayNameFor(x => x.Name)</div>
+                    <div class="col-12 item">
+                        @(Html.Kendo().TextBox()
+                    .Name("Name")
+                    .HtmlAttributes(new { Style = "width:100%;" })
+                    .Value(Model.Name)
+                        )
+                        <div class="error">@Html.ValidationMessageFor(m => m.Name)</div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="col-12 title">@Html.DisplayNameFor(x => x.Description)</div>
+                    <div class="col-12 item">
+                        @Html.TextAreaFor(m => m.Description, new { @style = "width:100%;height:95px;", @class = "k-textbox" })
+                        <div class="error">@Html.ValidationMessageFor(m => m.Description)</div>
+                    </div>
+                </div>
+                <fieldset>
+                    <legend></legend>
+                    <div class="col-11 text-center">
+                        @(Html.Kendo().Button()
+                            .Name("btnGuardar")
+                            .Content("Guardar")
+                            .ImageUrl(Url.Content("~/Content/Images/SaveButton.png"))
+                            .HtmlAttributes(new { @class = "k-primary", @type = "submit" })
+                        )
+
+                        @(Html.Kendo().Button()
+                            .Name("btnCancelar")
+                            .Content("Cancelar")
+                            .ImageUrl(Url.Content("~/Content/Images/CancelButton.png"))
+                            .HtmlAttributes(new { @type = "button", @style = "margin-left:20px;" })
+                            .Events(e =>
+                            {
+                                e.Click("cancelar");
+                            })
+                        )
+                    </div>
+                </fieldset>
+            </div>
+        </fieldset>
+    </div>
+    <div class="col-7">
+        <fieldset>
+            <legend>Detalle</legend>
+            <div class="col-12">
+                <div class="col-3">
+                    <div class="col-12 title">Materia prima</div>
+                    <div class="col-12 item">
+                        @(Html.Kendo().DropDownList()
+                          .Name("cmbMateriaPrima")
+                          .DataTextField("Name")
+                          .DataValueField("Id")
+                          .OptionLabel("Seleccionar...")
+                          .SelectedIndex(0)
+                          .Filter("contains")
+                          .DataSource(source =>
+                          {
+                              source.Read(read =>
+                              {
+                                  read.Action("getCombo", "MateriaPrima");
+                              });
+                          })
+                          .HtmlAttributes(new { style = "width: 100%", @onfocusout = "validateDetail();" })
+                        )
+                        <div id="errorMateriaPrima" class="error"></div>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="col-12 title">Unidad Medida</div>
+                    <div class="col-12 item">
+                        @(Html.Kendo().DropDownList()
+                          .Name("cmbUnidadMedida")
+                          .DataTextField("Name")
+                          .DataValueField("Id")
+                          .OptionLabel("Seleccionar...")
+                          .SelectedIndex(0)
+                          .Filter("contains")
+                          .DataSource(source =>
+                          {
+                              source.Read(read =>
+                              {
+                                  read.Action("getCombo", "UnidadMedida");
+                              });
+                          })
+                          .HtmlAttributes(new { style = "width: 100%", @onfocusout = "validateDetail();" })
+                        )
+                        <div id="errorUnidadMedida" class="error"></div>
+                    </div>
+                </div>
+                <div class="col-2">
+                    <div class="col-12 title">Cantidad</div>
+                    <div class="col-12 item">
+                        @(Html.Kendo().NumericTextBox()
+                          .Name("txtCantidad")
+                          .Spinners(false)
+                          .HtmlAttributes(new { style = "width: 100%", @onfocusout = "validateDetail();" })
+                        )
+                        <div id="errorCantidad" class="error"></div>
+                    </div>
+                </div>
+                <div class="col-2">
+                    <div class="col-12 title">Merma</div>
+                    <div class="col-12 item">
+                        @(Html.Kendo().NumericTextBox()
+                          .Name("txtMerma")
+                          .HtmlAttributes(new { style = "width: 100%", @onfocusout = "validateDetail();" })
+                          .Spinners(false)
+                        )
+                        <div id="errorMerma" class="error"></div>
+                    </div>
+                </div>
+                <div class="col-2 text-right">
+                    @(Html.Kendo().Button()
+                            .Name("btnDetail")
+                            .Content("")
+                            .ImageUrl(Url.Content("~/Content/Images/SaveButton.png"))
+                            .HtmlAttributes(new { @type = "button", @style = "margin-top: 10px;" })
+                            .Events(e =>
+                            {
+                                e.Click("btnDetailClick");
+                            })
+                    )
+                    @(Html.Kendo().Button()
+                            .Name("btnclear")
+                            .Content("")
+                            .ImageUrl(Url.Content("~/Content/Images/Refresh.png"))
+                            .HtmlAttributes(new { @type = "button", @style = "margin-let:10px;margin-top: 10px;" })
+                            .Events(e =>
+                            {
+                                e.Click("btnclearClick");
+                            })
+                    )
+                </div>
+            </div>
+            <div class="col-12">
+                @(Html.Kendo().Grid(Model.Detail)
+                 .Name("grdDetailFormula")
+                 .Columns(c =>
+                 {
+                     c.Bound(p => p.Id).Hidden(true);
+                     c.Bound(p => p.IdFormula).Hidden(true);
+                     c.Bound(p => p.IdRawMaterial).Hidden(true);
+                     c.Bound(p => p.IdUnitMeasurement).Hidden(true);
+                     c.Bound(p => p.RawMaterialName).Width(150)
+                        .ClientTemplate("<input type='hidden' id='d_decrease' name='d_decrease' value='#=QuantityDecrease#' />" +
+                                        "<input type='hidden' id='d_quantity' name='d_quantity' value='#=Quantity#' />" +
+                                        "<input type='hidden' id='d_iddetail' name='d_iddetail' value='#=Id#' />" +
+                                        "<input type='hidden' id='d_measurement' name='d_measurement' value='#=IdUnitMeasurement#' />" +
+                                        "<input type='hidden' id='d_rawmaterial' name='d_rawmaterial' value='#=IdRawMaterial#' />" +
+                                        "<input type='hidden' id='d_measurname' name='d_measurname' value='#=UnitMeasurementName#' />" +
+                                        "<input type='hidden' id='d_rawname' name='d_rawname' value='#=RawMaterialName#' />#=RawMaterialName#");
+                     c.Bound(p => p.UnitMeasurementName).Width(150).Title("Unidad Medida");
+                     c.Bound(p => p.Quantity).Width(100);
+                     c.Bound(p => p.QuantityDecrease).Width(100);
+                     c.Bound(p => p.IdRawMaterial).Visible(true).Title("").ClientTemplate("<a href='javascript:deleteItem(#=IdRawMaterial#);'><img src='" + Url.Content("~/Content/Images/CancelButton.png") + "' /></a>");
+                 })
+                 .Selectable(s =>
+                 {
+                     s.Mode(GridSelectionMode.Single);
+                 })
+                 .Events(e =>
+                 {
+                     e.Change("grdDetailFormulaChange");
+                 })
+                 .Scrollable()
+                 .DataSource(dataSource => dataSource
+                    .Ajax()
+                    .PageSize(20)
+                    .ServerOperation(false)
+                 )
+                )
+            </div>
+        </fieldset>
+    </div>
+}
+
+<script>
+    //Objetos html
+    var cmbMateriaPrima, cmbUnidadMedida, txtCantidad, txtMerma, grdDetailFormula, glbUID = '', txtIdFormula, glbIdFormulaDetail = 0;
+
+    $(document).ready(function () {
+        cmbMateriaPrima = $("#cmbMateriaPrima").data("kendoDropDownList");
+        cmbUnidadMedida = $("#cmbUnidadMedida").data("kendoDropDownList");
+        txtCantidad = $("#txtCantidad ").data("kendoNumericTextBox");
+        txtMerma = $("#txtMerma").data("kendoNumericTextBox");
+        grdDetailFormula = $("#grdDetailFormula").data("kendoGrid");
+        txtIdFormula = $("#Id");
+    });
+
+    function validateDetail() {
+        var result = true;
+
+        if (cmbMateriaPrima.value() == '') {
+            $("#errorMateriaPrima").html("*");
+            result = false;
+        }
+        else {
+            $("#errorMateriaPrima").html("");
+        }
+
+        if (cmbUnidadMedida.value() == '') {
+            $("#errorUnidadMedida").html("*");
+            result = false;
+        }
+        else {
+            $("#errorUnidadMedida").html("");
+        }
+
+        if (txtCantidad.value() == null) {
+            $("#errorCantidad").html("*");
+            result = false;
+        }
+        else {
+            $("#errorCantidad").html("");
+        }
+
+        if (txtMerma.value() == null) {
+            $("#errorMerma").html("*");
+            result = false;
+        }
+        else {
+            $("#errorMerma").html("");
+        }
+
+        return result;
+    }
+
+    function cancelar() {
+        window.location.replace("@Url.Action("Index","Formula")");
+    }
+
+    function btnDetailClick(e) {
+        if (validateDetail()) {
+            var item = getDetailItem();
+            var datasource = grdDetailFormula.dataSource;
+
+            if (validateGridItem(item)) {
+                if (glbUID != '') {
+                    for (var x = 0; x <= datasource.data().length - 1; x++) {
+                        var reg = datasource.data()[x];
+
+                        if (glbUID == reg.uid) {
+                            datasource.remove(reg);
+                            datasource.insert(item);
+                            btnclearClick();
+                        }
+                    }
+                }
+                else {
+                    datasource.insert(item);
+                    btnclearClick();
+                }
+            }
+            else {
+                alert("Ya existe");
+            }
+        }
+    }
+
+    function btnclearClick(e) {
+        cmbMateriaPrima.value("");
+        cmbUnidadMedida.value("");
+        txtCantidad.value(null);
+        txtMerma.value(null);
+
+        $("#errorMateriaPrima").html("");
+        $("#errorUnidadMedida").html("");
+        $("#errorCantidad").html("");
+        $("#errorMerma").html("");
+
+        glbUID = '';
+        glbIdFormulaDetail = 0;
+    }
+
+    function validateGridItem(itemB) {
+        var datasource = grdDetailFormula.dataSource;
+        var result = false;
+
+        if (datasource.data().length == 0) {
+            result = true;
+        }
+        else {
+            for (var x = 0; x <= datasource.data().length - 1; x++) {
+                var itemA = datasource.data()[x];
+                if (itemA.IdRawMaterial == itemB.IdRawMaterial) {
+                    if (glbUID != '') {
+                        if (itemA.uid == glbUID) {
+                            result = true;
+                            break;
+                        }
+                    }
+                    else {
+                        result = false;
+                        break;
+                    }
+                }
+                else {
+                    result = true;
+                }
+            }
+        }
+
+        return result;
+    }
+
+    function getDetailItem() {
+        return {
+            Id: txtIdFormula.val(),
+            IdFormula: glbIdFormulaDetail,
+            IdRawMaterial: cmbMateriaPrima.value(),
+            RawMaterialName: cmbMateriaPrima.text(),
+            IdUnitMeasurement: cmbUnidadMedida.value(),
+            UnitMeasurementName: cmbUnidadMedida.text(),
+            Quantity: txtCantidad.value(),
+            QuantityDecrease: txtMerma.value()
+        }
+    }
+
+    function deleteItem(IdRawMaterial) {
+        var datasource = grdDetailFormula.dataSource;
+
+        for (var x = 0; x <= datasource.data().length - 1; x++) {
+            var reg = datasource.data()[x];
+
+            if (IdRawMaterial == reg.IdRawMaterial) {
+                datasource.remove(reg);
+                btnclearClick();
+            }
+        }
+    }
+
+    function grdDetailFormulaChange(e) {
+        glbUID = $(grdDetailFormula.select()).data('uid');
+        var datasource = grdDetailFormula.dataSource;
+
+        for (var x = 0; x <= datasource.data().length - 1; x++) {
+            var reg = datasource.data()[x];
+
+            if (glbUID == reg.uid) {
+                cmbMateriaPrima.value(reg.IdRawMaterial);
+                cmbUnidadMedida.value(reg.IdUnitMeasurement);
+                txtCantidad.value(reg.Quantity);
+                txtMerma.value(reg.QuantityDecrease)
+                glbIdFormulaDetail = reg.Id;
+            }
+        }
+    }
+</script>
+
+<style>
+    .error {
+        color: red;
+    }
+</style>

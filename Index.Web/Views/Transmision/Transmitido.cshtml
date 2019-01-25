@@ -1,0 +1,68 @@
+﻿@using Kendo.Mvc.UI;
+@using Index.Commons.Transmition;
+@{
+    Layout = null;
+}
+
+@(Html.Kendo().Grid<OpaHeader>()
+                    .Name("grdTransmited")
+                    .ClientDetailTemplateId("QueueTemplate")
+                    .HtmlAttributes(new { @style = "height: 400px; font-size: 12px;" })
+                    .Events(e =>
+                    {
+                        e.DataBound("grdTransmitedDataBound");
+                    })
+                    .Columns(c =>
+                    {
+                        c.Bound(p => p.Id).Hidden(true);
+                        c.Bound(p => p.UserName).Hidden(true);
+                        c.Bound(p => p.IdCustomer).Hidden(true);
+                        c.Bound(p => p.IdAccount).Hidden(true);
+                        c.Bound(p => p.IdPriority).Hidden(true);
+                        c.Bound(p => p.IdState).Hidden(true);
+                        c.Bound(p => p.Transmited).Hidden(true);
+                        c.Bound(p => p.TransmitedLable).Width(150).Filterable(false).Title("Transmitidos");
+                        c.Bound(p => p.PriorityName).Width(150).Filterable(f => f.Cell(r => r.Operator("contains"))).Title("Prioridad");
+                        c.Bound(p => p.StateName).Width(150).Filterable(f => f.Cell(r => r.Operator("contains"))).Title("Estado");
+                        c.Bound(p => p.StartDateHeader).Width(150).Filterable(f => f.Cell(r => r.Operator("contains")))
+                            .ClientTemplate("#if(StartDateHeader == null){# #=''# #}else{##=kendo.toString(StartDateHeader, 'dd/MM/yyyy')##}#").Title("Fecha Inicio");
+                        c.Bound(p => p.EndDateHeader).Width(150).Filterable(f => f.Cell(r => r.Operator("contains")))
+                            .ClientTemplate("#if(EndDateHeader == null){# #=''# #}else{##=kendo.toString(EndDateHeader, 'dd/MM/yyyy')##}#").Title("Fecha Fin");
+                        c.Bound(p => p.StartDate).Width(200).Filterable(f => f.Cell(r => r.Operator("contains")))
+                            .ClientTemplate("#if(StartDate == null){# #=''# #}else{##=kendo.toString(StartDate, 'dd/MM/yyyy')##}#").Title("Inicio Transacción");
+                        c.Bound(p => p.EndDate).Width(200).Filterable(f => f.Cell(r => r.Operator("contains")))
+                            .ClientTemplate("#if(EndDate == null){# #=''# #}else{##=kendo.toString(EndDate, 'dd/MM/yyyy')##}#").Title("Fin Transacción");
+                    })
+                    .Editable(e =>
+                    {
+                        e.Mode(GridEditMode.PopUp)
+                         .DisplayDeleteConfirmation("¿Se encuentra realmente seguro de eliminar el registro?")
+                         .TemplateName("Template")
+                         .Window(w =>
+                            w.Title("Formulario de información de clientes")
+                            .Width(700)
+                         );
+                    })
+                    .Pageable(p =>
+                    {
+                        p.Refresh(true);
+                    })
+                    .Scrollable()
+                    .Filterable(f =>
+                    {
+                        f.Mode(GridFilterMode.Row);
+                    })
+                    .DataSource(dataSource => dataSource
+                        .Ajax()
+                        .Model(m =>
+                        {
+                            m.Id(o => o.Id);
+                        })
+                        .Read(r => r.Action("ReadTransmited", "Transmision"))
+                        .Events(e =>
+                        {
+                            e.Error("errorHandlergrdTransmited");
+                            e.RequestEnd("onRequestEndgrdTransmited");
+                        })
+                     )
+)

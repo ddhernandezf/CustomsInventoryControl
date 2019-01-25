@@ -1,0 +1,115 @@
+﻿@using Kendo.Mvc.UI;
+@using Index.Commons;
+
+@{
+    ViewBag.Title = "Unidades de medida";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <!-- start: FORM VALIDATION 1 PANEL -->
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="view-title">
+                    <div class="view-logo"><img src="@Url.Content("~/Content/Images/Headers/UnitMeasurement.png")" /></div>
+                    <div class="view-text">Catálogo de unidades de medida</div>
+                </div>
+            </div>
+            <div class="panel-body">
+                @(Html.Kendo().Grid<UnitMeasurement>()
+                    .Name("grdCrud")
+                    .Columns(c =>
+                    {
+                        c.Bound(p => p.Id);
+                        c.Bound(p => p.Name).Width(300).Filterable(f => f.Cell(r => r.Operator("contains")));
+                        c.Bound(p => p.Description).Width(500).Filterable(false);
+                        c.Bound(p => p.Symbol).Width(100).Filterable(false);
+                        c.Command(cmd =>
+                        {
+                            cmd.Edit().Text(" ");
+                            cmd.Destroy().Text(" ");
+                        }).Width(100).Locked(true).Lockable(false);
+                    })
+                    .Editable(e =>
+                    {
+                        e.Mode(GridEditMode.InLine).DisplayDeleteConfirmation("¿Se encuentra realmente seguro de eliminar el registro?");
+                    })
+                    .ToolBar(t =>
+                    {
+                        t.Create().Text("Nuevo").HtmlAttributes(new { @class = "k-primary" });
+                    })
+                    .Pageable(p =>
+                    {
+                        p.Refresh(true);
+                    })
+                    .Scrollable()
+                    .Filterable(f =>
+                    {
+                        f.Mode(GridFilterMode.Row);
+                    })
+                    //.HtmlAttributes(new { style = "height:550px;" })
+                    .DataSource(dataSource => dataSource
+                        .Ajax()
+                        .PageSize(20)
+                        .Model(m =>
+                        {
+                            m.Id(o => o.Id);
+                        })
+                        .Read(r => r.Action("Read", "UnidadMedida"))
+                        .Create(c => c.Action("Create", "UnidadMedida"))
+                        .Update(u => u.Action("Update", "UnidadMedida"))
+                        .Destroy(d => d.Action("Delete", "UnidadMedida"))
+                        .Events(e =>
+                        {
+                            e.Error("errorHandler");
+                            e.RequestEnd("onRequestEnd");
+                        })
+                     )
+                )
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/kendo-template" id="message">
+    <div class="k-widget k-tooltip k-tooltip-validation k-invalid-msg field-validation-error"
+         style="margin: 0.5em; display: block; " data-for="#=field#" data-valmsg-for="#=field#" id="#=field#_validationMessage">
+        <span class="k-icon k-warning"> </span>#=message#<div class="k-callout k-callout-n"></div>
+    </div>
+</script>
+<script>
+    var validationMessageTmpl = kendo.template($("#message").html());
+    function errorHandler(args) {
+        if (typeof args.errors === "string") {
+            onErrorGeneral(args.errors);
+        }
+        if (args.errors) {
+            var grid = $("#grdCrud").data("kendoGrid");
+            grid.one("dataBinding", function (e) {
+                e.preventDefault();
+
+                for (var error in args.errors) {
+                    showMessage(grid.editable.element, error, args.errors[error].errors);
+                }
+            });
+        }
+        if (args.errors.errorGeneral) {
+            wnd = $("#modalWindowAlert").kendoWindow({
+                title: "Error",
+                modal: true,
+                visible: false,
+                resizable: false,
+                width: 300
+            }).data("kendoWindow");
+
+            $("#yes").hide();
+            $("#no").hide();
+            $("#confirmMessage").html(args.errors.errorGeneral.errors[0]);
+            wnd.center().open();
+        }
+    }
+    function showMessage(container, name, errors) {
+        container.find("[data-valmsg-for=" + name + "],[data-val-msg-for=" + name + "]")
+                 .replaceWith(validationMessageTmpl({ field: name, message: errors[0] }))
+    }
+</script>

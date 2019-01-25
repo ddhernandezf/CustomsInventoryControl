@@ -1,0 +1,97 @@
+﻿@using Index.Commons;
+@using Kendo.Mvc.UI;
+
+@{
+    Layout = null;
+    Decimal existencia = (ViewBag.Stock == null) ? 0 : Convert.ToDecimal(ViewBag.Stock);
+}
+
+@(Html.Kendo().Grid<Adjustment>
+    ()
+    .Name("grdAdjustment")
+    .Events(e=> {
+        e.DataBound("grdAdjustmentDataBound");
+    })
+    .Columns(c =>
+    {
+        c.Bound(p => p.IdFileItemDischarge).Hidden(true);
+        c.Bound(p => p.IdFileDetailSubstract).Hidden(true);
+        c.Bound(p => p.IdFileDetailStock).Hidden(true);
+        c.Bound(p => p.IdItem).Hidden(true);
+        c.Bound(p => p.IdState).Hidden(true);
+        c.Bound(p => p.RegisterDate).Width(100).Filterable(false).Title("").ClientTemplate("#=kendo.toString(RegisterDate,'dd/MM/yyyy')#");
+        c.Bound(p => p.Quantity).Width(200).Filterable(false).ClientTemplate("#=kendo.toString(Quantity,'n6')#");
+        c.Bound(p => p.Decrease).Width(200).Filterable(false).ClientTemplate("#=kendo.toString(Decrease,'n6')#");
+        c.Bound(p => p.StateName).Width(100).Filterable(false).Title("Estado");
+        if ((Boolean)ViewBag.DeleteTransmitedPremission == true)
+        {
+            c.Bound(p => p.StateName).Width(30).Visible(true).Filterable(false).Title(" ").Locked(true).Lockable(false)
+                    .ClientTemplate("# if(StateName == 'Transmitido') " +
+                                           "{# <a class='custom-function' style='cursor:pointer;' onclick='deleteTransmited(#=IdFileItemDischarge#);'><img style='width: 25px;' title='Eliminar Transmitido' src='" + @Url.Content("~/Content/Images/Delete.png") + "' /></a>#} " +
+                                           "else {# <div></div> #}#");
+        }
+        c.Command(cmd =>
+        {
+            cmd.Edit().Text(" ");
+            cmd.Destroy().Text(" ");
+        }).Width(100).Locked(true).Lockable(false);
+    })
+    .Editable(e =>
+    {
+        e.Mode(GridEditMode.InLine).DisplayDeleteConfirmation("¿Se encuentra realmente seguro de eliminar el registro?");
+    })
+    .ToolBar(t =>
+    {
+        if (existencia > 0)
+        {
+            t.Create().Text("Nuevo").HtmlAttributes(new { @class = "k-primary" });
+        }
+    })
+    .Pageable(p =>
+    {
+        p.Refresh(true);
+    })
+    .Scrollable()
+    .Filterable(f =>
+    {
+        f.Mode(GridFilterMode.Row);
+    })
+    .DataSource(dataSource => dataSource
+    .Ajax()
+    .PageSize(20)
+    .Model(m =>
+    {
+        m.Id(o => o.IdFileItemDischarge);
+        m.Field(o => o.RegisterDate).Editable(false);
+    })
+    .Read(r => r.Action("Read", "Ajustes"))
+    .Create(c => c.Action("Update", "Ajustes"))
+    .Update(u => u.Action("Update", "Ajustes"))
+    .Destroy(d => d.Action("Delete", "Ajustes"))
+    .Events(e =>
+    {
+        e.Error("errorHandlerAdjustment");
+        e.RequestEnd("onRequestEndAdjustment");
+    })
+    )
+)
+
+<script>
+    function deleteTransmited(idfileitemdischarge) {
+        var r = confirm("Se dispone a eliminar un registro, el cual ya se encuentra transmitido. ¿Se encuentra realmente seguro de eliminar este registro?");
+        if (r == true) {
+            $("#loading").fadeIn();
+            
+            setTimeout(function () {
+                var result = wsExecute("GET", "json", "@Url.Action("DeleteTransmited", "Descargo")" + "?IdFileItemDischarge=" + idfileitemdischarge, null, false);
+
+                if (result != true) {
+                    alert(result);
+                }
+
+                $("#grdAdjustment").data("kendoGrid").dataSource.read();
+                $("#loading").fadeOut();
+            }, 500);
+        }
+    }
+</script>

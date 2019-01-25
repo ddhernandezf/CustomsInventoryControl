@@ -1,0 +1,101 @@
+﻿@using Kendo.Mvc.UI
+@model Index.Commons.PasswordReset
+@{
+    ViewBag.Title = "Cambio de password";
+    Layout = "~/Views/Shared/_LayoutLogin.cshtml";
+}
+<div id="login-box" style="margin-left: 19% !important;" class="main-login col-sm-8 col-sm-offset-4">
+    <div class="logo" style="text-align:center; font-weight: bolder;">
+        Aduana Web
+    </div>
+    <!-- start: LOGIN BOX -->
+    <div class="box-login">
+        @using (Html.BeginForm("Cambio", "Seguridad", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-login", id = "formaprincipal" }))
+            {
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(m => m.UserName)
+            <div>
+                <div class="col-6">
+                    <div class="col-12 title">@Html.DisplayNameFor(x => x.SitePassword)</div>
+                    <div class="col-12 item">
+                        @(Html.Kendo().TextBox()
+                    .Name("SitePassword")
+                    .HtmlAttributes(new { Style = "width:100%;", @type = "password" })
+                    .Value(Model.SitePassword)
+                        )
+                        <div class="error">@Html.ValidationMessageFor(m => m.SitePassword)</div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="col-12 title">@Html.DisplayNameFor(x => x.SitePasswordConfirm)</div>
+                    <div class="col-12 item">
+                        @(Html.Kendo().TextBox()
+                    .Name("SitePasswordConfirm")
+                    .HtmlAttributes(new { Style = "width:100%;", @type = "password" })
+                    .Value(Model.SitePasswordConfirm)
+                        )
+                        <div class="error">@Html.ValidationMessageFor(m => m.SitePasswordConfirm)</div>
+                    </div>
+                </div>
+                <br />
+                <div class="col-6">
+                    <div class="col-12 title">@Html.DisplayNameFor(x => x.MobilePassword)</div>
+                    <div class="col-12 item">
+                        @(Html.Kendo().TextBox()
+                    .Name("MobilePassword")
+                    .HtmlAttributes(new { Style = "width:100%;", @type = "password" })
+                    .Value(Model.MobilePassword)
+                        )
+                        <div class="error">@Html.ValidationMessageFor(m => m.MobilePassword)</div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="col-12 title">@Html.DisplayNameFor(x => x.MobilePasswordConfirm)</div>
+                    <div class="col-12 item">
+                        @(Html.Kendo().TextBox()
+                    .Name("MobilePasswordConfirm")
+                    .HtmlAttributes(new { Style = "width:100%;", @type = "password" })
+                    .Value(Model.MobilePasswordConfirm)
+                        )
+                        <div class="error">@Html.ValidationMessageFor(m => m.MobilePasswordConfirm)</div>
+                    </div>
+                </div>
+            </div>
+            <br /><br />
+            <div class="col-12 text-center">
+                @(Html.Kendo().Button()
+                .Name("btnReset")
+                .HtmlAttributes(new { @class = "k-primary", @type = "Suubmit" })
+                .Content("Guardar")
+                )
+
+                @(Html.Kendo().Button()
+                .Name("btnCancel")
+                .HtmlAttributes(new { @type = "button" })
+                .Content("Cancelar")
+                .Events(e =>
+                {
+                    e.Click("btnCancelClick");
+                })
+                )
+            </div>
+        }
+    </div>
+    <!-- end: LOGIN BOX -->
+    <!-- start: COPYRIGHT -->
+    <div class="copyright" style="text-align:center;margin-top:20px; font-weight:bolder;display:inline-block;width:100%;">
+        2016 © - Index S.A.
+    </div>
+    <!-- end: COPYRIGHT -->
+</div>
+<script>
+    function btnCancelClick() {
+        window.location.href = "@Url.Action("LogOut","Seguridad")";
+    }
+</script>
+<style>
+    body.login .main-login {
+        width: 70%;
+        margin-left: 15%;
+    }
+</style>

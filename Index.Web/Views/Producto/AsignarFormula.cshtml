@@ -1,0 +1,117 @@
+﻿@using Index.Commons;
+@using Kendo.Mvc.UI;
+
+@Styles.Render("~/Content/css")
+@Scripts.Render("~/bundles/modernizr")
+@Styles.Render("~/TelerikMVC/CSS")
+@Scripts.Render("~/TelerikMVC/JS")
+@Scripts.Render("~/TelerikMVC/CULTURE")
+
+@{
+    Layout = null;
+}
+
+@(Html.Kendo().Grid<Formula>()
+                    .Name("grdAjaxCrud")
+                    .Columns(c =>
+                    {
+                        c.Bound(p => p.Id);
+                        c.Bound(p => p.IdCustomer).Hidden(true);
+                        c.Bound(p => p.IdMainItem).Hidden(true);
+                        c.Bound(p => p.IdDetailItem).Hidden(true);
+                        c.Bound(p => p.DetailItem).Width(150).Filterable(f => f.Cell(r => r.Operator("contains")));
+                        c.Bound(p => p.Quantity).Width(150).Filterable(false);
+                        c.Bound(p => p.Decrease).Width(150).Filterable(false);
+                        c.Command(cmd =>
+                        {
+                            cmd.Edit().Text(" ");
+                            cmd.Destroy().Text(" ");
+                        }).Width(60);
+                    })
+                    .Editable(e =>
+                    {
+                        e.Mode(GridEditMode.PopUp)
+                         .DisplayDeleteConfirmation("¿Se encuentra realmente seguro de eliminar el registro?")
+                         .TemplateName("TemplateFormula")
+                         .Window(w =>
+                            w.Title("Ingreso de números telefónicos")
+                            .Width(700)
+                         );
+                    })
+                    .ToolBar(t =>
+                    {
+                        t.Create().Text("Nuevo");
+                    })
+                    .Pageable(p =>
+                    {
+                        p.Refresh(true);
+                    })
+                    .Scrollable()
+                    .Filterable(f =>
+                    {
+                        f.Mode(GridFilterMode.Row);
+                    })
+                    .DataSource(dataSource => dataSource
+                        .Ajax()
+                        .PageSize(20)
+                        .Model(m =>
+                        {
+                            m.Id(o => o.Id);
+                        })
+                        .Read(r => r.Action("Read", "Formula"))
+                        .Create(c => c.Action("Create", "Formula"))
+                        .Update(u => u.Action("Update", "Formula"))
+                        .Destroy(d => d.Action("Delete", "Formula"))
+                        .Events(e =>
+                        {
+                            e.Error("errorHandlerAjax");
+                            e.RequestEnd("onRequestEnd");
+                        })
+                     )
+)
+
+<script type="text/kendo-template" id="message">
+    <div class="k-widget k-tooltip k-tooltip-validation k-invalid-msg field-validation-error"
+         style="margin: 0.5em; display: block; " data-for="#=field#" data-valmsg-for="#=field#" id="#=field#_validationMessage">
+        <span class="k-icon k-warning"> </span>#=message#<div class="k-callout k-callout-n"></div>
+    </div>
+</script>
+<script>
+    var validationMessageTmpl = kendo.template($("#message").html());
+
+    function showMessageAjax(container, name, errors) {
+        container.find("[data-valmsg-for=" + name + "],[data-val-msg-for=" + name + "]")
+                 .replaceWith(validationMessageTmpl({ field: name, message: errors[0] }))
+    }
+
+    function onRequestEnd(e) {
+        wnd = $("#modalWindowAlert").kendoWindow({
+            title: "Confirmaci&oacute;n",
+            modal: true,
+            visible: false,
+            resizable: false,
+            width: 300
+        }).data("kendoWindow");
+
+        $("#yes").hide();
+        $("#no").hide();
+
+        if (e.type == "destroy" && !e.response.Errors) {
+            $("#confirmMessage").html("Registro eliminado exitosamente");
+            wnd.center().open();
+            this.read();
+        }
+
+        if (e.type == "update" && !e.response.Errors) {
+            $("#confirmMessage").html("Registro actualizado exitosamente");
+            wnd.center().open();
+            this.read();
+        }
+
+        if (e.type == "create" && !e.response.Errors) {
+            $("#confirmMessage").html("Registro agregado exitosamente");
+            wnd.center().open();
+            this.read();
+        }
+    }
+</script>

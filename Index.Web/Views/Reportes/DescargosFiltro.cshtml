@@ -1,0 +1,123 @@
+﻿@using Index.Commons;
+@using Kendo.Mvc.UI;
+
+@{
+    Layout = null;
+}
+
+<div class="tlb-container">
+    @(Html.Kendo().ToolBar()
+    .Name("ToolBar")
+    .Items(i =>
+    {
+        i.Add().Template("<label>No. Documento: </label>");
+        i.Add().Template("<input id='txtDocto' type='text' class='k-text' />");
+        i.Add().Type(CommandType.Separator);
+        i.Add().Type(CommandType.Button).Text("Buscar").Id("btnBuscar").HtmlAttributes(new { @class = "k-primary" });
+        i.Add().Type(CommandType.Button).Text("Ver Todo").Id("btnTodo").HtmlAttributes(new { @class = "k-primary" });
+        i.Add().Type(CommandType.Button).Text("Generar Reporte").Id("btnGenerar").HtmlAttributes(new { @class = "k-primary" });
+    })
+    )
+</div>
+<div class="grd-container">
+    @(Html.Kendo().Grid<FileHeader>()
+                    .Name("grdFileHeader")
+                    .ClientDetailTemplateId("DetailTemplate")
+                    .Events(e =>
+                    {
+                        e.Change("grdFileHeaderChange");
+                        e.DetailExpand("grdFileHeaderExpand");
+                    })
+                    .Columns(c =>
+                    {
+                        c.Bound(p => p.Id).Hidden(true);
+                        c.Bound(p => p.IdFileInfoConfig).Hidden(true);
+                        c.Bound(p => p.IdState).Hidden(true);
+                        c.Bound(p => p.IdAccount).Hidden(true);
+                        c.Bound(p => p.Operation).Width(60).Title("OP").Filterable(false);
+                        c.Bound(p => p.FileInfoName).Width(250).Title("Tipo").Filterable(false);
+                        c.Bound(p => p.IdDocument).Width(250).Title("No. Doc.").Filterable(f => f.Cell(r => r.Operator("contains")));
+                        c.Bound(p => p.StrCreateDate).Width(150).Format("{0: dd/MM/yyyy}").Title("Fec. crea").Filterable(false);
+                        c.Bound(p => p.StrExpirationDate).Width(150).Format("{0: dd/MM/yyyy}").Title("Fec. vence").Filterable(false);
+                        c.Bound(p => p.StrAuthorizationDate).Width(160).Format("{0: dd/MM/yyyy}").Title("Fec. aceptación").Filterable(false);
+                        c.Bound(p => p.ExchangeRate).Width(150).Title("Tasa Cambio").ClientTemplate("#=(ExchangeRate == null) ? '' : kendo.toString(ExchangeRate,'c3')#").Filterable(false);
+                        c.Bound(p => p.Insurance).Width(150).Title("Seguro").ClientTemplate("#=(Insurance == null) ? '' : kendo.toString(Insurance,'c3')#").Filterable(false);
+                        c.Bound(p => p.Cargo).Width(150).Title("Flete").ClientTemplate("#=(Cargo == null) ? '' : kendo.toString(Cargo,'c3')#").Filterable(false);
+                        c.Bound(p => p.StateName).Width(150).Title("Estado").Filterable(false);
+                    })
+                    .Scrollable()
+                    .Selectable(s =>
+                    {
+                        s.Mode(GridSelectionMode.Multiple);
+                    })
+                    .DataSource(dataSource => dataSource
+                        .Ajax()
+                     )
+    )
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('#btnBuscar').click(function () {
+            loadFilter($('#txtDocto').val());
+        });
+
+        $('#btnTodo').click(function () {
+            var r = confirm("Esta operación puede tardar un tiempo considerable, dependiendo del rango de fecha y de la cantidad de transacciones generadas por el cliente seleccionado. ¿Se encuentra realmente seguro de querer realizar esta acción.?");
+            if (r == true) {
+                loadAll();
+            }
+        });
+
+        $('#btnGenerar').click(function () {
+            $("#wndFiltroDocumentos").data("kendoWindow").close();
+            btnFiltrarClick();
+        });
+
+        $('#txtDocto').change(function () {
+            loadFilter($(this).val());
+        });
+    });
+
+    function loadFilter(iddocument) {
+        if (iddocument == null || iddocument == '') {
+            alert('Debe ingresar un número de documento para realizar la búsqueda');
+        }
+        else {
+            getData(iddocument);
+        }
+    }
+
+    function loadAll() {
+        getData(null);
+    }
+
+    function getData(iddocument) {
+        $("#loading").fadeIn();
+
+        setTimeout(function () {
+            var grdFileHeader = $("#grdFileHeader").data("kendoGrid");
+            var startdate = $("#StartDate").data("kendoDatePicker");
+            var enddate = $("#EndDate").data("kendoDatePicker");
+            var transmition = $("#Transmition").data("kendoDropDownList");
+
+            var result = wsExecute("GET", "json", "@Url.Action("JsonDescargosFiltroHeader", "Reportes")", {
+                StartDate: kendo.toString(startdate.value(), 'yyyy-MM-dd'),
+                EndDate: kendo.toString(enddate.value(), 'yyyy-MM-dd'),
+                GetTransmited: (transmition.value() == "1") ? null : ((transmition.value() == "2") ? true : false),
+                IdDocument: iddocument
+            }, false);
+
+            console.log(result);
+            var ds = new kendo.data.DataSource({
+                data: result,
+            });
+
+            grdFileHeader.setDataSource(ds);
+
+            setTimeout(function () {
+                $("#loading").fadeOut();
+            }, 500);
+        }, 1000);
+    }
+</script>

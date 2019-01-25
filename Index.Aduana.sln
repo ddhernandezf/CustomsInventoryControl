@@ -1,0 +1,105 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Index.DataBase", "Index.DataBase\Index.DataBase.sqlproj", "{9A93DAB2-21E5-4D23-9B07-BF2569FE4EA6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Index.Testing", "Index.Testing\Index.Testing.csproj", "{1D439DC2-BAE0-459C-8977-6B82FA91F33A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Index.Queue", "Index.Queue\Index.Queue.csproj", "{CE80D7AC-3783-46D2-A1FD-91AA930B8FCC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleTesting", "ConsoleTesting\ConsoleTesting.csproj", "{6DA10E2F-B47E-42AA-B0ED-A0716CD5AB0A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Index.Api", "Index.Api\Index.Api.csproj", "{40C4A32F-1E68-406F-81C6-55679598A37B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Index.Commons", "Index.Commons\Index.Commons.csproj", "{261C9A09-CC90-469E-8B3F-21A3873C5AE8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Index.Dal", "Index.Dal\Index.Dal.csproj", "{4612B805-177E-4328-8976-29EB77D5A05C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Index.Functionalities", "Index.Functionalities\Index.Functionalities.csproj", "{2665DFEF-B528-4845-98F6-7DCDCF076FD1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Index.Web", "Index.Web\Index.Web.csproj", "{D557807E-833B-4F1B-A1CA-E028C745FA1F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9A93DAB2-21E5-4D23-9B07-BF2569FE4EA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A93DAB2-21E5-4D23-9B07-BF2569FE4EA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A93DAB2-21E5-4D23-9B07-BF2569FE4EA6}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{9A93DAB2-21E5-4D23-9B07-BF2569FE4EA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A93DAB2-21E5-4D23-9B07-BF2569FE4EA6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9A93DAB2-21E5-4D23-9B07-BF2569FE4EA6}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{1D439DC2-BAE0-459C-8977-6B82FA91F33A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1D439DC2-BAE0-459C-8977-6B82FA91F33A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1D439DC2-BAE0-459C-8977-6B82FA91F33A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1D439DC2-BAE0-459C-8977-6B82FA91F33A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE80D7AC-3783-46D2-A1FD-91AA930B8FCC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE80D7AC-3783-46D2-A1FD-91AA930B8FCC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE80D7AC-3783-46D2-A1FD-91AA930B8FCC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE80D7AC-3783-46D2-A1FD-91AA930B8FCC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6DA10E2F-B47E-42AA-B0ED-A0716CD5AB0A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6DA10E2F-B47E-42AA-B0ED-A0716CD5AB0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6DA10E2F-B47E-42AA-B0ED-A0716CD5AB0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6DA10E2F-B47E-42AA-B0ED-A0716CD5AB0A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{40C4A32F-1E68-406F-81C6-55679598A37B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{40C4A32F-1E68-406F-81C6-55679598A37B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{40C4A32F-1E68-406F-81C6-55679598A37B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{40C4A32F-1E68-406F-81C6-55679598A37B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{261C9A09-CC90-469E-8B3F-21A3873C5AE8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{261C9A09-CC90-469E-8B3F-21A3873C5AE8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{261C9A09-CC90-469E-8B3F-21A3873C5AE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{261C9A09-CC90-469E-8B3F-21A3873C5AE8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4612B805-177E-4328-8976-29EB77D5A05C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4612B805-177E-4328-8976-29EB77D5A05C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4612B805-177E-4328-8976-29EB77D5A05C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4612B805-177E-4328-8976-29EB77D5A05C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2665DFEF-B528-4845-98F6-7DCDCF076FD1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2665DFEF-B528-4845-98F6-7DCDCF076FD1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2665DFEF-B528-4845-98F6-7DCDCF076FD1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2665DFEF-B528-4845-98F6-7DCDCF076FD1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D557807E-833B-4F1B-A1CA-E028C745FA1F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D557807E-833B-4F1B-A1CA-E028C745FA1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D557807E-833B-4F1B-A1CA-E028C745FA1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D557807E-833B-4F1B-A1CA-E028C745FA1F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 10
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://rymtech.visualstudio.com/
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = Index.DataBase\\Index.DataBase.sqlproj
+		SccProjectName1 = Index.DataBase
+		SccLocalPath1 = Index.DataBase
+		SccProjectUniqueName2 = Index.Testing\\Index.Testing.csproj
+		SccProjectName2 = Index.Testing
+		SccLocalPath2 = Index.Testing
+		SccProjectUniqueName3 = Index.Queue\\Index.Queue.csproj
+		SccProjectName3 = Index.Queue
+		SccLocalPath3 = Index.Queue
+		SccProjectUniqueName4 = ConsoleTesting\\ConsoleTesting.csproj
+		SccProjectName4 = ConsoleTesting
+		SccLocalPath4 = ConsoleTesting
+		SccProjectUniqueName5 = Index.Api\\Index.Api.csproj
+		SccProjectName5 = Index.Api
+		SccLocalPath5 = Index.Api
+		SccProjectUniqueName6 = Index.Commons\\Index.Commons.csproj
+		SccProjectName6 = Index.Commons
+		SccLocalPath6 = Index.Commons
+		SccProjectUniqueName7 = Index.Dal\\Index.Dal.csproj
+		SccProjectName7 = Index.Dal
+		SccLocalPath7 = Index.Dal
+		SccProjectUniqueName8 = Index.Functionalities\\Index.Functionalities.csproj
+		SccProjectName8 = Index.Functionalities
+		SccLocalPath8 = Index.Functionalities
+		SccProjectUniqueName9 = Index.Web\\Index.Web.csproj
+		SccProjectName9 = Index.Web
+		SccLocalPath9 = Index.Web
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,487 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Name>Index.DataBase</Name>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectVersion>4.1</ProjectVersion>
+    <ProjectGuid>{9a93dab2-21e5-4d23-9b07-bf2569fe4ea6}</ProjectGuid>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.SqlAzureV12DatabaseSchemaProvider</DSP>
+    <OutputType>Database</OutputType>
+    <RootPath>
+    </RootPath>
+    <RootNamespace>Index.DataBase</RootNamespace>
+    <AssemblyName>Index.DataBase</AssemblyName>
+    <ModelCollation>1033, CI</ModelCollation>
+    <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
+    <DeployToDatabase>True</DeployToDatabase>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetLanguage>CS</TargetLanguage>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <SqlServerVerification>False</SqlServerVerification>
+    <IncludeCompositeObjects>True</IncludeCompositeObjects>
+    <TargetDatabaseSet>True</TargetDatabaseSet>
+    <SccProjectName>SAK</SccProjectName>
+    <SccProvider>SAK</SccProvider>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccLocalPath>SAK</SccLocalPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
+    <!-- Default to the v11.0 targets path if the targets file for the current VS version is not found -->
+    <SSDTExists Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets')">True</SSDTExists>
+    <VisualStudioVersion Condition="'$(SSDTExists)' == ''">11.0</VisualStudioVersion>
+  </PropertyGroup>
+  <Import Condition="'$(SQLDBExtensionsRefPath)' != ''" Project="$(SQLDBExtensionsRefPath)\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <ItemGroup>
+    <Folder Include="Properties" />
+    <Folder Include="Tables" />
+    <Folder Include="Stored Procedures" />
+    <Folder Include="Stored Procedures\CustomerType" />
+    <Folder Include="Stored Procedures\PhoneType" />
+    <Folder Include="Stored Procedures\Phone" />
+    <Folder Include="Stored Procedures\Person" />
+    <Folder Include="Stored Procedures\Account" />
+    <Folder Include="Stored Procedures\Customer" />
+    <Folder Include="Stored Procedures\Premission" />
+    <Folder Include="Stored Procedures\Role" />
+    <Folder Include="Stored Procedures\User" />
+    <Folder Include="Stored Procedures\Cellar" />
+    <Folder Include="Stored Procedures\Country" />
+    <Folder Include="Stored Procedures\Customs" />
+    <Folder Include="Stored Procedures\Currency" />
+    <Folder Include="Stored Procedures\CustomerUser" />
+    <Folder Include="Stored Procedures\UnitMeasurement" />
+    <Folder Include="Stored Procedures\Item" />
+    <Folder Include="Stored Procedures\Formula" />
+    <Folder Include="Stored Procedures\Supplier" />
+    <Folder Include="Scripts" />
+    <Folder Include="Stored Procedures\Email" />
+    <Folder Include="Stored Procedures\Resolution" />
+    <Folder Include="Stored Procedures\AccountingItems" />
+    <Folder Include="Stored Procedures\Warranty" />
+    <Folder Include="Stored Procedures\FileInfo" />
+    <Folder Include="Stored Procedures\FileMasterDisplay" />
+    <Folder Include="Stored Procedures\FileDetailDisplay" />
+    <Folder Include="Stored Procedures\EmailType" />
+    <Folder Include="Stored Procedures\Fields" />
+    <Folder Include="Stored Procedures\FileAttachedDisplay" />
+    <Folder Include="Stored Procedures\AddressType" />
+    <Folder Include="Stored Procedures\Address" />
+    <Folder Include="Stored Procedures\FileHeader" />
+    <Folder Include="Stored Procedures\FileDetail" />
+    <Folder Include="Stored Procedures\Parameters" />
+    <Folder Include="Stored Procedures\FileAttached" />
+    <Folder Include="Stored Procedures\FileInfoType" />
+    <Folder Include="Stored Procedures\FileInfoConfig" />
+    <Folder Include="Stored Procedures\FileItemDischarge" />
+    <Folder Include="Stored Procedures\Discharge" />
+    <Folder Include="Stored Procedures\Report" />
+    <Folder Include="Stored Procedures\Transmition" />
+    <Folder Include="Stored Procedures\Priority" />
+    <Folder Include="Functions" />
+    <Folder Include="Stored Procedures\Queue" />
+    <Folder Include="Stored Procedures\Dashboard" />
+    <Folder Include="Scripts\LogPublicaciones" />
+    <Folder Include="Scripts\Ejemplos y QA" />
+    <Folder Include="Scripts\Ejecucion Migracion" />
+    <Folder Include="Stored Procedures\Adjustment" />
+    <Folder Include="Stored Procedures\Migracion" />
+    <Folder Include="Stored Procedures\Migracion\aduana" />
+    <Folder Include="Stored Procedures\Migracion\Cliente" />
+    <Folder Include="Stored Procedures\Migracion\Documento" />
+    <Folder Include="Stored Procedures\Migracion\Garantia" />
+    <Folder Include="Stored Procedures\Migracion\Inc_Arancelario" />
+    <Folder Include="Stored Procedures\Migracion\MateriaProducto" />
+    <Folder Include="Stored Procedures\Migracion\Miscelaneos" />
+    <Folder Include="Stored Procedures\Migracion\Pais" />
+    <Folder Include="Stored Procedures\Migracion\Proveedor" />
+    <Folder Include="Stored Procedures\Migracion\Transmision" />
+    <Folder Include="Stored Procedures\Migracion\UnidadMedida" />
+    <Folder Include="Tables\Migracion" />
+    <Folder Include="Triggers" />
+    <Folder Include="Scripts\Scripts modificacion INDEX" />
+    <Folder Include="Stored Procedures\Freeze" />
+    <Folder Include="Scripts\Soporte" />
+    <Folder Include="Scripts\Updated de datos erroneos" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="Tables\PhoneType.sql" />
+    <Build Include="Stored Procedures\CustomerType\spg_CustomerType.sql" />
+    <Build Include="Stored Procedures\PhoneType\spg_PhoneType.sql" />
+    <Build Include="Tables\Phone.sql" />
+    <Build Include="Tables\Person.sql" />
+    <Build Include="Stored Procedures\Phone\spg_Phone.sql" />
+    <Build Include="Stored Procedures\Phone\spi_Phone.sql" />
+    <Build Include="Stored Procedures\Phone\spu_Phone.sql" />
+    <Build Include="Stored Procedures\Phone\spd_Phone.sql" />
+    <Build Include="Stored Procedures\Person\spi_Person.sql" />
+    <Build Include="Stored Procedures\Person\spu_Person.sql" />
+    <Build Include="Stored Procedures\Person\spd_Person.sql" />
+    <Build Include="Stored Procedures\Person\spg_person.sql" />
+    <Build Include="Tables\Customer.sql" />
+    <Build Include="Tables\Account.sql" />
+    <Build Include="Tables\CustomerAccount.sql" />
+    <Build Include="Stored Procedures\Account\spg_Account.sql" />
+    <Build Include="Stored Procedures\Account\spi_Account.sql" />
+    <Build Include="Stored Procedures\Account\spu_Account.sql" />
+    <Build Include="Stored Procedures\Account\spd_Account.sql" />
+    <Build Include="Stored Procedures\Customer\spi_Customer.sql" />
+    <Build Include="Stored Procedures\Customer\spi_CustomerAccount.sql" />
+    <Build Include="Stored Procedures\Customer\spu_Customer.sql" />
+    <Build Include="Stored Procedures\Customer\spd_Customer.sql" />
+    <Build Include="Stored Procedures\Customer\spd_CustomerAccount.sql" />
+    <Build Include="Stored Procedures\Customer\spg_Customer.sql" />
+    <Build Include="Stored Procedures\Customer\spg_CustomerAccount.sql" />
+    <Build Include="Tables\Premission.sql" />
+    <Build Include="Tables\Role.sql" />
+    <Build Include="Tables\RolePremission.sql" />
+    <Build Include="Tables\User.sql" />
+    <Build Include="Tables\UserRole.sql" />
+    <Build Include="Stored Procedures\Premission\spg_premission.sql" />
+    <Build Include="Stored Procedures\Premission\spi_AssignRoleToPremission.sql" />
+    <Build Include="Stored Procedures\Premission\spd_AssignRoleToPremission.sql" />
+    <Build Include="Stored Procedures\Role\spg_Role.sql" />
+    <Build Include="Stored Procedures\Role\spi_role.sql" />
+    <Build Include="Stored Procedures\Role\spu_role.sql" />
+    <Build Include="Stored Procedures\Role\spd_role.sql" />
+    <Build Include="Stored Procedures\Role\spi_AssignUserToRole.sql" />
+    <Build Include="Stored Procedures\Role\spd_AssignUserToRole.sql" />
+    <Build Include="Stored Procedures\User\spi_User.sql" />
+    <Build Include="Stored Procedures\User\spu_User.sql" />
+    <Build Include="Stored Procedures\User\spd_user.sql" />
+    <Build Include="Stored Procedures\User\sp_SiteLogin.sql" />
+    <Build Include="Stored Procedures\User\sp_MobileLogin.sql" />
+    <Build Include="Stored Procedures\User\sp_SitePasswordChange.sql" />
+    <Build Include="Stored Procedures\User\sp_MobilePasswordReset.sql" />
+    <Build Include="Stored Procedures\Role\spg_RoleByUser.sql" />
+    <Build Include="Stored Procedures\Account\spg_AccountByCustomer.sql" />
+    <Build Include="Tables\Cellar.sql" />
+    <Build Include="Tables\Country.sql" />
+    <Build Include="Tables\UnitMeasurement.sql" />
+    <Build Include="Tables\Item.sql" />
+    <Build Include="Tables\Currency.sql" />
+    <Build Include="Tables\Formula.sql" />
+    <Build Include="Tables\Customs.sql" />
+    <Build Include="Tables\CustomerUser.sql" />
+    <Build Include="Tables\CustomerDischarge.sql" />
+    <Build Include="Stored Procedures\Customer\spg_CustomerByUser.sql" />
+    <Build Include="Stored Procedures\Cellar\spi_Cellar.sql" />
+    <Build Include="Stored Procedures\Cellar\spu_Cellar.sql" />
+    <Build Include="Stored Procedures\Cellar\spd_Cellar.sql" />
+    <Build Include="Stored Procedures\Cellar\spg_Cellar.sql" />
+    <Build Include="Stored Procedures\Country\spi_Country.sql" />
+    <Build Include="Stored Procedures\Country\spu_Country.sql" />
+    <Build Include="Stored Procedures\Country\spd_Country.sql" />
+    <Build Include="Stored Procedures\Country\spg_Country.sql" />
+    <Build Include="Stored Procedures\Customs\spi_Customs.sql" />
+    <Build Include="Stored Procedures\Customs\spu_Customs.sql" />
+    <Build Include="Stored Procedures\Customs\spd_Customs.sql" />
+    <Build Include="Stored Procedures\Customs\spg_Customs.sql" />
+    <Build Include="Stored Procedures\Currency\spi_Currency.sql" />
+    <Build Include="Stored Procedures\Currency\spu_Currency.sql" />
+    <Build Include="Stored Procedures\Currency\spd_Currency.sql" />
+    <Build Include="Stored Procedures\Currency\spg_Currency.sql" />
+    <Build Include="Stored Procedures\CustomerUser\spi_CustomerUser.sql" />
+    <Build Include="Stored Procedures\CustomerUser\spu_CustomerUser.sql" />
+    <Build Include="Stored Procedures\CustomerUser\spd_CustomerUser.sql" />
+    <Build Include="Stored Procedures\UnitMeasurement\spi_UnitMeasurement.sql" />
+    <Build Include="Stored Procedures\UnitMeasurement\spu_UnitMeasurement.sql" />
+    <Build Include="Stored Procedures\UnitMeasurement\spd_UnitMeasurement.sql" />
+    <Build Include="Stored Procedures\UnitMeasurement\spg_UnitMeasurement.sql" />
+    <Build Include="Stored Procedures\Item\spi_Item.sql" />
+    <Build Include="Stored Procedures\Item\spu_Item.sql" />
+    <Build Include="Stored Procedures\Item\spd_Item.sql" />
+    <Build Include="Stored Procedures\Item\spg_Item.sql" />
+    <Build Include="Stored Procedures\Formula\spi_Formula.sql" />
+    <Build Include="Stored Procedures\Formula\spu_Formula.sql" />
+    <Build Include="Stored Procedures\Formula\spd_Formula.sql" />
+    <Build Include="Stored Procedures\Formula\spg_Formula.sql" />
+    <Build Include="Tables\Supplier.sql" />
+    <Build Include="Stored Procedures\Supplier\spi_Supplier.sql" />
+    <Build Include="Stored Procedures\Supplier\spu_Supplier.sql" />
+    <Build Include="Stored Procedures\Supplier\spd_Supplier.sql" />
+    <Build Include="Stored Procedures\Supplier\spg_Supplier.sql" />
+    <Build Include="Stored Procedures\User\spg_User.sql" />
+    <Build Include="Stored Procedures\Premission\spg_PremissionByRole.sql" />
+    <Build Include="Stored Procedures\Premission\spg_ValidatePremision.sql" />
+    <Build Include="Stored Procedures\Premission\spg_Menu.sql" />
+    <Build Include="Stored Procedures\Premission\spg_MenuByUser.sql" />
+    <Build Include="Stored Procedures\Customer\spg_CustomerAssignedByUser.sql" />
+    <Build Include="Stored Procedures\CustomerUser\spd_CustomerUser2.sql" />
+    <Build Include="Tables\Resolution.sql" />
+    <Build Include="Tables\AccountingItem.sql" />
+    <Build Include="Tables\EmailType.sql" />
+    <Build Include="Tables\Email.sql" />
+    <Build Include="Tables\State.sql" />
+    <Build Include="Tables\FileInfo.sql" />
+    <Build Include="Tables\FileMasterDisplay.sql" />
+    <Build Include="Tables\Table.sql" />
+    <Build Include="Tables\Fields.sql" />
+    <Build Include="Tables\FileDetailDisplay.sql" />
+    <Build Include="Tables\Warranty.sql" />
+    <Build Include="Tables\FileHeader.sql" />
+    <Build Include="Tables\FileDetail.sql" />
+    <Build Include="Tables\FileItemDischarge.sql" />
+    <Build Include="Tables\FileAttached.sql" />
+    <Build Include="Stored Procedures\Email\spd_Email.sql" />
+    <Build Include="Stored Procedures\Email\spg_Email.sql" />
+    <Build Include="Stored Procedures\Email\spi_Email.sql" />
+    <Build Include="Stored Procedures\Email\spu_Email.sql" />
+    <Build Include="Stored Procedures\Resolution\spi_Resolution.sql" />
+    <Build Include="Stored Procedures\Resolution\spu_Resolution.sql" />
+    <Build Include="Stored Procedures\Resolution\spd_Resolution.sql" />
+    <Build Include="Stored Procedures\Resolution\spg_Resolution.sql" />
+    <Build Include="Stored Procedures\AccountingItems\spg_AccountingItems.sql" />
+    <Build Include="Stored Procedures\Warranty\spi_Warranty.sql" />
+    <Build Include="Stored Procedures\Warranty\spu_Warranty.sql" />
+    <Build Include="Stored Procedures\Warranty\spd_Warranty.sql" />
+    <Build Include="Stored Procedures\Warranty\spg_Warranty.sql" />
+    <Build Include="Stored Procedures\FileInfo\spi_FileInfo.sql" />
+    <Build Include="Stored Procedures\FileInfo\spu_FileInfo.sql" />
+    <Build Include="Stored Procedures\FileInfo\spd_FileInfo.sql" />
+    <Build Include="Stored Procedures\FileInfo\spg_FileInfo.sql" />
+    <Build Include="Stored Procedures\FileMasterDisplay\spi_FileMasterDisplay.sql" />
+    <Build Include="Stored Procedures\FileMasterDisplay\spu_FileMasterDisplay.sql" />
+    <Build Include="Stored Procedures\FileMasterDisplay\spd_FileMasterDisplay.sql" />
+    <Build Include="Stored Procedures\FileMasterDisplay\spg_FileMasterDisplay.sql" />
+    <Build Include="Stored Procedures\FileDetailDisplay\spd_FileDetailDisplay.sql" />
+    <Build Include="Stored Procedures\FileDetailDisplay\spg_FileDetailDisplay.sql" />
+    <Build Include="Stored Procedures\FileDetailDisplay\spi_FileDetailDisplay.sql" />
+    <Build Include="Stored Procedures\FileDetailDisplay\spu_FileDetailDisplay.sql" />
+    <Build Include="Stored Procedures\EmailType\spg_EmailType.sql" />
+    <Build Include="Stored Procedures\Fields\spg_FieldsMasterDisplay.sql" />
+    <Build Include="Stored Procedures\Fields\spg_FieldsDetailDisplay.sql" />
+    <Build Include="Tables\FileAttachedDisplay.sql" />
+    <Build Include="Stored Procedures\FileAttachedDisplay\spd_FileAttachedDisplay.sql" />
+    <Build Include="Stored Procedures\FileAttachedDisplay\spg_FileAttachedDisplay.sql" />
+    <Build Include="Stored Procedures\FileAttachedDisplay\spi_FileAttachedDisplay.sql" />
+    <Build Include="Stored Procedures\FileAttachedDisplay\spu_FileAttachedDisplay.sql" />
+    <Build Include="Stored Procedures\Fields\spg_FieldsAttachedDisplay.sql" />
+    <Build Include="Stored Procedures\Person\spi_Enterprise.sql" />
+    <Build Include="Stored Procedures\Person\spu_Enterprise.sql" />
+    <Build Include="Stored Procedures\Person\spd_Enterprise.sql" />
+    <Build Include="Stored Procedures\Person\spg_Enterprise.sql" />
+    <Build Include="Tables\AddressType.sql" />
+    <Build Include="Tables\Address.sql" />
+    <Build Include="Stored Procedures\AddressType\spg_AddressType.sql" />
+    <Build Include="Stored Procedures\Address\spd_Address.sql" />
+    <Build Include="Stored Procedures\Address\spg_Address.sql" />
+    <Build Include="Stored Procedures\Address\spi_Address.sql" />
+    <Build Include="Stored Procedures\Address\spu_Address.sql" />
+    <Build Include="Stored Procedures\FileHeader\spi_FileHeader.sql" />
+    <Build Include="Stored Procedures\FileHeader\spu_FileHeader.sql" />
+    <Build Include="Stored Procedures\FileHeader\spd_FileHeader.sql" />
+    <Build Include="Stored Procedures\FileHeader\spg_FileHeader.sql" />
+    <Build Include="Stored Procedures\Customer\spg_CustomerAccountToAssing.sql" />
+    <Build Include="Tables\ItemInventory.sql" />
+    <Build Include="Stored Procedures\FileDetail\spi_FileDetail.sql" />
+    <Build Include="Stored Procedures\FileDetail\spu_FileDetail.sql" />
+    <Build Include="Stored Procedures\FileDetail\spd_FileDetail.sql" />
+    <Build Include="Tables\Parameters.sql" />
+    <Build Include="Stored Procedures\Parameters\spg_Parameters.sql" />
+    <Build Include="Stored Procedures\Customer\spg_CustomerToAssignUser.sql" />
+    <Build Include="Stored Procedures\FileAttached\spd_FileAttached.sql" />
+    <Build Include="Stored Procedures\FileAttached\spg_FileAttached.sql" />
+    <Build Include="Stored Procedures\FileAttached\spi_FileAttached.sql" />
+    <Build Include="Stored Procedures\FileAttached\spu_FileAttached.sql" />
+    <Build Include="Tables\DestinyCustomer.sql" />
+    <Build Include="Tables\FileInfoType.sql" />
+    <Build Include="Stored Procedures\FileInfoType\spg_FileInfoType.sql" />
+    <Build Include="Tables\FileInfoConfig.sql" />
+    <Build Include="Stored Procedures\FileInfoConfig\spi_FileInfoConfig.sql" />
+    <Build Include="Stored Procedures\FileInfoConfig\spu_FileInfoConfig.sql" />
+    <Build Include="Stored Procedures\FileInfoConfig\spd_FileInfoConfig.sql" />
+    <Build Include="Stored Procedures\FileInfoConfig\spg_FileInfoConfig.sql" />
+    <Build Include="Stored Procedures\FileDetail\spg_FileDetail.sql" />
+    <Build Include="Stored Procedures\FileItemDischarge\spi_FileItemDischarge.sql" />
+    <Build Include="Stored Procedures\FileItemDischarge\spu_FileItemDischarge.sql" />
+    <Build Include="Stored Procedures\FileItemDischarge\spd_FileItemDischarge.sql" />
+    <Build Include="Stored Procedures\Discharge\spg_DischargeParameters.sql" />
+    <Build Include="Stored Procedures\Discharge\spg_DischargeRawMaterial.sql" />
+    <Build Include="Stored Procedures\Discharge\spg_DischargeTransactions.sql" />
+    <Build Include="Stored Procedures\FileItemDischarge\spo_FileItemDischarge.sql" />
+    <Build Include="Tables\Priority.sql" />
+    <Build Include="Tables\OpaHeader.sql" />
+    <Build Include="Tables\OpaDetail.sql" />
+    <Build Include="Tables\OpaDetailHist.sql" />
+    <Build Include="Tables\OpaResponse.sql" />
+    <Build Include="Tables\OpaQueue.sql" />
+    <Build Include="Tables\OpaQueueLog.sql" />
+    <Build Include="Stored Procedures\Report\spg_Report_SwornDeclaration_One.sql" />
+    <Build Include="Tables\ResolutionAccountingItem.sql" />
+    <Build Include="Stored Procedures\AccountingItems\spg_AccountingItemTree.sql" />
+    <Build Include="Stored Procedures\AccountingItems\spi_AccountingItemAssing.sql" />
+    <Build Include="Stored Procedures\AccountingItems\spd_AccountingItemUnassing.sql" />
+    <Build Include="Stored Procedures\FileHeader\spg_FileHeaderValidationData.sql" />
+    <Build Include="Stored Procedures\FileDetail\spg_FileDetailValidationData.sql" />
+    <Build Include="Stored Procedures\FileDetail\spg_FileDetailValidateToDischarge.sql" />
+    <Build Include="Stored Procedures\Report\spg_Report_DischargeDetail.sql" />
+    <Build Include="Stored Procedures\Transmition\spg_TransmitionData.sql" />
+    <Build Include="Stored Procedures\FileItemDischarge\spg_FilItemDischargeValidate.sql" />
+    <Build Include="Stored Procedures\Priority\spg_Priority.sql" />
+    <Build Include="Stored Procedures\Transmition\spi_OpaHeader.sql" />
+    <Build Include="Stored Procedures\Transmition\spi_OpaDetail.sql" />
+    <Build Include="Stored Procedures\Transmition\spg_OpaHeader.sql" />
+    <Build Include="Stored Procedures\Transmition\spg_OpaDetail.sql" />
+    <Build Include="Stored Procedures\Transmition\spd_OpaDetail.sql" />
+    <Build Include="Stored Procedures\Transmition\spo_QueueToLog.sql" />
+    <Build Include="Functions\fncg_Transmited.sql" />
+    <Build Include="Stored Procedures\Queue\spg_Queue.sql" />
+    <Build Include="Stored Procedures\Queue\spu_BatchToProccess.sql" />
+    <Build Include="Stored Procedures\Queue\spg_QueueItems.sql" />
+    <Build Include="Stored Procedures\Queue\spu_ItemChangeState.sql" />
+    <Build Include="Stored Procedures\Queue\spg_States.sql" />
+    <Build Include="Stored Procedures\Queue\spg_Execute.sql" />
+    <Build Include="Stored Procedures\Queue\spo_OpaResponse.sql" />
+    <Build Include="Stored Procedures\Queue\spg_OpaResponse.sql" />
+    <Build Include="Stored Procedures\Queue\spu_DocumentChangeState.sql" />
+    <Build Include="Stored Procedures\Transmition\spu_TransmitionQueueAgain.sql" />
+    <Build Include="Stored Procedures\Transmition\spg_TransmitionGetUserEmail.sql" />
+    <Build Include="Stored Procedures\Queue\spu_ItemStartEndProccessTime.sql" />
+    <Build Include="Stored Procedures\Queue\spu_DocumentStartEndProccessTime.sql" />
+    <Build Include="Stored Procedures\Queue\spg_UserProccess.sql" />
+    <Build Include="Stored Procedures\Queue\spg_TransmitionResult.sql" />
+    <Build Include="Stored Procedures\Dashboard\spg_DashboardTransmited.sql" />
+    <Build Include="Stored Procedures\Dashboard\spg_DashboardTransmitedDetail.sql" />
+    <Build Include="Stored Procedures\Dashboard\spg_DashboardExpired.sql" />
+    <Build Include="Stored Procedures\Dashboard\spg_DashboardExpiredDetail.sql" />
+    <Build Include="Stored Procedures\Dashboard\spg_DashboardCustomer.sql" />
+    <Build Include="Stored Procedures\FileDetail\spg_FileDetailIsFieldsSeted.sql" />
+    <Build Include="Stored Procedures\FileHeader\spg_FileMasterIsFieldsSeted.sql" />
+    <Build Include="Stored Procedures\FileAttached\spg_FileAttachedIsFieldsSeted.sql" />
+    <Build Include="Stored Procedures\Customer\spg_CustomerAccountData.sql" />
+    <Build Include="Stored Procedures\Customer\spu_CustomerAccountData.sql" />
+    <Build Include="Stored Procedures\Role\spg_RoleByUserToAssign.sql" />
+    <Build Include="Tables\OpaResponseHist.sql" />
+    <Build Include="Stored Procedures\Report\spg_Report_Formula.sql" />
+    <Build Include="Stored Procedures\Report\spg_Report_ExportList.sql" />
+    <Build Include="Stored Procedures\Premission\spg_PremissionValidate.sql" />
+    <Build Include="Stored Procedures\User\spu_UserSitePassword.sql" />
+    <Build Include="Stored Procedures\Transmition\spg_DetailResponse.sql" />
+    <Build Include="Stored Procedures\Transmition\spu_TransmitionBatchAgain.sql" />
+    <Build Include="Stored Procedures\Adjustment\spg_Adjustment.sql" />
+    <Build Include="Stored Procedures\Adjustment\spo_Adjustment.sql" />
+    <Build Include="Stored Procedures\Adjustment\spu_Adjustment.sql" />
+    <Build Include="Stored Procedures\Adjustment\spd_Adjustment.sql" />
+    <Build Include="Stored Procedures\Report\spg_Report_SwornDeclaration_One_FilteredHeader.sql" />
+    <Build Include="Stored Procedures\Report\spg_Report_SwornDeclaration_One_FilteredDetail.sql" />
+    <Build Include="Stored Procedures\Report\spg_Report_DischargeDetail_FilteredDetail.sql" />
+    <Build Include="Stored Procedures\Report\spg_Report_DischargeDetail_FilteredHeader.sql" />
+    <Build Include="Stored Procedures\Migracion\aduana\sp_mgr_cargar_aduana.sql" />
+    <Build Include="Stored Procedures\Migracion\Cliente\sp_mgr_cargar_cliente.sql" />
+    <Build Include="Stored Procedures\Migracion\Cliente\sp_mgr_cliente_telefono.sql" />
+    <Build Include="Stored Procedures\Migracion\Cliente\sp_mgr_crear_cliente.sql" />
+    <Build Include="Stored Procedures\Migracion\Cliente\sp_mgr_insertar_telefono.sql" />
+    <Build Include="Stored Procedures\Migracion\Cliente\sp_mgr_resolucion.sql" />
+    <Build Include="Stored Procedures\Migracion\Documento\sp_mgr_cargar_detalle.sql" />
+    <Build Include="Stored Procedures\Migracion\Documento\sp_mgr_cargar_documento.sql" />
+    <Build Include="Stored Procedures\Migracion\Documento\sp_mgr_cargar_transaccion.sql" />
+    <Build Include="Stored Procedures\Migracion\Documento\sp_mgr_correccion_datos.sql" />
+    <Build Include="Stored Procedures\Migracion\Garantia\sp_mgr_cargar_garantia.sql" />
+    <Build Include="Stored Procedures\Migracion\Inc_Arancelario\fn_mgr_Acc_Parent.sql" />
+    <Build Include="Stored Procedures\Migracion\Inc_Arancelario\fn_mgr_Acc_Parent_Level.sql" />
+    <Build Include="Stored Procedures\Migracion\Inc_Arancelario\sp_mgr_cargar_partida.sql" />
+    <Build Include="Stored Procedures\Migracion\MateriaProducto\sp_mgr_cargar_formula.sql" />
+    <Build Include="Stored Procedures\Migracion\MateriaProducto\sp_mgr_cargar_mp.sql" />
+    <Build Include="Stored Procedures\Migracion\Miscelaneos\fn_mgr_RemoveChars.sql" />
+    <Build Include="Stored Procedures\Migracion\Miscelaneos\fn_mgr_split_string.sql" />
+    <Build Include="Stored Procedures\Migracion\Miscelaneos\fn_mgr_user.sql" />
+    <Build Include="Stored Procedures\Migracion\Miscelaneos\sp_mgr_crear_error.sql" />
+    <Build Include="Stored Procedures\Migracion\Miscelaneos\sp_mgr_split_name.sql" />
+    <Build Include="Stored Procedures\Migracion\Pais\sp_mgr_cargar_pais.sql" />
+    <Build Include="Stored Procedures\Migracion\Proveedor\sp_mgr_cargar_proveedor.sql" />
+    <Build Include="Stored Procedures\Migracion\Proveedor\sp_mgr_crear_proveedor.sql" />
+    <Build Include="Stored Procedures\Migracion\Transmision\sp_mgr_transmision.sql" />
+    <Build Include="Stored Procedures\Migracion\Transmision\sp_mgr_transmision_log.sql" />
+    <Build Include="Stored Procedures\Migracion\UnidadMedida\sp_mgr_cargar_um.sql" />
+    <Build Include="Tables\Migracion\tbl_mgr_aduana.sql" />
+    <Build Include="Tables\Migracion\tbl_mgr_cliente.sql" />
+    <Build Include="Tables\Migracion\tbl_mgr_documento.sql" />
+    <Build Include="Tables\Migracion\tbl_mgr_error.sql" />
+    <Build Include="Tables\Migracion\tbl_mgr_garantia.sql" />
+    <Build Include="Tables\Migracion\tbl_mgr_materia_producto.sql" />
+    <Build Include="Tables\Migracion\tbl_mgr_pais.sql" />
+    <Build Include="Tables\Migracion\tbl_mgr_proveedor.sql" />
+    <Build Include="Tables\Migracion\tbl_mgr_transaccion.sql" />
+    <Build Include="Tables\Migracion\tbl_mgr_transaccion_detalle.sql" />
+    <Build Include="Tables\Migracion\tbl_mgr_transmision.sql" />
+    <Build Include="Tables\Migracion\tbl_mgr_transmision_log.sql" />
+    <Build Include="Tables\Migracion\tbl_mgr_um.sql" />
+    <Build Include="Stored Procedures\Transmition\spg_TransmitionDataByIds.sql" />
+    <Build Include="Tables\OpaResponse_r.sql" />
+    <Build Include="Triggers\OpaResponseReplication.sql" />
+    <Build Include="Stored Procedures\Transmition\spd_OpaDetailItem.sql" />
+    <Build Include="Stored Procedures\Transmition\spd_ErrorOpaDetail.sql" />
+    <Build Include="Stored Procedures\FileHeader\spg_FileHeaderCurrentMonth.sql" />
+    <Build Include="Stored Procedures\FileHeader\spg_FileHeaderFiltered.sql" />
+    <Build Include="Stored Procedures\FileItemDischarge\spg_DischargeDetailResumeCounter.sql" />
+    <Build Include="Stored Procedures\FileItemDischarge\spg_DischargeDetailResume.sql" />
+    <Build Include="Stored Procedures\FileHeader\spg_FileHeaderUsAttached.sql" />
+    <Build Include="Stored Procedures\FileInfoConfig\spg_FileInfoConfigActiveValidate.sql" />
+    <Build Include="Stored Procedures\Item\spg_ItemGlobalStock.sql" />
+    <Build Include="Stored Procedures\Item\spg_ItemFormula.sql" />
+    <Build Include="Stored Procedures\FileItemDischarge\spd_FileItemDischargeTransmited.sql" />
+    <Build Include="Stored Procedures\Freeze\spg_FreezeDocument.sql" />
+    <Build Include="Stored Procedures\Freeze\spg_FreezeRegister.sql" />
+    <Build Include="Stored Procedures\Freeze\spu_FreezeDocument.sql" />
+    <Build Include="Stored Procedures\Freeze\spu_UnfreezeDocument.sql" />
+    <Build Include="Stored Procedures\Freeze\spu_UnfreezeRegister.sql" />
+    <Build Include="Stored Procedures\Freeze\spu_FreezeRegister.sql" />
+    <Build Include="Stored Procedures\Report\spg_Report_Item.sql" />
+    <Build Include="Stored Procedures\Report\spg_Report_FrozenList.sql" />
+    <Build Include="Scripts\Updated de datos erroneos\Consulta de scenario.sql" />
+    <Build Include="Scripts\Updated de datos erroneos\ejeuccion de solucion.sql" />
+    <Build Include="Scripts\Updated de datos erroneos\log.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Gabriel.publish.publish.xml" />
+    <None Include="Scripts\003 Usuarios y roles index.sql" />
+    <None Include="Scripts\001 Initial Data.sql" />
+    <None Include="Scripts\002 Initial Data _Incisos Arancelarios_.sql" />
+    <None Include="Scripts\LogPublicaciones\Publish_20170324.sql" />
+    <None Include="Scripts\Ejemplos y QA\Primer revisión de QA de proceso genral.sql" />
+    <None Include="Scripts\LogPublicaciones\Publish_20170331.sql" />
+    <None Include="Scripts\LogPublicaciones\Publish_20170403.sql" />
+    <None Include="Scripts\LogPublicaciones\Publish_20170404.sql" />
+    <None Include="IndexCA_Local.publish.publish.publish.xml" />
+    <None Include="Scripts\LogPublicaciones\Publish_20170411.sql" />
+    <None Include="Scripts\LogPublicaciones\Publish_20170421.sql" />
+    <None Include="Scripts\Ejecucion Migracion\Ejecucion_Migracion.sql" />
+    <None Include="Scripts\Ejecucion Migracion\Actualización de estados de transmisión.sql" />
+    <None Include="IndexCloud.publish.publish.xml" />
+    <None Include="IndexCloudPruebas.publish.publish.publish.xml" />
+    <None Include="Scripts\LogPublicaciones\Publish_20170511.sql" />
+    <None Include="Scripts\LogPublicaciones\Publish_20170525.sql" />
+    <None Include="Scripts\Scripts modificacion INDEX\Eliminar registros transmitidos _Carlos_Erik_.sql" />
+    <None Include="Scripts\LogPublicaciones\Publish_20170619.sql" />
+    <None Include="Scripts\Soporte\Evaluación descargo DoctosImport.sql" />
+    <None Include="Scripts\LogPublicaciones\Publish_20170622.sql" />
+  </ItemGroup>
+</Project>

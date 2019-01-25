@@ -1,0 +1,11 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_LayoutLogin.cshtml";
+}
+<script>
+    $(document).ready(function () {
+        sessionStorage.clear();
+        localStorage.clear();
+        window.location.href = "@Url.Action("Login","Seguridad")";
+    });
+</script>

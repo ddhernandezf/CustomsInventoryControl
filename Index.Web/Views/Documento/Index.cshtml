@@ -1,0 +1,331 @@
+﻿@using Kendo.Mvc.UI;
+@using Index.Commons;
+
+@{
+    ViewBag.Title = "Documentos";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <!-- start: FORM VALIDATION 1 PANEL -->
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="view-title">
+                    <div class="view-logo"><img src="@Url.Content("~/Content/Images/Headers/ResolutionWhite.png")" /></div>
+                    <div class="view-text">Catálogo de documentos</div>
+                </div>
+            </div>
+
+            <div class="panel-body">
+                @(Html.Kendo().Grid<Index.Commons.FileInfo>()
+                    .Name("grdCrud")
+                    .Columns(c =>
+                    {
+                        c.Bound(p => p.Id).Hidden(true);
+                        c.Bound(p => p.Name).Width(300).Filterable(f => f.Cell(r => r.Operator("contains")));
+                        c.Bound(p => p.Description).Width(500).Filterable(false);
+                        c.Bound(p => p.Id).Width(30).Visible(true).Filterable(false).Title(" ").Locked(true).Lockable(false)
+                            .ClientTemplate("<a style='cursor:pointer;' onclick='showWindowConfig(#=Id#,\"#=Name#\");'><img style='width: 25px;' title='Configurar documento' src='" + @Url.Content("~/Content/Images/Menu/Configuracion.png") + "' /></a>");
+                        c.Command(cmd =>
+                        {
+                            cmd.Edit().Text(" ");
+                            cmd.Destroy().Text(" ");
+                        }).Width(100).Locked(true).Lockable(false);
+                    })
+                    .Editable(e =>
+                    {
+                        e.Mode(GridEditMode.PopUp)
+                         .DisplayDeleteConfirmation("¿Se encuentra realmente seguro de eliminar el registro?")
+                         .TemplateName("Template")
+                         .Window(w =>
+                            w.Title("Formulario de documentos")
+                            .Width(700)
+                         );
+                    })
+                    .ToolBar(t =>
+                    {
+                        t.Create().Text("Nuevo").HtmlAttributes(new { @class = "k-primary" });
+                    })
+                    .Pageable(p =>
+                    {
+                        p.Refresh(true);
+                    })
+                    .Scrollable()
+                    .Filterable(f =>
+                    {
+                        f.Mode(GridFilterMode.Row);
+                    })
+                    .DataSource(dataSource => dataSource
+                        .Ajax()
+                        .PageSize(20)
+                        .Model(m =>
+                        {
+                            m.Id(o => o.Id);
+                        })
+                        .Read(r => r.Action("Read", "Documento"))
+                        .Create(c => c.Action("Create", "Documento"))
+                        .Update(u => u.Action("Update", "Documento"))
+                        .Destroy(d => d.Action("Delete", "Documento"))
+                        .Events(e =>
+                        {
+                            e.Error("errorHandler");
+                            e.RequestEnd("onRequestEndDocument");
+                        })
+                     )
+                )
+            </div>
+        </div>
+    </div>
+</div>
+
+@(Html.Kendo().Window()
+    .Name("wndDoctoConfig")
+    .Title("Configuración de documento")
+    .Width(800)
+    .Modal(true)
+    .Visible(false)
+    .Actions(a =>
+    {
+        a.Maximize();
+        a.Close();
+    })
+)
+
+@(Html.Kendo().Window()
+    .Name("wndField")
+    .Title("Personalización de campos")
+    .Width(750)
+    .Height(600)
+    .Modal(true)
+    .Iframe(true)
+    .Visible(false)
+    .Actions(a =>
+    {
+        a.Maximize();
+        a.Close();
+    })
+)
+
+<script type="text/kendo-template" id="message">
+    <div class="k-widget k-tooltip k-tooltip-validation k-invalid-msg field-validation-error"
+         style="margin: 0.5em; display: block; " data-for="#=field#" data-valmsg-for="#=field#" id="#=field#_validationMessage">
+        <span class="k-icon k-warning"> </span>#=message#<div class="k-callout k-callout-n"></div>
+    </div>
+</script>
+
+<script>
+    var validationMessageTmpl = kendo.template($("#message").html());
+
+    function errorHandler(args) {
+        if (typeof args.errors === "string") {
+            onErrorGeneral(args.errors);
+        }
+        if (args.errors) {
+            var grid = $("#grdCrud").data("kendoGrid");
+            grid.one("dataBinding", function (e) {
+                e.preventDefault();
+
+                for (var error in args.errors) {
+                    showMessage(grid.editable.element, error, args.errors[error].errors);
+                }
+            });
+        }
+        if (args.errors.errorGeneral) {
+            wnd = $("#modalWindowAlert").kendoWindow({
+                title: "Error",
+                modal: true,
+                visible: false,
+                resizable: false,
+                width: 300
+            }).data("kendoWindow");
+
+            $("#yes").hide();
+            $("#no").hide();
+            $("#confirmMessage").html(args.errors.errorGeneral.errors[0]);
+            wnd.center().open();
+        }
+    }
+
+    function onRequestEndDocument(e) {
+        wnd = $("#modalWindowAlert").kendoWindow({
+            title: "Confirmaci&oacute;n",
+            modal: true,
+            visible: false,
+            resizable: false,
+            width: 300
+        }).data("kendoWindow");
+
+        $("#yes").hide();
+        $("#no").hide();
+
+        if (e.type == "destroy" && !e.response.Errors) {
+            $("#confirmMessage").html("Registro eliminado exitosamente");
+            wnd.center().open();
+            this.read();
+        }
+
+        if (e.type == "update" && !e.response.Errors) {
+            $("#confirmMessage").html("Registro actualizado exitosamente");
+            wnd.center().open();
+            this.read();
+        }
+
+        if (e.type == "create" && !e.response.Errors) {
+            wizName = e.response.Data[0].Name;
+            this.read();
+            $("#loading").fadeIn();
+
+            setTimeout(function () {
+                var DataSource = $("#grdCrud").data("kendoGrid").dataSource.data();
+                wizId = dataSourceBrowser(DataSource, 'Name', wizName, 'Id');
+
+                if (wizId != null) {
+                    OpenWizzard = true;
+                    showWindowConfig(wizId, wizName);
+                }
+                else {
+                    $("#confirmMessage").html("Registro agregado exitosamente");
+                    wnd.center().open();
+                    $("#loading").fadeOut();
+                }
+            }, 700);
+        }
+    }
+
+    function errorHandlerAjax(args) {
+        if (typeof args.errors === "string") {
+            onErrorGeneral(args.errors);
+        }
+        if (args.errors) {
+            var grid = $("#grdAjaxCrud").data("kendoGrid");
+            grid.one("dataBinding", function (e) {
+                e.preventDefault();
+
+                for (var error in args.errors) {
+                    showMessage(grid.editable.element, error, args.errors[error].errors);
+                }
+            });
+        }
+        if (args.errors.errorGeneral) {
+            wnd = $("#modalWindowAlert").kendoWindow({
+                title: "Error",
+                modal: true,
+                visible: false,
+                resizable: false,
+                width: 300
+            }).data("kendoWindow");
+
+            $("#yes").hide();
+            $("#no").hide();
+            $("#confirmMessage").html(args.errors.errorGeneral.errors[0]);
+            wnd.center().open();
+        }
+    }
+
+    function showMessage(container, name, errors) {
+        container.find("[data-valmsg-for=" + name + "],[data-val-msg-for=" + name + "]")
+                 .replaceWith(validationMessageTmpl({ field: name, message: errors[0] }))
+    }
+
+    function showWindowField(idfile) {
+        var result = wsExecute("GET", "json", "@Url.Action("ValidateToFieldAssign", "Documento")", { IdFileInfoConfig: idfile }, false);
+
+        if (result === true) {
+            $("#loading").fadeIn();
+            window.location.href = "@Url.Action("Router", "Campo")" + "?IdFileInfoConfig=" + idfile;
+        }
+        else {
+            alert(result);
+        }
+    }
+
+    function showWindowConfig(idfileinfo, fileinfoname) {
+        $("#loading").fadeIn();
+        var win = $("#wndDoctoConfig").data("kendoWindow");
+        win.refresh({ url: "@Url.Action("Configuracion", "Documento")", data: { IdFileInfo: idfileinfo } });
+        win.title('Configuración de documento ' + fileinfoname);
+
+        setTimeout(function () {
+            win.open();
+            win.center();
+            setTimeout(function () {
+                win.center();
+                setTimeout(function () {
+                    $("#grdFileConfig").data("kendoGrid").dataSource.read();
+                    $("#loading").fadeOut();
+                }, 1000);
+            }, 1000);
+        }, 2500);
+    }
+
+    function onRequestEndFileConfig(e) {
+        wnd = $("#modalWindowAlert").kendoWindow({
+            title: "Confirmaci&oacute;n",
+            modal: true,
+            visible: false,
+            resizable: false,
+            width: 300
+        }).data("kendoWindow");
+
+        $("#yes").hide();
+        $("#no").hide();
+
+        if (e.type == "destroy" && !e.response.Errors) {
+            $("#confirmMessage").html("Registro eliminado exitosamente");
+            wnd.center().open();
+            $("#grdFileConfig").data("kendoGrid").dataSource.read();
+        }
+
+        if (e.type == "update" && !e.response.Errors) {
+            $("#confirmMessage").html("Registro actualizado exitosamente");
+            wnd.center().open();
+            $("#grdFileConfig").data("kendoGrid").dataSource.read();
+        }
+
+        if (e.type == "create" && !e.response.Errors) {
+            $("#confirmMessage").html("Registro agregado exitosamente");
+            wnd.center().open();
+            $("#grdFileConfig").data("kendoGrid").dataSource.read();
+        }
+    }
+
+    function errorHandlerFileConfig(args) {
+        if (typeof args.errors === "string") {
+            onErrorGeneral(args.errors);
+        }
+        if (args.errors) {
+            var grid = $("#grdFileConfig").data("kendoGrid");
+            grid.one("dataBinding", function (e) {
+                e.preventDefault();
+
+                for (var error in args.errors) {
+                    showMessage(grid.editable.element, error, args.errors[error].errors);
+                }
+            });
+        }
+        if (args.errors.errorGeneral) {
+            wnd = $("#modalWindowAlert").kendoWindow({
+                title: "Error",
+                modal: true,
+                visible: false,
+                resizable: false,
+                width: 300
+            }).data("kendoWindow");
+
+            $("#yes").hide();
+            $("#no").hide();
+            $("#confirmMessage").html(args.errors.errorGeneral.errors[0]);
+            wnd.center().open();
+        }
+        $("#grdFileConfig").data("kendoGrid").dataSource.read();
+    }
+
+    function IdFileInfoTypeSelect(e) {
+        $("#IdAccount").data("kendoDropDownList").open();
+    }
+
+    function IdAccountSelect(e) {
+        $("#UseAttached").focus();
+    }
+</script>

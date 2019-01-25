@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://tempuri.org/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://tempuri.org/">
+      <s:element name="Test">
+        <s:complexType />
+      </s:element>
+      <s:element name="TestResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="TestResult" type="tns:clsRespuestaDescargo" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="clsRespuestaDescargo">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="sIdEnvio" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="sCodRespuesta" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="sMensajeError" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="lOperacion" type="s:long" />
+          <s:element minOccurs="0" maxOccurs="1" name="sFechaDescargo" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="dCifQ" type="s:double" />
+          <s:element minOccurs="1" maxOccurs="1" name="dDaiQ" type="s:double" />
+          <s:element minOccurs="1" maxOccurs="1" name="dIvaQ" type="s:double" />
+          <s:element minOccurs="0" maxOccurs="1" name="sPolExpFecha" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="sPolImpFecha" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="sGeneraMulta" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="dMontoMultaNac" type="s:double" />
+          <s:element minOccurs="0" maxOccurs="1" name="sRazonMultaNac" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="dMontoMultaExt" type="s:double" />
+          <s:element minOccurs="0" maxOccurs="1" name="sRazonMultaExt" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="wmValidarDescargo">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="psUsuario" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="psClave" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="psExportadorNit" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="psPolizaImportacion" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="pLineaPolizaImport" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="pdUnidades" type="s:double" />
+            <s:element minOccurs="0" maxOccurs="1" name="psPolizaExportacion" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="piLineaPolizaExport" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="wmValidarDescargoResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="wmValidarDescargoResult" type="tns:clsRespuestaDescargo" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="wmExistePoliza">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="psUsuario" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="psClave" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="psPoliza" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="psTipoPoliza" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="wmExistePolizaResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="wmExistePolizaResult" type="s:boolean" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="wmEnviarDescargo">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="psUsuario" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="psClave" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="psExportadorNit" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="psPolizaImportacion" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="pLineaPolizaImport" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="pdUnidades" type="s:double" />
+            <s:element minOccurs="0" maxOccurs="1" name="psPolizaExportacion" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="piLineaPolizaExport" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="wmEnviarDescargoResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="wmEnviarDescargoResult" type="tns:clsRespuestaDescargo" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="wmEnviarDescargoFecha">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="psUsuario" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="psClave" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="psExportadorNit" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="psPolizaImportacion" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="pLineaPolizaImport" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="pdUnidades" type="s:double" />
+            <s:element minOccurs="0" maxOccurs="1" name="psPolizaExportacion" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="piLineaPolizaExport" type="s:int" />
+            <s:element minOccurs="0" maxOccurs="1" name="psFechaCc" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="wmEnviarDescargoFechaResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="wmEnviarDescargoFechaResult" type="tns:clsRespuestaDescargo" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="TestSoapIn">
+    <wsdl:part name="parameters" element="tns:Test" />
+  </wsdl:message>
+  <wsdl:message name="TestSoapOut">
+    <wsdl:part name="parameters" element="tns:TestResponse" />
+  </wsdl:message>
+  <wsdl:message name="wmValidarDescargoSoapIn">
+    <wsdl:part name="parameters" element="tns:wmValidarDescargo" />
+  </wsdl:message>
+  <wsdl:message name="wmValidarDescargoSoapOut">
+    <wsdl:part name="parameters" element="tns:wmValidarDescargoResponse" />
+  </wsdl:message>
+  <wsdl:message name="wmExistePolizaSoapIn">
+    <wsdl:part name="parameters" element="tns:wmExistePoliza" />
+  </wsdl:message>
+  <wsdl:message name="wmExistePolizaSoapOut">
+    <wsdl:part name="parameters" element="tns:wmExistePolizaResponse" />
+  </wsdl:message>
+  <wsdl:message name="wmEnviarDescargoSoapIn">
+    <wsdl:part name="parameters" element="tns:wmEnviarDescargo" />
+  </wsdl:message>
+  <wsdl:message name="wmEnviarDescargoSoapOut">
+    <wsdl:part name="parameters" element="tns:wmEnviarDescargoResponse" />
+  </wsdl:message>
+  <wsdl:message name="wmEnviarDescargoFechaSoapIn">
+    <wsdl:part name="parameters" element="tns:wmEnviarDescargoFecha" />
+  </wsdl:message>
+  <wsdl:message name="wmEnviarDescargoFechaSoapOut">
+    <wsdl:part name="parameters" element="tns:wmEnviarDescargoFechaResponse" />
+  </wsdl:message>
+  <wsdl:portType name="WSOPASoap">
+    <wsdl:operation name="Test">
+      <wsdl:input message="tns:TestSoapIn" />
+      <wsdl:output message="tns:TestSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="wmValidarDescargo">
+      <wsdl:input message="tns:wmValidarDescargoSoapIn" />
+      <wsdl:output message="tns:wmValidarDescargoSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="wmExistePoliza">
+      <wsdl:input message="tns:wmExistePolizaSoapIn" />
+      <wsdl:output message="tns:wmExistePolizaSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="wmEnviarDescargo">
+      <wsdl:input message="tns:wmEnviarDescargoSoapIn" />
+      <wsdl:output message="tns:wmEnviarDescargoSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="wmEnviarDescargoFecha">
+      <wsdl:input message="tns:wmEnviarDescargoFechaSoapIn" />
+      <wsdl:output message="tns:wmEnviarDescargoFechaSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="WSOPASoap" type="tns:WSOPASoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="Test">
+      <soap:operation soapAction="http://tempuri.org/Test" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="wmValidarDescargo">
+      <soap:operation soapAction="http://tempuri.org/wmValidarDescargo" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="wmExistePoliza">
+      <soap:operation soapAction="http://tempuri.org/wmExistePoliza" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="wmEnviarDescargo">
+      <soap:operation soapAction="http://tempuri.org/wmEnviarDescargo" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="wmEnviarDescargoFecha">
+      <soap:operation soapAction="http://tempuri.org/wmEnviarDescargoFecha" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="WSOPASoap12" type="tns:WSOPASoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="Test">
+      <soap12:operation soapAction="http://tempuri.org/Test" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="wmValidarDescargo">
+      <soap12:operation soapAction="http://tempuri.org/wmValidarDescargo" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="wmExistePoliza">
+      <soap12:operation soapAction="http://tempuri.org/wmExistePoliza" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="wmEnviarDescargo">
+      <soap12:operation soapAction="http://tempuri.org/wmEnviarDescargo" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="wmEnviarDescargoFecha">
+      <soap12:operation soapAction="http://tempuri.org/wmEnviarDescargoFecha" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="WSOPA">
+    <wsdl:port name="WSOPASoap" binding="tns:WSOPASoap">
+      <soap:address location="https://sws.export.com.gt/WS_OPA_2015/WSOPA.asmx" />
+    </wsdl:port>
+    <wsdl:port name="WSOPASoap12" binding="tns:WSOPASoap12">
+      <soap12:address location="https://sws.export.com.gt/WS_OPA_2015/WSOPA.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

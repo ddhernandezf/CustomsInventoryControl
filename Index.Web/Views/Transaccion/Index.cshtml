@@ -1,0 +1,564 @@
+﻿@using Kendo.Mvc.UI;
+@using Index.Commons;
+@{
+    ViewBag.Title = "Importaciones";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="row">
+    <div class="col-md-12">
+        <!-- start: FORM VALIDATION 1 PANEL -->
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="view-title">
+                    <div class="view-logo"><img src="@Url.Content("~/Content/Images/Headers/TransactionWhite.png")" /></div>
+                    <div class="view-text">Transacciones</div>
+                </div>
+            </div>
+            <div class="panel-body">
+                <div class="tlb-container">
+                    @(Html.Kendo().ToolBar()
+                        .Name("ToolBar")
+                        .HtmlAttributes(new { @style = "font-size: 11px;" })
+                        .Items(i =>
+                        {
+                            i.Add().TemplateId("drpTipoDocto");
+                            i.Add().Type(CommandType.Separator);
+                            i.Add().TemplateId("fltDocto");
+                            i.Add().Type(CommandType.Separator);
+                            i.Add().TemplateId("fltFecCrea");
+                            i.Add().Type(CommandType.Separator);
+                            i.Add().TemplateId("fltFecVence");
+                            i.Add().Type(CommandType.Separator);
+                            i.Add().TemplateId("fltFecAuth");
+                            i.Add().Type(CommandType.Separator);
+                            i.Add().TemplateId("fltTodo");
+                        })
+                    )
+                </div>
+                <div class="grd-container" style="min-height: 365px;">
+                    @(Html.Kendo().Grid<FileHeader>()
+                    .Name("grdCrud")
+                    .HtmlAttributes(new { @style = "height:365px;" })
+                    .AutoBind(false)
+                    .Columns(c =>
+                    {
+                        c.Bound(p => p.Id).Hidden(true);
+                        c.Bound(p => p.IdFileInfoConfig).Hidden(true);
+                        c.Bound(p => p.IdState).Hidden(true);
+                        c.Bound(p => p.IdAccount).Hidden(true);
+                        c.Bound(p => p.Operation).Width(60).Title("OP").Filterable(false);
+                        c.Bound(p => p.FileInfoName).Width(250).Title("Tipo").Filterable(f => f.Cell(r => r.Operator("contains")));
+                        c.Bound(p => p.IdDocument).Width(250).Title("No. Doc.").Filterable(f => f.Cell(r => r.Operator("contains")));
+                        c.Bound(p => p.CreateDate).Width(150).Format("{0: dd/MM/yyyy}").Title("Fec. crea").Filterable(f => f.Cell(r => r.Operator("contains")));
+                        c.Bound(p => p.ExpirationDate).Width(150).Format("{0: dd/MM/yyyy}").Title("Fec. vence").Filterable(f => f.Cell(r => r.Operator("contains")));
+                        c.Bound(p => p.AuthorizationDate).Width(160).Format("{0: dd/MM/yyyy}").Title("Fec. aceptación").Filterable(f => f.Cell(r => r.Operator("contains")));
+                        c.Bound(p => p.ExchangeRate).Width(150).Filterable(false).Title("Tasa Cambio").ClientTemplate("#=(ExchangeRate == null) ? '' : kendo.toString(ExchangeRate,'c3')#");
+                        c.Bound(p => p.Insurance).Width(150).Filterable(false).Title("Seguro").ClientTemplate("#=(Insurance == null) ? '' : kendo.toString(Insurance,'c3')#");
+                        c.Bound(p => p.Cargo).Width(150).Filterable(false).Title("Flete").ClientTemplate("#=(Cargo == null) ? '' : kendo.toString(Cargo,'c3')#");
+                        c.Bound(p => p.Facturas).Width(150).Title("Facturas").Filterable(false);
+                        c.Bound(p => p.StateName).Width(150).Title("Estado").Filterable(false);
+                        if ((Boolean)ViewBag.Freeze == true)
+                        {
+                            c.Bound(p => p.Id).Width(30).Visible(true).Filterable(false).Title(" ")
+                                .ClientTemplate("# if(IsSubstract == false) " +
+                                           "{# <a style='cursor:pointer;' onclick='FreezeDocument(#=Id#, \"#=IdDocument#\");'><img style='width: 25px;' title='Congelar registro' src='" + @Url.Content("~/Content/Images/Menu/Congelar.png") + "' /></a>#} " +
+                                           "else {# <div></div> #}#")
+                                .Locked(true);
+                        }
+                        c.Bound(p => p.Id).Width(30).Visible(true).Filterable(false).Title(" ").Locked(true).Lockable(false)
+                        .ClientTemplate("<a class='custom-function' style='cursor:pointer;' onclick='showDetail(#=Id#);'><img style='width: 25px;' title='Detalle' src='" + @Url.Content("~/Content/Images/Detail.png") + "' /></a>");
+                        c.Bound(p => p.UseAttached).Width(30).Visible(true).Filterable(false).Title(" ").Locked(true).Lockable(false)
+                            .ClientTemplate("# if(UseAttached == true) " +
+                                           "{# <a class='custom-function' style='cursor:pointer;' onclick='showAttached(#=Id#, #=UseAttached#, #=IdFileInfoConfig#, #=IsSubstract#, \"#=FileInfoName#\", \"#=IdDocument#\");'><img style='width: 25px;' title='Adjuntos' src='" + @Url.Content("~/Content/Images/Attached.png") + "' /></a>#} " +
+                                           "else {# <div></div> #}#");
+                        c.Bound(p => p.Id).Width(105).Visible(true).Filterable(false).Title(" ").Locked(true).Lockable(false)
+                            .ClientTemplate("<a class='k-button k-button-icontext k-grid-edit' style='cursor:pointer;' onclick='showUpdateWindow(#=Id#);'><span class='k-icon k-edit'></span></a>&nbsp;<a class='k-button k-button-icontext k-grid-delete' style='cursor:pointer;' onclick='deleteData(#=Id#);'><span class='k-icon k-delete'></span></a>");
+                    })
+                    .ToolBar(t =>
+                    {
+                        t.Custom().Text("Nuevo").HtmlAttributes(new { @id = "newHeader", @class = "k-primary" });
+                    })
+                    .Pageable(p =>
+                    {
+                        p.Refresh(true);
+                    })
+                    .Scrollable()
+                    .DataSource(dataSource => dataSource
+                        .Ajax()
+                        .PageSize(20)
+                        .Model(m =>
+                        {
+                            m.Id(o => o.Id);
+                        })
+                        .Read(r => r.Action("Read", "Transaccion").Data("FileHeaderFilter"))
+                        .Events(e =>
+                        {
+                            e.Error("errorHandler");
+                            e.RequestEnd("onRequestEnd");
+                        })
+                     )
+                    )
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@(Html.Kendo().Window()
+    .Name("wndCreate")
+    .Title("Nuevo registro")
+    .Width(800)
+    .Height(500)
+    .Modal(true)
+    .Visible(false)
+    .Content(@<text>
+        <iframe id="header-create"> </iframe>
+    </text>)
+    .Actions(a =>
+    {
+        a.Maximize();
+        a.Close();
+    })
+)
+
+@(Html.Kendo().Window()
+    .Name("wndUpdate")
+    .Title("Actualizar registro")
+    .Width(800)
+    .Height(500)
+    .Modal(true)
+    .Visible(false)
+    .Content(@<text>
+        <iframe id="header-update"> </iframe>
+    </text>)
+    .Actions(a =>
+    {
+        a.Maximize();
+        a.Close();
+    })
+)
+
+@(Html.Kendo().Window()
+    .Name("wndDetail")
+    .Title("Detalle de documento")
+    .Width(800)
+    .Height(500)
+    .Modal(true)
+    .Visible(false)
+    .Actions(a =>
+    {
+        a.Maximize();
+        a.Close();
+    })
+)
+
+@(Html.Kendo().Window()
+    .Name("wndAdjunto")
+    .Title("Formulario de adjuntos")
+    .Width(900)
+    .Modal(true)
+    .Visible(false)
+    .Actions(a =>
+    {
+        a.Maximize();
+        a.Close();
+    })
+    .Events(e=> {
+        e.Close("wndAdjuntoClose");
+    })
+)
+
+<script>
+    var dtResolucion, dtMoneda, dtGarantia, dtAduana, dtPais, dtBodega;
+    var dataForm, dataContent, data;
+    var glbFileInfoConfig = null, glbIdDocument = null, glbCreateDate = null, glbExpirationDate = null, glbAuthDate = null, glbGetAll = false;
+    var glbIdFileHeaderToRedirect = 0;
+    var CanCreateNew = false;
+
+    $(document).ready(function () {
+        $("#loading").fadeIn();
+        $(".k-grid-toolbar").hide();
+
+        setTimeout(function(){
+            $('#FileConfig').data("kendoDropDownList").dataSource.read();
+        }, 500);
+    });
+
+    function FreezeDocument(idfileheader, iddocument) {
+        $("#loading").fadeIn();
+        var win = $("#wndAdjunto").data("kendoWindow");
+        win.refresh({ url: "@Url.Action("Documento", "Congelar")", data: { IdFileHeader: idfileheader, Document: iddocument } });
+        win.title('Congelar documento: ' + iddocument);
+
+        setTimeout(function () {
+            win.open();
+            win.center();
+            setTimeout(function () {
+                win.center();
+                setTimeout(function () {
+                    $("#grdFreeze").data("kendoGrid").dataSource.read();
+                    $("#loading").fadeOut();
+                }, 1000);
+            }, 1500);
+        }, 3000);
+    }
+
+    $("#newHeader").click(function (e) {
+        if(CanCreateNew == true){
+            e.preventDefault();
+            $("#loading").fadeIn();
+            var frame = $("#header-create");
+            frame.hide();
+            var idrop = $("#FileConfig").data("kendoDropDownList").value()
+            $("#IdFileInfoConfig").val(idrop);
+            if (idrop != "") {
+                var win = $("#wndCreate").data("kendoWindow");
+                var url = '@Url.Action("Nuevo", "Transaccion")' + '?IdFileInfoConfig=' + idrop;
+                frame.attr('src', url);
+                setTimeout(function () {
+                    win.center();
+                    win.open();
+                    frame.css({
+                        border: "none",
+                        width: "99%",
+                        height: "95%"
+                    });
+
+                    setTimeout(function () {
+                        $("#loading").fadeOut();
+                        frame.show();
+                    }, 500);
+                }, 500);
+            }
+        }
+        else{
+            alert('El tipo de documento se encuentra inactivo, por lo tanto no se pueden crear nuevas transacciones con este tipo de documento.');
+        }
+    });
+
+    function wndAdjuntoClose(e) {
+        if (glbIdFileHeaderToRedirect != 0) {
+            $("#loading").fadeIn();
+            window.location.href = "@Url.Action("Router", "Transaccion")" + "?IdFileHeader=" + glbIdFileHeaderToRedirect;
+        }
+    }
+
+    function FileHeaderFilter(e) {
+        return {
+            IdFileInfoConfig: glbFileInfoConfig,
+            IdDocument: glbIdDocument,
+            CreateDate: glbCreateDate,
+            ExpirationDate: glbExpirationDate,
+            AuthorizationDate: glbAuthDate,
+            GetAll: glbGetAll
+        }
+    }
+
+    function SelectIdFileInfo(e) {
+        var item = this.dataItem(e.item);
+        glbFileInfoConfig = (item.Id == "") ? null : item.Id;
+        $("#grdCrud").data("kendoGrid").dataSource.read();
+
+        if (item.Id == "") {
+            $(".k-grid-toolbar").hide();
+            CanCreateNew = false;
+        }
+        else {
+            CanCreateNew = wsExecute("GET", "json", "@Url.Action("ConfigActiveValidate", "Documento")" + "?IdFileInfoConfig=" + glbFileInfoConfig, null, false);
+            if(CanCreateNew === true){
+                $(".k-grid-toolbar").show();
+            }
+            else{
+                $(".k-grid-toolbar").hide();
+            }
+        }
+    }
+
+    function txtDoctoChange(e){
+        var val = $(e).val();
+        val = (val == '') ? null : val;
+        glbIdDocument = val;
+        $("#grdCrud").data("kendoGrid").dataSource.read();
+    }
+
+    function CreateDateChange(e){
+        var val = (this.value() == null) ? null : kendo.toString(this.value(), 'yyyy-MM-dd');
+        glbCreateDate = val;
+        $("#grdCrud").data("kendoGrid").dataSource.read();
+    }
+
+    function ExpirationDateChange(e){
+        var val = (this.value() == null) ? null : kendo.toString(this.value(), 'yyyy-MM-dd');
+        glbExpirationDate = val;
+        $("#grdCrud").data("kendoGrid").dataSource.read();
+    }
+
+    function AuthChange(e){
+        var val = (this.value() == null) ? null : kendo.toString(this.value(), 'yyyy-MM-dd');
+        glbAuthDate = val;
+        $("#grdCrud").data("kendoGrid").dataSource.read();
+    }
+
+    function chkTodoChange(e){
+        if($(e).is(':checked') === true){
+            var r = confirm("Esta operación puede tardar un tiempo considerable de acuerdo con la transaccionalidad que el cliente posea. ¿Se encuentra seguro de realizar esta acción?");
+            if (r == true) {
+                glbGetAll = true;
+            } else {
+                $(e).attr('checked', false);
+                glbGetAll = false;
+            }
+            $("#grdCrud").data("kendoGrid").dataSource.read();
+        }
+        else{
+            glbGetAll = $(e).is(':checked');
+            $("#grdCrud").data("kendoGrid").dataSource.read();
+        }
+    }
+
+    function showUpdateWindow(idfileheader) {
+        $("#loading").fadeIn();
+        var htmlcontainer = $('#html-continer');
+        htmlcontainer.html('');
+
+        var win = $("#wndUpdate").data("kendoWindow");
+        var frame = $("#header-update");
+        var url = '@Url.Action("Actualizar", "Transaccion")' + '?IdFileHeader=' + idfileheader;
+        frame.attr('src', url);
+        frame.css({
+            border: "none",
+            width: "99%",
+            height: "95%"
+        });
+
+        setTimeout(function () {
+            win.center();
+            win.open();
+            $("#loading").fadeOut();
+        }, 500);
+    }
+
+    function deleteData(idfileheader) {
+        var validateParams = wsExecute("GET", "json", "@Url.Action("getHeaderValidationDataJson", "Transaccion")" + "?IdFileHeader=" + idfileheader, null, false);
+        var customMsg = "";
+        if (validateParams.HasAttached || validateParams.HasDetail) {
+            alert('El registro contiene información de archivos adjuntos, información en el detalle o ambas. El registros no puede eliminarse.');
+        }
+        else {
+            var response = confirm("¿Se encuentra realmente seguro de eliminar este registro?");
+
+            if (response) {
+                var result = wsExecute("GET", "json", "@Url.Action("Delete", "Transaccion")" + "?IdFileHeader=" + idfileheader, null, false);
+                if (result == "TRUE") {
+                    $("#grdCrud").data("kendoGrid").dataSource.read();
+                    sendMessage("Documento eliminado exitosamente.", true);
+                }
+                else {
+                    sendMessage(result, false);
+                }
+            }
+        }
+    }
+
+    function sendMessage(message, ItsOk) {
+        wnd = $("#modalWindowAlert").kendoWindow({
+            title: "Confirmaci&oacute;n",
+            modal: true,
+            visible: false,
+            resizable: false,
+            width: 300
+        }).data("kendoWindow");
+
+        $("#yes").hide();
+        $("#no").hide();
+
+        $("#confirmMessage").html(message);
+        wnd.center().open();
+    }
+
+    function showAttached(idfileheader, execute, idfileinfoconfig, issubstract, docname, docnumber) {
+        var FieldExist = wsExecute("GET", "json", "@Url.Action("AttachedFieldsExists", "Campo")" + "?IdFileInfoConfig=" + idfileinfoconfig, null, false);
+        if (FieldExist === false) {
+            alert("No se han definido los campos de adjunto para este documento.");
+        }
+        else {
+            if (execute) {
+
+                $("#loading").fadeIn();
+                var win = $("#wndAdjunto").data("kendoWindow");
+                win.title('Adjuntos de ' + docname + " " + docnumber);
+                win.refresh({ url: "@Url.Action("Adjunto", "Transaccion")", data: {
+                    IdFileHeader: idfileheader,
+                    IdFileInfoConfig: idfileinfoconfig,
+                    IsSubstract: issubstract}
+            });
+
+            setTimeout(function () {
+                win.center();
+                win.open();
+                setTimeout(function () {
+                    $("#grdAttached").data("kendoGrid").dataSource.read();
+                    $("#loading").fadeOut();
+                }, 500);
+            }, 2500);
+        }
+        }
+    }
+
+    function showDetail(idfileheader) {
+        $("#loading").fadeIn();
+        window.location.href = "@Url.Action("Router", "Transaccion")" + "?IdFileHeader=" + idfileheader;
+    }
+
+    function grdAttachedEdit(e) {
+        if ($("#IdSupplierOrDestiny").length > 0) {
+            $("#IdSupplierOrDestiny").data("kendoDropDownList").value(e.model.IdSupplier);
+        }
+    }
+
+    function errorHandlerAttached(args) {
+        if (typeof args.errors === "string") {
+            onErrorGeneral(args.errors);
+        }
+        if (args.errors) {
+            var grid = $("#grdAttached").data("kendoGrid");
+            grid.one("dataBinding", function (e) {
+                e.preventDefault();
+
+                for (var error in args.errors) {
+                    showMessage(grid.editable.element, error, args.errors[error].errors);
+                }
+            });
+        }
+        if (args.errors.errorGeneral) {
+            wnd = $("#modalWindowAlert").kendoWindow({
+                title: "Error",
+                modal: true,
+                visible: false,
+                resizable: false,
+                width: 300
+            }).data("kendoWindow");
+
+            $("#yes").hide();
+            $("#no").hide();
+            $("#confirmMessage").html(args.errors.errorGeneral.errors[0]);
+            wnd.center().open();
+        }
+    }
+
+    function onRequestEndAttached(e) {
+        wnd = $("#modalWindowAlert").kendoWindow({
+            title: "Confirmaci&oacute;n",
+            modal: true,
+            visible: false,
+            resizable: false,
+            width: 300
+        }).data("kendoWindow");
+
+        $("#yes").hide();
+        $("#no").hide();
+
+        if (e.type == "destroy" && !e.response.Errors) {
+            $("#confirmMessage").html("Registro eliminado exitosamente");
+            wnd.center().open();
+            this.read();
+        }
+
+        if (e.type == "update" && !e.response.Errors) {
+            this.read();
+        }
+
+        if (e.type == "create" && !e.response.Errors) {
+            this.read();
+        }
+    }
+
+    function showMessage(container, name, errors) {
+        container.find("[data-valmsg-for=" + name + "],[data-val-msg-for=" + name + "]")
+                 .replaceWith(validationMessageTmpl({ field: name, message: errors[0] }))
+    }
+
+    function FileConfigDataBound(e){
+        $('#grdCrud').data("kendoGrid").dataSource.read();
+        $("#loading").fadeOut();
+    }
+</script>
+
+<script id="drpTipoDocto">
+    @(Html.Kendo().DropDownList()
+        .Name("FileConfig")
+        .DataTextField("Name")
+        .DataValueField("Id")
+        .OptionLabel("Seleccionar documento...")
+        .SelectedIndex(0)
+        .Filter("contains")
+        .AutoBind(false)
+        .DataSource(source =>
+        {
+            source.Read(read =>
+            {
+                read.Action("getComboConfig", "Documento");
+            });
+        })
+        .HtmlAttributes(new { style = "width: 175px" })
+        .Events(e =>
+        {
+            e.Select("SelectIdFileInfo");
+            e.DataBound("FileConfigDataBound");
+        })
+    )
+</script>
+
+<script id="fltDocto">
+    <label>No. Doc.</label>
+    <input type='text' id='txtDocto' class='k-textbox' onchange='txtDoctoChange(this);'/>
+</script>
+
+<script id="fltFecCrea">
+    <label>Fec. Crea</label>
+    @(Html.Kendo().DatePicker()
+        .Name("CreateDate")
+        .Value("")
+        .Format("dd/MM/yyyy")
+        .HtmlAttributes(new { @style = "width:100px;" })
+        .Events(e=> {
+            e.Change("CreateDateChange");
+        })
+    )
+</script>
+
+<script id="fltFecVence">
+    <label>Fec. Vence</label>
+    @(Html.Kendo().DatePicker()
+        .Name("ExpirationDate")
+        .Value("")
+        .Format("dd/MM/yyyy")
+        .HtmlAttributes(new { @style = "width:100px;" })
+        .Events(e =>
+        {
+            e.Change("ExpirationDateChange");
+        })
+    )
+</script>
+
+<script id="fltFecAuth">
+    <label>Fec. Autoriza</label>
+    @(Html.Kendo().DatePicker()
+        .Name("AuthDate")
+        .Value("")
+        .Format("dd/MM/yyyy")
+        .HtmlAttributes(new { @style = "width:100px;" })
+        .Events(e =>
+        {
+            e.Change("AuthChange");
+        })
+    )
+</script>
+
+<script id="fltTodo">
+    @(Html.Kendo().CheckBox()
+        .Name("chkTodo")
+        .Label("Ver Todo")
+        .HtmlAttributes( new { @onchange = "chkTodoChange(this);" })
+    )
+</script>

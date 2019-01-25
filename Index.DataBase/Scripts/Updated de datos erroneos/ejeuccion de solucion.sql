@@ -1,0 +1,42 @@
+--DECLARE	@IdFileDetailStock		INT = 93772,
+--		@IdFileDetailSubstract	INT = 622257;
+
+--SELECT * FROM FileItemDischarge WHERE IdFileDetailStock = @IdFileDetailStock AND IdFileDetailSubstract = @IdFileDetailSubstract;
+--SELECT * FROM OpaDetailHist WHERE IdFileDetailStock = @IdFileDetailStock AND IdFileDetailSubstract = @IdFileDetailSubstract;
+--SELECT * FROM OpaResponseHist WHERE IdOpaDetail IN (SELECT Id FROM OpaDetailHist WHERE IdFileDetailStock = @IdFileDetailStock AND IdFileDetailSubstract = @IdFileDetailSubstract);
+
+--BEGIN TRAN
+--UPDATE OpaDetailHist SET IdFileItemDischarge = 2158056 WHERE Id = 3926633;
+--UPDATE FileItemDischarge SET IdState = 10 WHERE Id = 2158056;
+--UPDATE OpaDetailHist SET IdFileItemDischarge = 2158057 WHERE Id = 3926667;
+--UPDATE FileItemDischarge SET IdState = 10 WHERE Id = 2158057;
+--UPDATE OpaDetailHist SET IdFileItemDischarge = 2158058 WHERE Id = 3926649;
+--UPDATE FileItemDischarge SET IdState = 10 WHERE Id = 2158058;
+--UPDATE OpaDetailHist SET IdFileItemDischarge = 2158059 WHERE Id = 3926644;
+--UPDATE FileItemDischarge SET IdState = 10 WHERE Id = 2158059;
+--UPDATE OpaDetailHist SET IdFileItemDischarge = 2158060 WHERE Id = 3926660;
+--UPDATE FileItemDischarge SET IdState = 10 WHERE Id = 2158060;
+--UPDATE OpaDetailHist SET IdFileItemDischarge = 2158061 WHERE Id = 3926632;
+--UPDATE FileItemDischarge SET IdState = 10 WHERE Id = 2158061;
+--UPDATE OpaDetailHist SET IdFileItemDischarge = 2158062 WHERE Id = 3926645;
+--UPDATE FileItemDischarge SET IdState = 10 WHERE Id = 2158062;
+--UPDATE OpaDetailHist SET IdFileItemDischarge = 2158063 WHERE Id = 3926661;
+--UPDATE FileItemDischarge SET IdState = 10 WHERE Id = 2158063;
+--UPDATE OpaDetailHist SET IdFileItemDischarge = 2158064 WHERE Id = 3926650;
+--UPDATE FileItemDischarge SET IdState = 10 WHERE Id = 2158064;
+--UPDATE OpaDetailHist SET IdFileItemDischarge = 2158065 WHERE Id = 3926676;
+--UPDATE FileItemDischarge SET IdState = 10 WHERE Id = 2158065;
+--UPDATE OpaDetailHist SET IdFileItemDischarge = 2158066 WHERE Id = 3926662;
+--UPDATE FileItemDischarge SET IdState = 10 WHERE Id = 2158066;
+--UPDATE	OpaResponseHist SET IdOpaDetail = 3926633 WHERE Id = 3934824;
+--UPDATE	OpaResponseHist SET IdOpaDetail = 3926667 WHERE Id = 3934820;
+--UPDATE	OpaResponseHist SET IdOpaDetail = 3926649 WHERE Id = 3934822;
+--UPDATE	OpaResponseHist SET IdOpaDetail = 3926644 WHERE Id = 3934821;
+--UPDATE	OpaResponseHist SET IdOpaDetail = 3926660 WHERE Id = 3934823;
+--UPDATE	OpaResponseHist SET IdOpaDetail = 3926632 WHERE Id = 3934819;
+--UPDATE	OpaResponseHist SET IdOpaDetail = 3926645 WHERE Id = 3934818;
+--UPDATE	OpaResponseHist SET IdOpaDetail = 3926661 WHERE Id = 3934817;
+--UPDATE	OpaResponseHist SET IdOpaDetail = 3926650 WHERE Id = 3934816;
+--UPDATE	OpaResponseHist SET IdOpaDetail = 3926676 WHERE Id = 3934815;
+--UPDATE	OpaResponseHist SET IdOpaDetail = 3926662 WHERE Id = 3934814;
+----COMMIT --rollback

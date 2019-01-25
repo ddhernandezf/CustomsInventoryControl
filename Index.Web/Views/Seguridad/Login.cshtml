@@ -1,0 +1,51 @@
+﻿@model Index.Commons.UserLogin
+@{
+    ViewBag.Title = "Iniciar sesión";
+    Layout = "~/Views/Shared/_LayoutLogin.cshtml";
+}
+<div id="login-box" class="main-login col-sm-4 col-sm-offset-4">
+    <div style="text-align:center; font-weight: bolder;" class="logo">
+        Aduana Web
+    </div>
+    <!-- start: LOGIN BOX -->
+    <div class="box-login">
+        <h3>Ingresar al Sistema</h3>
+        <p>
+            Ingrese su usuario y contraseña para ingresar.
+        </p>
+        @using (Html.BeginForm("Login", "Seguridad", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-login", id = "formaprincipal" }))
+            {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "", new { @class = "errorHandler alert alert-danger" })
+
+            <div class="errorHandler alert alert-danger no-display">
+                <i class="icon-remove-sign"></i> Posee algunos errores, por favor verifique.
+            </div>
+                <fieldset>
+                    <div class="form-group">
+                        <span class="input-icon">
+                            <input type="text" class="form-control" autofocus placeholder="Usuario" id="Username" name="Username" required autocomplete="off" />
+                            <i class="icon-user"></i>
+                        </span>
+                    </div>
+                    <div class="form-group form-actions">
+                        <span class="input-icon">
+                            <input type="password" class="form-control password" placeholder="Contraseña" id="Password" name="Password" required />
+                            <i class="icon-lock"></i>
+                        </span>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-bricky pull-right submitbtn" style="background-color: #005CA8 !important;border-color: #005CA8 !important;">
+                            Ingresar <i class="icon-circle-arrow-right"></i>
+                        </button>
+                    </div>
+                </fieldset>
+        }
+    </div>
+    <!-- end: LOGIN BOX -->
+    <!-- start: COPYRIGHT -->
+    <div style="text-align:center;margin-top:20px; font-weight:bolder;" class="copyright">
+        2016 © - Index S.A.
+    </div>
+    <!-- end: COPYRIGHT -->
+</div>

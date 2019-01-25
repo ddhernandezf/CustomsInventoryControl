@@ -1,0 +1,55 @@
+﻿
+@{
+    ViewBag.Title = "Index S.A.";
+    Layout = null;
+}
+
+@Styles.Render("~/Content/css")
+@Scripts.Render("~/bundles/modernizr")
+@Styles.Render("~/TelerikMVC/CSS")
+@Scripts.Render("~/TelerikMVC/JS")
+@Scripts.Render("~/TelerikMVC/CULTURE")
+
+<link rel="icon" type="image/png" href="@Url.Content("~/Content/Images/favicon.ico")" />
+
+<div class="principal-contnet">
+    <div class="logo">
+        <img src="@Url.Content("~/Content/Images/LogoIndex00002.png")" />
+    </div>
+    <div class="Message">Disculpa los inconvenientes la aplicación funciona únicamente en una pestaña. Por favor cierra la pestaña y continúa realizando tus operaciones.</div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        sessionStorage.clear();
+        localStorage.clear();
+    });
+</script>
+
+<style>
+    body {
+        background-color: #dddddd;
+        padding: 0px;
+        margin: 0px;
+        display: inline-block;
+        width: 100%;
+    }
+
+    .principal-contnet {
+        width: 80%;
+        margin-left: 10%;
+        margin-top: 85px;
+        text-align: center;
+    }
+
+    .logo {
+        width: 100%;
+    }
+
+    .Message {
+        color: #005CA8;
+        font-size: 30px;
+        font-weight: bolder;
+        padding-top: 30px;
+    }
+</style>

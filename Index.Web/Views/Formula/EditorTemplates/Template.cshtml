@@ -1,0 +1,92 @@
+﻿@using Kendo.Mvc.UI;
+@model Index.Commons.Formula
+
+<div class="generali-popup-form">
+    @Html.HiddenFor(m => m.Id)
+    @Html.HiddenFor(m => m.IdCustomer)
+    @Html.HiddenFor(m => m.IdMainItem)
+    <div class="error">
+        @Html.ValidationMessage("errorGeneral")
+    </div>
+    <div class="col-10">
+        <div class="col-12 title">@Html.DisplayNameFor(x => x.IdDetailItem)</div>
+        <div class="col-12 item">
+            @(Html.Kendo().DropDownList()
+              .Name("IdDetailItem")
+              .DataTextField("Name")
+              .DataValueField("Id")
+              .OptionLabel("Seleccionar...")
+              .SelectedIndex(0)
+              .Filter("contains")
+              .DataSource(source =>
+              {
+                  source.Custom().Group(g =>
+                  {
+                      g.Add("Parent", typeof(String));
+                  });
+                  source.Read(read =>
+                  {
+                      read.Action("getCombo", "MateriaPrima");
+                  });
+              })
+              .HtmlAttributes(new { style = "width: 100%" })
+              .Events(e=> {
+                  e.Select("IdDetailItemSelect");
+              })
+            )
+            <div class="error">@Html.ValidationMessageFor(m => m.IdDetailItem)</div>
+        </div>
+    </div>
+    <div class="col-5">
+        <div class="col-12 title">@Html.DisplayNameFor(x => x.Quantity)</div>
+        <div class="col-12 item">
+            @(Html.Kendo().NumericTextBox()
+                    .Name("Quantity")
+                    .HtmlAttributes(new { Style = "width:100%;" })
+                    .Value(Convert.ToDouble(Model.Quantity))
+                    .Spinners(false)
+                    .Decimals(6)
+                    .Format("n6")
+                    .Events(e=> {
+                        e.Change("QuantityChange");
+                    })
+            )
+            <div class="error">@Html.ValidationMessageFor(m => m.Quantity)</div>
+        </div>
+    </div>
+    <div class="col-5">
+        <div class="col-12 title">@Html.DisplayNameFor(x => x.Decrease)</div>
+        <div class="col-12 item">
+            @(Html.Kendo().NumericTextBox()
+                    .Name("Decrease")
+                    .HtmlAttributes(new { Style = "width:100%;" })
+                    .Value(Convert.ToDouble(Model.Decrease))
+                    .Spinners(false)
+                    .Decimals(6)
+                    .Format("n6")
+                    .Events(e=> {
+                        e.Change("DecreaseChange");
+                    })
+            )
+            <div class="error">@Html.ValidationMessageFor(m => m.Decrease)</div>
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="col-12 title">@Html.DisplayNameFor(x => x.Active)</div>
+        <div class="col-12 item">
+            @(Html.Kendo().CheckBox()
+                .Name("Active")
+                .Checked(Model.Active)
+            )
+            <div class="error">@Html.ValidationMessageFor(m => m.Active)</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        setTimeout(function () {
+            $("#IdDetailItem").data("kendoDropDownList").open();
+        }, 500);
+    });
+</script>

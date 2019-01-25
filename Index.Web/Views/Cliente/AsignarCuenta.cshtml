@@ -1,0 +1,102 @@
+﻿@using Index.Commons;
+@using Kendo.Mvc.UI;
+
+@{
+    Layout = null;
+}
+
+<div class="legend-container">
+    Marque o desmarque las cuentas que necessita o no utilizara para este cliente.
+</div>
+<div class="account-container">
+    @(Html.Kendo().Grid<AccountToAssign>()
+                    .Name("grdAsignacionCuenta")
+                    .Columns(c =>
+                    {
+                        c.Bound(p => p.Id).Hidden(true);
+                        c.Bound(p => p.Name).Width(350).Filterable(f => f.Cell(r => r.Operator("contains"))).ClientTemplate("#=Name#").Title("Cuentas");
+                        c.Bound(p => p.IsAssigned).Width(150).ClientTemplate("<input onchange='checkboxChange(this);' type='checkbox' name='itme-#=Id#' data-id='#=Id#' #=(IsAssigned == true) ? checked='checked' : ''# />").Filterable(false).Title("Asignado");
+                        c.Bound(p => p.IsAssigned).Width(50).Filterable(false).Title(" ").Locked(true).Lockable(false)
+                            .ClientTemplate("# if(IsAssigned == true) " +
+                                           "{# <div id='itemname#=Id#' class='col-9 item'><a id='link#=Id#' class='k-button k-button-icontext' href='javascript:showCustomerAccountDataWindow(" + ViewBag.idperson + ", #=Id#);'><span class='k-icon k-edit'></span> </a></div>#} " +
+                                           "else {# <div id='itemname#=Id#' class='col-9 item'></div> #}#");
+                    })
+                    .Pageable(p =>
+                    {
+                        p.Refresh(true);
+                    })
+                    .Scrollable()
+                    .Filterable(f =>
+                    {
+                        f.Mode(GridFilterMode.Row);
+                    })
+                    .DataSource(dataSource => dataSource
+                        .Ajax()
+                        .PageSize(20)
+                        .Model(m =>
+                        {
+                            m.Id(o => o.Id);
+                        })
+                        .Read(r => r.Action("ReadAsignarCuenta", "Cliente", new { IdCustomer = ViewBag.idperson }))
+                     )
+    )
+</div>
+
+<style>
+    .account-container {
+        display: inline-block;
+        width: 100%;
+    }
+
+    .legend-container {
+        display: inline-block;
+        width: 80%;
+        margin-left:10%;
+        margin-bottom: 10px;
+        margin-top: 15px;
+        font-size: 12px;
+        font-weight: bolder;
+    }
+
+    .row-container {
+        margin: 0px;
+        padding: 0px;
+        min-height: 24px;
+    }
+</style>
+
+<script>
+    function checkboxChange(object) {
+        accountAssignment($(object).is(':checked'), parseInt($(object).data("id")));
+    }
+
+    function accountAssignment(addorremove, id) {
+        var result;
+        if (addorremove) {
+            result = wsExecute('POST', 'json', '@Url.Action("CreateAccount", "Cliente")', { 'model': { IdCustomer: '@ViewBag.idperson', IdAccount: id } }, false);
+            var content = $("#itemname" + id).html();
+            $("#itemname" + id).html(content + '<a id="link' + id + '" class="k-button k-button-icontext" href="javascript:showCustomerAccountDataWindow(@ViewBag.idperson, ' + id + ');"><span class="k-icon k-edit"></span> </a>');
+        }
+        else {
+            result = wsExecute('POST', 'json', '@Url.Action("DeleteAccount", "Cliente")', { 'model': { IdCustomer: '@ViewBag.idperson', IdAccount: id } }, false)
+            $("#link" + id).remove();
+        }
+
+        if (result.Errors) {
+            if (args.errors.errorGeneral) {
+                wnd = $("#modalWindowAlert").kendoWindow({
+                    title: "Error",
+                    modal: true,
+                    visible: false,
+                    resizable: false,
+                    width: 300
+                }).data("kendoWindow");
+
+                $("#yes").hide();
+                $("#no").hide();
+                $("#confirmMessage").html(args.errors.errorGeneral.errors[0]);
+                wnd.center().open();
+            }
+        }
+    }
+</script>

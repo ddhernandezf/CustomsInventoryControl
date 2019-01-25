@@ -1,0 +1,191 @@
+﻿@using Kendo.Mvc.UI;
+@using Index.Commons;
+
+@{
+    ViewBag.Title = "ListaCongelados";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <!-- start: FORM VALIDATION 1 PANEL -->
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="view-title">
+                    <div class="view-text">Reporte Importaciones Congeladas</div>
+                </div>
+                <div class="cr-filter">
+                    <div class="col-2">
+                        <div class="col-12 title">Fecha inicio</div>
+                        <div class="col-12 item">
+                            @(Html.Kendo().DatePicker()
+                                .Name("StartDate")
+                                .HtmlAttributes(new { Style = "width:100%;" })
+                                .Format("dd/MM/yyyy")
+                                .Events(e =>
+                                {
+                                    e.Change("StartDateChange");
+                                })
+                            )
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        <div class="col-12 title">Fecha fin</div>
+                        <div class="col-12 item">
+                            @(Html.Kendo().DatePicker()
+                                .Name("EndDate")
+                                .HtmlAttributes(new { Style = "width:100%;" })
+                                .Format("dd/MM/yyyy")
+                            )
+                        </div>
+                    </div>
+                    @(Html.Kendo().ToolBar()
+                        .Name("KendoToolbar")
+                        .HtmlAttributes(new { @style = "text-align: right;float: right; min-width: 100px; margin-top: 19px;" })
+                        .Items(i =>
+                        {
+                            i.Add().Type(CommandType.Button).ImageUrl(Url.Content("~/Content/Images/Filter.png")).Click("btnFiltrarClick");
+                            i.Add().Type(CommandType.Button).ImageUrl(Url.Content("~/Content/Images/PDFFILE.png")).Click("btnDownloadPdf");
+                            i.Add().Type(CommandType.Button).ImageUrl(Url.Content("~/Content/Images/XLSFILE.png")).Click("btnDownloadXls");
+                            i.Add().Type(CommandType.Button).ImageUrl(Url.Content("~/Content/Images/FullScreen.png")).Click("btnFullScreen");
+                        })
+                    )
+                </div>
+            </div>
+            <div class="panel-body">
+                <div class="cr-report">
+                    <iframe style="border:none;" id="rptViewer" width="400" height="200"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@(Html.Kendo().Window()
+    .Name("wndFullScreen")
+    .Title("Pantalla completa")
+    .Width(800)
+    .Height(500)
+    .Modal(true)
+    .Visible(false)
+    .Actions(a =>
+    {
+        a.Close();
+    })
+    .Content(@<text>
+        <iframe style="border:none;" id="rptViewerFullScreen" width="400" height="200"></iframe>
+    </text>)
+)
+
+@(Html.Kendo().Window()
+    .Name("wndFiltroDocumentos")
+    .Title("Filtro por documentos")
+    .Width(900)
+    .Modal(true)
+    .Visible(false)
+    .Actions(a =>
+    {
+        a.Maximize();
+        a.Close();
+    })
+)
+
+<style>
+    .cr-filter {
+        display: inline-block;
+        width: 100%;
+        border-top: solid;
+        border-width: 0.4px;
+        padding: 0px;
+        margin: 0px;
+    }
+
+    #btnFiltrar {
+        border: solid;
+        border-width: 0.4px;
+        margin-top: 20px;
+        float: right;
+    }
+
+    #wndFullScreen {
+        overflow: hidden;
+    }
+</style>
+
+<script>
+    var frame = $("#rptViewer"), FilePath = null, strFileHeader = '', strFileDetail = '';
+
+    $(document).ready(function () {
+        frame.css({ width: "100%", height: "400px" });
+        frame.attr('src', "@Url.Action("BlankReport", "Reportes")");
+
+        setTimeout(function () {
+            btnFiltrarClick();
+        }, 300);
+    });
+
+    function btnFullScreen(e) {
+        if (FilePath != null) {
+            $("#loading").fadeIn();
+            var win = $("#wndFullScreen").data("kendoWindow");
+            var fsframe = $("#rptViewerFullScreen");
+            setTimeout(function () {
+                win.center();
+                win.open();
+                win.maximize();
+
+                fsframe.css({ width: "100%", height: "100%" });
+                fsframe.attr('src', FilePath + '.pdf');
+                $("#loading").fadeOut();
+            }, 700);
+        }
+    }
+
+    function btnDownloadPdf(e) {
+        if (FilePath != null) {
+            window.location.href = '@Url.Action("Downloads", "Archivos")' + '?UrlFile=' + FilePath + '.pdf';
+        }
+    }
+
+    function btnDownloadXls(e) {
+        if (FilePath != null) {
+            window.location.href = '@Url.Action("Downloads", "Archivos")' + '?UrlFile=' + FilePath + '.xls';
+        }
+    }
+
+    function StartDateChange(e) {
+        var startdate = $("#StartDate").data("kendoDatePicker");
+        var enddate = $("#EndDate").data("kendoDatePicker");
+        enddate.min(startdate.value());
+        enddate.open();
+    }
+
+    function btnFiltrarClick(e) {
+        $("#loading").fadeIn();
+
+        setTimeout(function () {
+            var startdate = $("#StartDate").data("kendoDatePicker");
+            var enddate = $("#EndDate").data("kendoDatePicker");
+
+            if ((startdate.value() == null && enddate.value() == null) ||
+                (startdate.value() != null && enddate.value() != null)) {
+                FilePath = wsExecute("GET", "json", "@Url.Action("ListaCongeladosData", "Reportes")", {
+                    StartDate: (startdate.value() == null) ? null : kendo.toString(startdate.value(), 'yyyy-MM-dd'),
+                    EndDate: (enddate.value() == null) ? null : kendo.toString(enddate.value(), 'yyyy-MM-dd'),
+                }, false);
+
+                var url = FilePath + '.pdf';
+                frame.attr('src', url);
+
+                setTimeout(function () {
+                    $("#loading").fadeOut();
+                }, 700);
+            }
+            else {
+                alert('Los valores de fechas deben encontrarse ambos seleccionado o ambos vacios para poder generar el reporte.');
+                $("#loading").fadeOut();
+            }
+        }, 500)
+    }
+
+</script>

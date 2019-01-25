@@ -1,0 +1,59 @@
+﻿@using Kendo.Mvc.UI;
+@model Index.Commons.Phone
+
+<div class="generali-popup-form">
+    @Html.HiddenFor(m => m.Id)
+    @Html.HiddenFor(m => m.IdPerson)
+<div class="error">
+        @Html.ValidationMessage("errorGeneral")
+    </div>
+    <div class="col-3">
+        <div class="col-12 title">@Html.DisplayNameFor(x => x.IdPhoneType)</div>
+        <div class="col-12 item">
+            @(Html.Kendo().DropDownList()
+              .Name("IdPhoneType")
+              .DataTextField("Name")
+              .DataValueField("Id")
+              .OptionLabel("Seleccionar...")
+              .SelectedIndex(0)
+              .Filter("contains")
+              .DataSource(source =>
+              {
+                  source.Read(read =>
+                  {
+                      read.Action("getComboPhoneType", "Telefono");
+                  });
+              })
+              .HtmlAttributes(new { style = "width: 100%" })
+              .Events(e=> {
+                  e.Select("IdPhoneTypeSelect");
+              })
+            )
+            <div class="error">@Html.ValidationMessageFor(m => m.IdPhoneType)</div>
+        </div>
+    </div>
+    <div class="col-5">
+        <div class="col-12 title">@Html.DisplayNameFor(x => x.Number)</div>
+        <div class="col-12 item">
+            @(Html.Kendo().NumericTextBox()
+                    .Name("Number")
+                    .HtmlAttributes(new { Style = "width:100%;" })
+                    .Value(Convert.ToDouble(Model.Number))
+                    .Spinners(false)
+                    .Format("0")
+                    .Events(e=> {
+                        e.Change("NumberChange");
+                    })
+            )
+            <div class="error">@Html.ValidationMessageFor(m => m.Number)</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        setTimeout(function () {
+            $("#IdPhoneType").data("kendoDropDownList").open();
+        }, 500);
+    });
+</script>

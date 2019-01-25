@@ -1,0 +1,83 @@
+﻿@using Kendo.Mvc.UI;
+@model Index.Commons.Customs
+
+<div class="generali-popup-form">
+    @Html.HiddenFor(m => m.Id)
+<div class="error">
+        @Html.ValidationMessage("errorGeneral")
+    </div>
+    <div class="col-4">
+        <div class="col-12 title">@Html.DisplayNameFor(x => x.IdCountry)</div>
+        <div class="col-12 item">
+            @(Html.Kendo().DropDownList()
+              .Name("IdCountry")
+              .DataTextField("Name")
+              .DataValueField("Id")
+              .OptionLabel("Seleccionar...")
+              .SelectedIndex(0)
+              .Filter("contains")
+              .DataSource(source =>
+              {
+                  source.Read(read =>
+                  {
+                      read.Action("getCombo", "Pais");
+                  });
+              })
+              .HtmlAttributes(new { style = "width: 100%" })
+              .Events(e=> {
+                  e.Select("IdCountrySelect");
+              })
+            )
+            <div class="error">@Html.ValidationMessageFor(m => m.IdCountry)</div>
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="col-12 title">@Html.DisplayNameFor(x => x.Name)</div>
+        <div class="col-12 item">
+            @(Html.Kendo().TextBox()
+                    .Name("Name")
+                    .HtmlAttributes(new { Style = "width:100%;" })
+                    .Value(Model.Name)
+            )
+            <div class="error">@Html.ValidationMessageFor(m => m.Name)</div>
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="col-12 title">@Html.DisplayNameFor(x => x.Address)</div>
+        <div class="col-12 item">
+            @(Html.Kendo().TextBox()
+                    .Name("Address")
+                    .HtmlAttributes(new { Style = "width:100%;" })
+                    .Value(Model.Address)
+            )
+            <div class="error">@Html.ValidationMessageFor(m => m.Address)</div>
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="col-12 title">@Html.DisplayNameFor(x => x.Code)</div>
+        <div class="col-12 item">
+            @(Html.Kendo().TextBox()
+                    .Name("Code")
+                    .HtmlAttributes(new { Style = "width:100%;" })
+                    .Value(Model.Code)
+            )
+            <div class="error">@Html.ValidationMessageFor(m => m.Code)</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        setTimeout(function () {
+            $("#IdCountry").data("kendoDropDownList").open();
+
+            $("#Name").change(function () {
+                $("#Address").focus();
+            });
+
+            $("#Address").change(function () {
+                $(".k-button.k-button-icontext.k-primary.k-grid-update").focus();
+            });
+        }, 500);
+    });
+</script>

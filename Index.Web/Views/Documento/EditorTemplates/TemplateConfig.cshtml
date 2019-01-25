@@ -1,0 +1,187 @@
+﻿@using Kendo.Mvc.UI;
+@model Index.Commons.FileInfoConfig
+
+<div class="generali-popup-form">
+    @Html.HiddenFor(m => m.Id)
+    @Html.HiddenFor(m => m.IdFileInfo)
+    <div class="error">
+        @Html.ValidationMessage("errorGeneral")
+    </div>
+    <div class="col-5">
+        <div class="col-12 title">@Html.DisplayNameFor(x => x.IdFileInfoType)</div>
+        <div class="col-12 item">
+            @(Html.Kendo().DropDownList()
+              .Name("IdFileInfoType")
+              .DataTextField("Name")
+              .DataValueField("Id")
+              .OptionLabel("Seleccionar...")
+              .SelectedIndex(0)
+              .Filter("contains")
+              .DataSource(source =>
+              {
+                  source.Read(read =>
+                  {
+                      read.Action("getComboFileType", "Documento");
+                  });
+              })
+              .HtmlAttributes(new { style = "width: 100%" })
+              .Events(e =>
+              {
+                  e.Select("IdFileInfoTypeSelect");
+              })
+            )
+            <div class="error">@Html.ValidationMessageFor(m => m.IdFileInfoType)</div>
+        </div>
+    </div>
+    <div class="col-5">
+        <div class="col-12 title">@Html.DisplayNameFor(x => x.IdAccount)</div>
+        <div class="col-12 item">
+            @(Html.Kendo().DropDownList()
+              .Name("IdAccount")
+              .DataTextField("Name")
+              .DataValueField("Id")
+              .OptionLabel("Seleccionar...")
+              .SelectedIndex(0)
+              .Filter("contains")
+              .DataSource(source =>
+              {
+                  source.Read(read =>
+                  {
+                      read.Action("getComboCuenta", "Cuenta");
+                  });
+              })
+              .HtmlAttributes(new { style = "width: 100%" })
+              .Events(e =>
+              {
+                  e.Select("IdAccountSelect");
+              })
+            )
+            <div class="error">@Html.ValidationMessageFor(m => m.IdAccount)</div>
+        </div>
+    </div>
+    <div class="col-1">
+        <div class="col-12 title">@Html.DisplayNameFor(x => x.Active)</div>
+        <div class="col-12 item">
+            @(Html.Kendo().CheckBox()
+                .Name("Active")
+                .Checked(Model.Active)
+            )
+            <div class="error">@Html.ValidationMessageFor(m => m.Active)</div>
+        </div>
+    </div>
+    <div class="col-1">
+        <div class="col-12 title">@Html.DisplayNameFor(x => x.UseAttached)</div>
+        <div class="col-12 item">
+            @(Html.Kendo().CheckBox()
+                .Name("UseAttached")
+            )
+            <div class="error">@Html.ValidationMessageFor(m => m.UseAttached)</div>
+        </div>
+    </div>
+    <div class="col-1">
+        <div class="col-12 title">@Html.DisplayNameFor(x => x.Addition)</div>
+        <div class="col-12 item">
+            @(Html.Kendo().CheckBox()
+                .Name("Addition")
+            )
+            <div class="error">@Html.ValidationMessageFor(m => m.Addition)</div>
+        </div>
+    </div>
+    <div class="col-1">
+        <div class="col-12 title">@Html.DisplayNameFor(x => x.Substraction)</div>
+        <div class="col-12 item">
+            @(Html.Kendo().CheckBox()
+                .Name("Substraction")
+            )
+            <div class="error">@Html.ValidationMessageFor(m => m.Substraction)</div>
+        </div>
+    </div>
+    <div class="col-2">
+        <div class="col-12 title">@Html.DisplayNameFor(x => x.UseRawMaterial)</div>
+        <div class="col-12 item">
+            @(Html.Kendo().CheckBox()
+                .Name("UseRawMaterial")
+            )
+            <div class="error">@Html.ValidationMessageFor(m => m.UseRawMaterial)</div>
+        </div>
+    </div>
+    <div class="col-2">
+        <div class="col-12 title">@Html.DisplayNameFor(x => x.Transmissible)</div>
+        <div class="col-12 item">
+            @(Html.Kendo().CheckBox()
+                .Name("Transmissible")
+            )
+            <div class="error">@Html.ValidationMessageFor(m => m.Transmissible)</div>
+        </div>
+    </div>
+    <div class="col-2">
+        <div class="col-12 title">@Html.DisplayNameFor(x => x.UseExpired)</div>
+        <div class="col-12 item">
+            @(Html.Kendo().CheckBox()
+                .Name("UseExpired")
+            )
+            <div class="error">@Html.ValidationMessageFor(m => m.UseExpired)</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#Active").change(function () {
+            var active = false, truemessage = false;
+
+            if ($(this).is(':checked')) {
+                active = true;
+            }
+            else {
+                active = false;
+            }
+
+            if (active === true) {
+                alert('Este tipo de documento quedará habilitado para nuevas transacciones.');
+            }
+            else {
+                var r = confirm('Al inactivar este tipo de documento, se evitara que se creen nuevas transacciones con este tipo de documento. ¿Se encuentra seguro de inactivar este tipo de documento?');
+                if (r == false) {
+                    $(this).prop('checked', true);
+                }
+            }
+        });
+
+        setTimeout(function () {
+            $("#IdFileInfoType").data("kendoDropDownList").open();
+
+            $("#UseAttached").change(function () {
+                $("#Addition").focus();
+            });
+
+            $("#Addition").change(function () {
+                if ($(this).is(":checked")) {
+                    $("#Substraction").prop('checked', false);
+                }
+                else {
+                    $("#Substraction").prop('checked', true);
+                }
+                $("#UseRawMaterial").focus();
+            });
+
+            $("#Substraction").change(function () {
+                if ($(this).is(":checked")) {
+                    $("#Addition").prop('checked', false);
+                }
+                else {
+                    $("#Addition").prop('checked', true);
+                }
+                $("#UseRawMaterial").focus();
+            });
+
+            $("#UseRawMaterial").change(function () {
+                $("#UseExpired").focus();
+            });
+
+            $("#UseExpired").change(function () {
+                $(".k-button.k-button-icontext.k-primary.k-grid-update").focus();
+            });
+        }, 500);
+    });
+</script>

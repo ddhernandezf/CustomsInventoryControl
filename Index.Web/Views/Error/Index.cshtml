@@ -1,0 +1,61 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/Error.cshtml";
+}
+
+
+<div class="error-content">
+    <div class="error-image">
+        <img src="~/Content/Images/Error.png" />
+    </div>
+    <div class="error-message">
+        @ViewBag.ErrorMessage
+    </div>
+    <div class="home">
+        @if (TempData["CLEARDATA"] != null)
+        {
+            <a href="@Url.Action("Login","Seguridad")" class="k-button k-primary">Iniciar Sesión</a>
+        }
+        else
+        {
+            <a href="@Url.Action("Index","Home")" class="k-button k-primary">Inicio</a>
+        }
+    </div>
+</div>
+
+<style>
+    .error-content {
+        width: 90%;
+        margin-left: 5%;
+        position: relative;
+        display: inline-block;
+    }
+
+    .error-image {
+        float: left;
+        width: 30%;
+        position: relative;
+        display: inline-block;
+    }
+
+    img {
+        width: 100%;
+    }
+
+    .error-message {
+        width: 70%;
+        float: left;
+        font-size: 20px;
+        text-align: justify;
+        padding: 20px;
+        color: red;
+    }
+
+    .home {
+        width: 100%;
+        float: left;
+        text-align: center;
+        padding: 10px 0px;
+    }
+</style>

@@ -1,0 +1,59 @@
+﻿@using Kendo.Mvc.UI;
+@model Index.Commons.Address
+
+<div class="generali-popup-form">
+    @Html.HiddenFor(m => m.Id)
+    @Html.HiddenFor(m => m.IdPerson)
+<div class="error">
+        @Html.ValidationMessage("errorGeneral")
+    </div>
+    <div class="col-3">
+        <div class="col-12 title">@Html.DisplayNameFor(x => x.IdAddressType)</div>
+        <div class="col-12 item">
+            @(Html.Kendo().DropDownList()
+              .Name("IdAddressType")
+              .DataTextField("Name")
+              .DataValueField("Id")
+              .OptionLabel("Seleccionar...")
+              .SelectedIndex(0)
+              .Filter("contains")
+              .DataSource(source =>
+              {
+                  source.Read(read =>
+                  {
+                      read.Action("getComboAddressType", "Direccion");
+                  });
+              })
+              .HtmlAttributes(new { style = "width: 100%" })
+              .Events(e =>
+              {
+                  e.Select("IdAddressTypeSelect");
+              })
+            )
+            <div class="error">@Html.ValidationMessageFor(m => m.IdAddressType)</div>
+        </div>
+    </div>
+    <div class="col-8">
+        <div class="col-12 title">@Html.DisplayNameFor(x => x.AddressValue)</div>
+        <div class="col-12 item">
+            @(Html.Kendo().TextBox()
+                    .Name("AddressValue")
+                    .HtmlAttributes(new { Style = "width:100%;" })
+                    .Value(Model.AddressValue)
+            )
+            <div class="error">@Html.ValidationMessageFor(m => m.AddressValue)</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        setTimeout(function () {
+            $("#IdAddressType").data("kendoDropDownList").open();
+
+            $("#AddressValue").change(function () {
+                $(".k-button.k-button-icontext.k-primary.k-grid-update").focus();
+            });
+        }, 500);
+    });
+</script>

@@ -1,0 +1,152 @@
+﻿@using Index.Commons;
+@using Kendo.Mvc.UI;
+
+@{
+    Layout = null;
+}
+
+<div class="ai-filter">
+    <div class="col-11 no-padding">
+        <div class="col-10">
+            <div class="col-12 title">Partida arancelaria</div>
+            <div class="col-12 item">
+                @(Html.Kendo().TextBox()
+                    .Name("FilterText")
+                    .HtmlAttributes(new { Style = "width:100%;" })
+                )
+            </div>
+        </div>
+        <div class="col-1">
+            @(Html.Kendo().Button()
+                .Name("btnFilter")
+                .HtmlAttributes(new { @style= "margin-top: 16px;" })
+                .ImageUrl(Url.Content("~/Content/Images/Filter.png"))
+            )
+        </div>
+    </div>
+</div>
+<div class="ai-content">
+    @(Html.Kendo().TreeView()
+        .Name("treeview")
+        .HtmlAttributes(new { @style = "width:100%;" })
+        .TemplateId("accountingitemtreevew")
+        .Events(e =>
+        {
+            e.Check("onCheck");
+            e.Select("treeviewSelect");
+        })
+    )
+</div>
+<div class="ai-display">
+    <div id="show-info"></div>
+</div>
+
+<style>
+    img {
+        width: 20px;
+    }
+
+    .k-checkbox-label:before {
+        border-color: #666;
+        background: #fff;
+        border-radius: 1px;
+        margin-top: -8px;
+        width: 15px;
+        height: 15px;
+        margin-left: 10px;
+    }
+
+    .ai-content {
+        width: 100%;
+        height: 380px;
+        overflow: scroll;
+    }
+
+    .k-treeview span.k-in {
+        font-size: 10px;
+    }
+
+    .ai-filter {
+        border-bottom: solid;
+        width: 100%;
+        display: inline-block;
+        border-width: 1px;
+        border-color: #005CA8;
+        margin-bottom:10px;
+    }
+
+    .ai-display {
+        border-top: solid;
+        width: 100%;
+        height: 40px;
+        display: inline-block;
+        border-width: 1px;
+        border-color: #005CA8;
+        margin-top:10px;
+    }
+
+    #show-info {
+        width: 98%;
+        text-align: justify;
+        font-size: 11px;
+        padding: 5px;
+    }
+</style>
+
+<script id="accountingitemtreevew" type="text/kendo-ui-template">
+    # if (!item.items) { #
+    # if (item.checked) { #
+    <input type='checkbox' value='#=item.id#' id='#=item.uid#' checked='checked' onchange="onCheck(this);">
+    # } #
+    # if (!item.checked) { #
+    <input type='checkbox' value='#=item.id#' id='#=item.uid#' onchange="onCheck(this);">
+    # } #
+    # } #
+    #: item.text #
+</script>
+
+<script>
+    var treedata, treeview;
+
+    $(document).ready(function () {
+        $("#loading").fadeIn();
+        setTimeout(function () {
+            treedata = wsExecute('GET', 'json', '@Url.Action("GetAccountingItemTreeJson", "Resolucion")' + '?IdResolution=@ViewBag.IdResolution', null, false);
+            treedata = proccessObjectTree(treedata);
+
+            treeview = $("#treeview").data("kendoTreeView");
+            treeview.dataSource.data(treedata);
+            $("#loading").fadeOut();
+        }, 500);
+    });
+
+    $("#FilterText").change(function () {
+        var filterText = $(this).val(), filteredData = [];
+        $("#loading").fadeIn();
+
+        setTimeout(function () {
+            if (filterText !== "") {
+                var trvw = $("#treeview").data("kendoTreeView");
+                var ds = trvw.dataSource.data();
+                var dsResult = [];
+
+                recursiveFilter(treedata, filterText, dsResult);
+                treeview.dataSource.data(dsResult);
+            }
+            else {
+                treeview.dataSource.data(treedata);
+            }
+            $("#loading").fadeOut();
+        }, 500);
+    });
+
+    function accountingItemAssignment(addorremove, id) {
+        var result;
+        if (addorremove) {
+            result = wsExecute('POST', 'json', '@Url.Action("Assign", "Resolucion")', { 'model': { IdResolution: '@ViewBag.idresolution', IdAccountingItem: id } }, false);
+        }
+        else {
+            result = wsExecute('POST', 'json', '@Url.Action("UnAssign", "Resolucion")', { 'model': { IdResolution: '@ViewBag.idresolution', IdAccountingItem: id } }, false);
+        }
+    }
+</script>

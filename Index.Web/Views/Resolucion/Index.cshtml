@@ -1,0 +1,275 @@
+﻿@using Kendo.Mvc.UI;
+@using Index.Commons;
+
+@{
+    ViewBag.Title = "Resoluciones";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <!-- start: FORM VALIDATION 1 PANEL -->
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="view-title">
+                    <div class="view-logo"><img src="@Url.Content("~/Content/Images/Headers/ResolutionWhite.png")" /></div>
+                    <div class="view-text">Catálogo de resoluciones</div>
+                </div>
+            </div>
+            <div class="panel-body">
+                @(Html.Kendo().Grid<Resolution>()
+                    .Name("grdCrud")
+                    .Columns(c =>
+                    {
+                        c.Bound(p => p.Id).Hidden(true);
+                        c.Bound(p => p.IdCustomer).Hidden(true);
+                        c.Bound(p => p.Name).Width(300).Filterable(false);
+                        c.Bound(p => p.Description).Width(300).Filterable(false);
+                        c.Bound(p => p.RateDate).Width(200).Filterable(f => f.Cell(r => r.Operator("contains")))
+                            .ClientTemplate("#=kendo.toString(RateDate, 'dd/MM/yyyy')#");
+                        c.Bound(p => p.IdAccount).Width(25).Filterable(false).Title(" ").Locked(true).Lockable(false)
+                            .ClientTemplate("<a style='cursor:pointer;' onclick='showWindow(\"#=Name#\",#=Id#);'><img style='width: 25px;' title='Asignar Partidas' src='" + @Url.Content("~/Content/Images/Menu/Partida.png") + "' /></a>");
+                        c.Command(cmd =>
+                        {
+                            cmd.Edit().Text(" ");
+                            cmd.Destroy().Text(" ");
+                        }).Width(100).Locked(true).Lockable(false);
+                    })
+                    .Editable(e =>
+                    {
+                        e.Mode(GridEditMode.PopUp)
+                         .DisplayDeleteConfirmation("¿Se encuentra realmente seguro de eliminar el registro?")
+                         .TemplateName("Template")
+                         .Window(w =>
+                            w.Title("Formulario de resoluciones")
+                            .Width(700)
+                         );
+                    })
+                    .ToolBar(t =>
+                    {
+                        t.Create().Text("Nuevo").HtmlAttributes(new { @class = "k-primary" });
+                    })
+                    .Pageable(p =>
+                    {
+                        p.Refresh(true);
+                    })
+                    .Scrollable()
+                    .Filterable(f =>
+                    {
+                        f.Mode(GridFilterMode.Row);
+                    })
+                    .DataSource(dataSource => dataSource
+                        .Ajax()
+                        .PageSize(20)
+                        .Model(m =>
+                        {
+                            m.Id(o => o.Id);
+                        })
+                        .Read(r => r.Action("Read", "Resolucion"))
+                        .Create(c => c.Action("Create", "Resolucion"))
+                        .Update(u => u.Action("Update", "Resolucion"))
+                        .Destroy(d => d.Action("Delete", "Resolucion"))
+                        .Events(e =>
+                        {
+                            e.Error("errorHandler");
+                            e.RequestEnd("onRequestEndResolution");
+                        })
+                     )
+                )
+            </div>
+        </div>
+    </div>
+</div>
+@(Html.Kendo().Window()
+    .Name("asignarPartidas")
+    .Title("Asignar partidas a resolución")
+    .Width(800)
+    .Height(550)
+    .Modal(true)
+    .Visible(false)
+    .Actions(a =>
+    {
+        a.Maximize();
+        a.Close();
+    })
+)
+
+<script type="text/kendo-template" id="message">
+    <div class="k-widget k-tooltip k-tooltip-validation k-invalid-msg field-validation-error"
+         style="margin: 0.5em; display: block; " data-for="#=field#" data-valmsg-for="#=field#" id="#=field#_validationMessage">
+        <span class="k-icon k-warning"> </span>#=message#<div class="k-callout k-callout-n"></div>
+    </div>
+</script>
+
+<script>
+    var validationMessageTmpl = kendo.template($("#message").html());
+    function errorHandler(args) {
+        if (typeof args.errors === "string") {
+            onErrorGeneral(args.errors);
+        }
+        if (args.errors) {
+            var grid = $("#grdCrud").data("kendoGrid");
+            grid.one("dataBinding", function (e) {
+                e.preventDefault();
+
+                for (var error in args.errors) {
+                    showMessage(grid.editable.element, error, args.errors[error].errors);
+                }
+            });
+        }
+        if (args.errors.errorGeneral) {
+            wnd = $("#modalWindowAlert").kendoWindow({
+                title: "Error",
+                modal: true,
+                visible: false,
+                resizable: false,
+                width: 300
+            }).data("kendoWindow");
+
+            $("#yes").hide();
+            $("#no").hide();
+            $("#confirmMessage").html(args.errors.errorGeneral.errors[0]);
+            wnd.center().open();
+        }
+    }
+
+    function onRequestEndResolution(e) {
+        wnd = $("#modalWindowAlert").kendoWindow({
+            title: "Confirmaci&oacute;n",
+            modal: true,
+            visible: false,
+            resizable: false,
+            width: 300
+        }).data("kendoWindow");
+
+        $("#yes").hide();
+        $("#no").hide();
+
+        if (e.type == "destroy" && !e.response.Errors) {
+            $("#confirmMessage").html("Registro eliminado exitosamente");
+            wnd.center().open();
+            this.read();
+        }
+
+        if (e.type == "update" && !e.response.Errors) {
+            $("#confirmMessage").html("Registro actualizado exitosamente");
+            wnd.center().open();
+            this.read();
+        }
+
+        if (e.type == "create" && !e.response.Errors) {
+            wizName = e.response.Data[0].Name;
+            this.read();
+            $("#loading").fadeIn();
+
+            setTimeout(function () {
+                var DataSource = $("#grdCrud").data("kendoGrid").dataSource.data();
+                wizId = dataSourceBrowser(DataSource, 'Name', wizName, 'Id');
+
+                if (wizId != null) {
+                    OpenWizzard = true;
+                    showWindow(wizName, wizId);
+                }
+                else {
+                    $("#confirmMessage").html("Registro agregado exitosamente");
+                    wnd.center().open();
+                    $("#loading").fadeOut();
+                }
+            }, 700);
+        }
+    }
+
+    function errorHandlerAjax(args) {
+        if (typeof args.errors === "string") {
+            onErrorGeneral(args.errors);
+        }
+        if (args.errors) {
+            var grid = $("#grdAjaxCrud").data("kendoGrid");
+            grid.one("dataBinding", function (e) {
+                e.preventDefault();
+
+                for (var error in args.errors) {
+                    showMessage(grid.editable.element, error, args.errors[error].errors);
+                }
+            });
+        }
+        if (args.errors.errorGeneral) {
+            wnd = $("#modalWindowAlert").kendoWindow({
+                title: "Error",
+                modal: true,
+                visible: false,
+                resizable: false,
+                width: 300
+            }).data("kendoWindow");
+
+            $("#yes").hide();
+            $("#no").hide();
+            $("#confirmMessage").html(args.errors.errorGeneral.errors[0]);
+            wnd.center().open();
+        }
+    }
+
+    function showMessage(container, name, errors) {
+        container.find("[data-valmsg-for=" + name + "],[data-val-msg-for=" + name + "]")
+                 .replaceWith(validationMessageTmpl({ field: name, message: errors[0] }))
+    }
+
+    function showWindow(fullname, idresolution) {
+        var win = $("#asignarPartidas").data("kendoWindow");
+        win.refresh({ url: "@Url.Action("asignarPartidas", "Resolucion")", data: { IdResolution: idresolution } });
+        win.title('Asignar partidas a resolución ' + fullname);
+        win.center();
+        win.open();
+    }
+
+    function proccessObjectTree(data) {
+        var result = [];
+
+        for (var i = 0; i < data.length; i++) {
+            var item = {};
+            item["id"] = data[i].Id;
+            item["text"] = data[i].Description;
+            item["checked"] = data[i].Assigned;
+            item["hasChildren"] = (data[i].HasChildren.length > 0) ? true : false;
+            item["items"] = (data[i].HasChildren.length > 0) ? proccessObjectTree(data[i].HasChildren) : null;
+
+            result.push(item);
+        }
+
+        return result;
+    }
+
+    function onCheck(e) {
+        var checkbox = $(e);
+        accountingItemAssignment(checkbox.is(":checked"), checkbox.val())
+    }
+
+    function treeviewSelect(e) {
+        var partida = this.text(e.node).split("-")[0];
+        var texto = this.text(e.node).split("-")[1];
+
+        $("#show-info").html('<strong>Partida arancelaria: </strong>' + partida + '<strong>Descripción: </strong>' + texto);
+
+        console.log();
+    }
+
+    function recursiveFilter(data, filtertext, dsResult) {
+        for (var i = 0; i < data.length; i++) {
+            if (!data[i].items) {
+                if (data[i].text.toUpperCase().indexOf(filtertext.toUpperCase()) >= 0) {
+                    dsResult.push(data[i]);
+                }
+                else if (data[i].text.split('-')[0].replace('.', '').replace('.', '').replace('.', '').indexOf(filtertext.toUpperCase()) >= 0) {
+                    dsResult.push(data[i]);
+                }
+            }
+            else {
+                recursiveFilter(data[i].items, filtertext, dsResult);
+            }
+        }
+    }
+
+    function RateDateChange(e) {
+        $(".k-button.k-button-icontext.k-primary.k-grid-update").focus();
+    }
+</script>
